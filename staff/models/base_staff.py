@@ -1,0 +1,52 @@
+from django.db import models
+from django.conf import settings
+
+class BaseStaff(models.Model):
+
+    system_user = models.OneToOneField(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='staff_profile'
+    )
+    document_type = models.CharField(
+        max_length=50
+    )
+    document_number = models.CharField(
+        max_length=50,
+        unique=True,
+        db_index=True
+    )
+    type_personnel = models.CharField(
+        max_length=50
+    )
+    phone_number = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
+    address = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True
+    )
+    birth_date = models.DateField(
+        blank=True,
+        null=True
+    )
+
+    # Metadata
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Base Staff'
+        verbose_name_plural = 'Base Staffs'
+        ordering = ['-created_at']
+
+
+    def __str__(self):
+        return f"{self.system_user.get_full_name()} - {self.document_number}"
+    
+    def is_active_staff(self):
+        return self.is_active
