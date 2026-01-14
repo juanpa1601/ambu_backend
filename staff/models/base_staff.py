@@ -33,11 +33,12 @@ class BaseStaff(models.Model):
         blank=True,
         null=True
     )
-
-    # Metadata
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    signature = models.ImageField(
+        upload_to='signatures/',
+        blank=True,
+        null=True,
+        help_text='Digital signature of the healthcare staff'
+    )
 
     class Meta:
         verbose_name = 'Base Staff'
@@ -48,5 +49,3 @@ class BaseStaff(models.Model):
     def __str__(self):
         return f"{self.system_user.get_full_name()} - {self.document_number}"
     
-    def is_active_staff(self):
-        return self.is_active
