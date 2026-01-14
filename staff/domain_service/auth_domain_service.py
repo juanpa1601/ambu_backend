@@ -80,3 +80,47 @@ class AuthDomainService:
         except Exception as e:
             self.logger.error(f'Error determining staff type: {str(e)}')
         return None
+
+    def revoke_token(
+        self, 
+        user: User
+    ) -> bool:
+        '''
+        Revoke (delete) authentication token for user.
+        
+        Args:
+            user: User object whose token should be revoked
+            
+        Returns:
+            True if token was deleted, False if no token existed
+        '''
+        try:
+            token: Token = Token.objects.get(user=user)
+            token.delete()
+            self.logger.info(f'Token revoked for user: {user.username}')
+            return True
+        except Token.DoesNotExist:
+            self.logger.warning(f'No token found for user: {user.username}')
+            return False
+        except Exception as e:
+            self.logger.error(f'Error revoking token for user {user.username}: {str(e)}')
+            raise
+    
+    def verify_user_has_token(
+        self, 
+        user: User
+    ) -> bool:
+        '''
+        Check if user has an active token.
+        
+        Args:
+            user: User object to check
+            
+        Returns:
+            True if user has a token, False otherwise
+        '''
+        try:
+            return Token.objects.filter(user=user).exists()
+        except Exception as e:
+            self.logger.error(f'Error checking token for user {user.username}: {str(e)}')
+            return False    
