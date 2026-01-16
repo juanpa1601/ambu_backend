@@ -20,12 +20,6 @@ class Administrative(models.Model):
         max_length=50,
         help_text='Access level of the administrative staff'
     )
-    signature = models.ImageField(
-        upload_to='signatures/',
-        blank=True,
-        null=True,
-        help_text='Digital signature of the administrative staff'
-    )
 
     class Meta:
         verbose_name = 'Administrative Staff'

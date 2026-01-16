@@ -33,12 +33,14 @@ class BaseStaff(models.Model):
         blank=True,
         null=True
     )
-    signature = models.ImageField(
-        upload_to='signatures/',
+    signature = models.TextField(
         blank=True,
         null=True,
-        help_text='Digital signature of the healthcare staff'
+        help_text='Digital signature in base64 format'
     )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Base Staff'
