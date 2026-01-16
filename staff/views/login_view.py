@@ -1,7 +1,7 @@
 from rest_framework.request import Request
 from rest_framework.response import Response
 from typing import Any
-
+from rest_framework.permissions import AllowAny
 from core.views.base_view import BaseView
 from staff.serializers.input import LoginSerializer
 from staff.application_service import LoginApplicationService
@@ -9,8 +9,9 @@ from staff.types.dataclass import LoginRequest
 
 class LoginView(BaseView):
     
-    authentication_classes = []  # Public endpoint
-    
+    authentication_classes = []
+    permission_classes = [AllowAny]
+
     def post(
         self, 
         request: Request

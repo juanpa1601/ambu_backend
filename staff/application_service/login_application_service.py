@@ -49,7 +49,7 @@ class LoginApplicationService:
             # Step 4: Build response
             login_response: LoginResponse = LoginResponse(
                 access_token=token,
-                user_id=user.id,
+                system_user_id=user.id,
                 username=user.username,
                 email=user.email,
                 full_name=user.get_full_name() or user.username,
