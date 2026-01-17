@@ -33,7 +33,6 @@ class LoginView(BaseView):
                 "msg": 1,
                 "data": {
                     "access_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
-                    "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGc...",
                     "user": {
                         "id": 1,
                         "username": "john_doe",

@@ -127,4 +127,28 @@ class AuthDomainService:
             return Token.objects.filter(user=user).exists()
         except Exception as e:
             self.logger.error(f'Error checking token for user {user.username}: {str(e)}')
-            return False    
+            return False 
+
+    def is_administrative_user(
+        self, 
+        user: User
+    ) -> bool:
+        '''
+        Check if user is administrative staff.
+        
+        Args:
+            user: Authenticated user object
+            
+        Returns:
+            True if user is administrative staff, False otherwise
+        '''
+        try:
+            if hasattr(user, 'staff_profile'):
+                base_staff = user.staff_profile
+                return hasattr(base_staff, 'administrative_profile')
+            if user.is_superuser:
+                return True
+            return False
+        except Exception as e:
+            self.logger.error(f'Error checking administrative user: {str(e)}')
+            return False   
