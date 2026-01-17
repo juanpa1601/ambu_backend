@@ -138,3 +138,47 @@ class UserDomainService:
         except Exception as e:
             self.logger.error(f'Error retrieving user detail: {str(e)}', exc_info=True)
             raise
+
+    def change_user_active_status(
+        self, 
+        system_user_id: int,
+        new_status: bool
+    ) -> tuple[bool, str, User | None]:
+        '''
+        Change the active status of a user.
+        
+        Args:
+            system_user_id: ID of the system_user (User model)
+            new_status: New active status (True/False)
+            
+        Returns:
+            Tuple of (success, message, user_object)
+        '''
+        try:
+            user: User = User.objects.get(id=system_user_id)
+            # Check if user is superuser (cannot change status)
+            if user.is_superuser:
+                self.logger.warning(
+                    f'Attempted to change status of superuser: {user.username} (system_user_id: {system_user_id})'
+                )
+                return (False, 'Cannot change status of superuser accounts.', None)
+            # Check if status is already the same
+            if user.is_active == new_status:
+                status_text = 'active' if new_status else 'inactive'
+                self.logger.info(f'User {user.username} is already {status_text}')
+                return (False, f'User is already {status_text}.', user)
+            # Update user status
+            old_status: bool = user.is_active
+            user.is_active = new_status
+            user.save()
+            status_text = 'activated' if new_status else 'deactivated'
+            self.logger.info(
+                f'User {user.username} (system_user_id: {system_user_id}) status changed from {old_status} to {new_status}'
+            )
+            return (True, f'User successfully {status_text}.', user)
+        except User.DoesNotExist:
+            self.logger.warning(f'User not found with id: {system_user_id}')
+            return (False, 'User not found.', None)
+        except Exception as e:
+            self.logger.error(f'Error changing user status: {str(e)}', exc_info=True)
+            raise
