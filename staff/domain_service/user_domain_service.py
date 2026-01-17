@@ -35,7 +35,8 @@ class UserDomainService:
                     full_name=full_name,
                     is_active=user.is_active,
                     document_type=base_staff.document_type,
-                    document_number=base_staff.document_number
+                    document_number=base_staff.document_number,
+                    type_personnel=base_staff.type_personnel
                 )
                 user_items.append(user_item)
             self.logger.info(f'Retrieved {len(user_items)} staff users')
