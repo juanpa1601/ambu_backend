@@ -59,7 +59,10 @@ class ListUsersView(BaseView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     
-    def get(self, request: Request) -> Response:
+    def get(
+        self,
+        request: Request
+    ) -> Response:
         '''
         Handle GET request to list all staff users.
         Only administrative users can access this endpoint.

@@ -22,7 +22,6 @@ class UserDomainService:
         try:
             # Query all BaseStaff with related system_user
             base_staff_list: List[BaseStaff] = BaseStaff.objects.select_related('system_user').all()
-            
             user_items: List[UserListItem] = []
             for base_staff in base_staff_list:
                 user: User = base_staff.system_user
