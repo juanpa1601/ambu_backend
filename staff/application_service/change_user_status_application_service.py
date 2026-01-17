@@ -43,7 +43,7 @@ class ChangeUserStatusApplicationService:
                 return {
                     'response': 'You do not have permission to change user status.',
                     'msg': -1,
-                    'status_http_code': 403
+                    'status_code_http': 403
                 }
             # Step 2: Change user status through domain service
             success: bool
@@ -59,13 +59,13 @@ class ChangeUserStatusApplicationService:
                     return {
                         'response': message,
                         'msg': -1,
-                        'status_http_code': 404
+                        'status_code_http': 404
                     }
                 # Other errors (superuser, already same status, etc.)
                 return {
                     'response': message,
                     'msg': -1,
-                    'status_http_code': 400
+                    'status_code_http': 400
                 }
             # Step 3: Build success response
             self.logger.info(
@@ -74,7 +74,7 @@ class ChangeUserStatusApplicationService:
             return {
                 'response': message,
                 'msg': 1,
-                'status_http_code': 200,
+                'status_code_http': 200,
                 'data': {
                     'user_id': user.id,
                     'username': user.username,
@@ -89,5 +89,5 @@ class ChangeUserStatusApplicationService:
             return {
                 'response': 'An error occurred while changing user status.',
                 'msg': -1,
-                'status_http_code': 500
+                'status_code_http': 500
             }

@@ -17,14 +17,14 @@ class GetDetailUserApplicationService:
 
     def get_user_detail(
         self, 
-        base_staff_id: int,
+        system_user_id: int,
         requesting_user: User
     ) -> dict[str, Any]:
         '''
-        Get detailed user information by base_staff_id.
+        Get detailed user information by system_user_id.
         
         Args:
-            base_staff_id: ID of the BaseStaff record to retrieve
+            system_user_id: ID of the SystemUser record to retrieve
             requesting_user: User making the request (for logging)
             
         Returns:
@@ -43,10 +43,10 @@ class GetDetailUserApplicationService:
                     'status_code_http': 403
                 }
             # Step 2: Get user detail from domain service
-            user_detail: UserDetailResponse | None = self.user_domain_service.get_user_detail_by_base_staff_id(base_staff_id)
+            user_detail: UserDetailResponse | None = self.user_domain_service.get_user_detail_by_system_user_id(system_user_id)
             if not user_detail:
                 self.logger.warning(
-                    f'User {requesting_user.username} requested non-existent base_staff_id: {base_staff_id}'
+                    f'User {requesting_user.username} requested non-existent system_user_id: {system_user_id}'
                 )
                 return {
                     'response': 'User not found.',
@@ -82,7 +82,7 @@ class GetDetailUserApplicationService:
                 'specific_profile': user_detail.specific_data
             }
             self.logger.info(
-                f'User {requesting_user.username} retrieved detail for base_staff_id: {base_staff_id}'
+                f'User {requesting_user.username} retrieved detail for system_user_id: {system_user_id}'
             )
             return {
                 'response': 'User detail retrieved successfully.',
@@ -92,7 +92,7 @@ class GetDetailUserApplicationService:
             }
         except Exception as e:
             self.logger.error(
-                f'Error getting user detail for base_staff_id {base_staff_id}: {str(e)}',
+                f'Error getting user detail for system_user_id {system_user_id}: {str(e)}',
                 exc_info=True
             )
             return {

@@ -15,20 +15,20 @@ class GetDetailUserView(BaseView):
     def get(
         self, 
         request: Request, 
-        base_staff_id: int
+        system_user_id: int
     ) -> Response:
 
         '''
         API endpoint to retrieve detailed information of a specific user.
         Requires authentication.
         
-        GET /api/staff/{base_staff_id}/get_detail_user/
+        GET /api/staff/{system_user_id}/get_detail_user/
         
         Headers:
             Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
         
         Path Parameters:
-            base_staff_id (int): ID of the BaseStaff record
+            system_user_id (int): ID of the SystemUser record
         
         Success Response (200 OK):
             {
@@ -81,7 +81,7 @@ class GetDetailUserView(BaseView):
         def service_callback(user: User) -> dict[str, Any]:
             get_detail_user_application_service: GetDetailUserApplicationService = GetDetailUserApplicationService()
             return get_detail_user_application_service.get_user_detail(
-                base_staff_id=base_staff_id,
+                system_user_id=system_user_id,
                 requesting_user=user
             )
         

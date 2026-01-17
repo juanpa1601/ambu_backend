@@ -45,64 +45,76 @@ class UserDomainService:
             self.logger.error(f'Error retrieving staff users: {str(e)}', exc_info=True)
             raise
 
-    def get_user_detail_by_base_staff_id(
+    def get_user_detail_by_system_user_id(
         self, 
-        base_staff_id: int
+        system_user_id: int
     ) -> UserDetailResponse | None:
         '''
-        Retrieve complete user details by base_staff_id.
+        Retrieve complete user details by system_user_id.
         
         Args:
-            base_staff_id: ID of the BaseStaff record
+            system_user_id: ID of the system_user (User model)
             
         Returns:
             UserDetailResponse dataclass with all user information or None
         '''
         try:
-            # Get BaseStaff with related system_user
-            base_staff: BaseStaff = BaseStaff.objects.select_related('system_user').get(id=base_staff_id)
-            user: User = base_staff.system_user
-            if user.is_superuser:
-                self.logger.warning(f'BaseStaff id {base_staff_id} belongs to superuser {user.username}')
+            # Get User directly by system_user_id
+            user: User = User.objects.get(id=system_user_id)
+            # Check if user has a BaseStaff profile
+            try:
+                base_staff: BaseStaff = BaseStaff.objects.select_related('system_user').get(system_user=user)
+            except BaseStaff.DoesNotExist:
+                self.logger.warning(f'User {user.username} (id: {system_user_id}) does not have a staff profile')
                 return None
+            # Check if user is superuser
+            if user.is_superuser:
+                staff_type = 'superuser'
+                specific_data = {
+                    'is_superuser': True,
+                    'permissions': 'full_access',
+                    'role': 'System Administrator'
+                }
+                self.logger.info(f'Retrieved superuser detail for system_user_id: {system_user_id}')
+            else:
+                # Determine staff type and get specific data
+                staff_type: str | None = None
+                specific_data: dict | None = None
+                # Check Healthcare
+                if hasattr(base_staff, 'healthcare_profile'):
+                    staff_type = 'healthcare'
+                    healthcare: Healthcare = base_staff.healthcare_profile
+                    specific_data = {
+                        'professional_registration': healthcare.professional_registration,
+                        'professional_position': healthcare.professional_position,
+                        'signature_url': base_staff.signature.url if base_staff.signature else None
+                    }
+                # Check Driver
+                elif hasattr(base_staff, 'driver_profile'):
+                    staff_type = 'driver'
+                    driver: Driver = base_staff.driver_profile
+                    specific_data = {
+                        'license_number': driver.license_number,
+                        'license_category': driver.license_category,
+                        'license_issue_date': driver.license_issue_date.isoformat() if driver.license_issue_date else None,
+                        'license_expiry_date': driver.license_expiry_date.isoformat() if driver.license_expiry_date else None,
+                        'blood_type': getattr(driver, 'blood_type', None),
+                        'signature_url': base_staff.signature.url if base_staff.signature else None
+                    }
+                # Check Administrative
+                elif hasattr(base_staff, 'administrative_profile'):
+                    staff_type = 'administrative'
+                    administrative: Administrative = base_staff.administrative_profile
+                    specific_data = {
+                        'department': administrative.department,
+                        'role': administrative.role,
+                        'access_level': administrative.access_level,
+                        'signature_url': base_staff.signature.url if base_staff.signature else None
+                    }
             # Build full name
             full_name: str = user.get_full_name() or user.username
             # Get signature URL
             signature_url: str | None = base_staff.signature.url if base_staff.signature else None
-            # Determine staff type and get specific data
-            staff_type: str | None = None
-            specific_data: dict | None = None
-            # Check Healthcare
-            if hasattr(base_staff, 'healthcare_profile'):
-                staff_type = 'healthcare'
-                healthcare: Healthcare = base_staff.healthcare_profile
-                specific_data = {
-                    'professional_registration': healthcare.professional_registration,
-                    'professional_position': healthcare.professional_position,
-                    'signature_url': base_staff.signature if base_staff.signature else None
-                }
-            # Check Driver
-            elif hasattr(base_staff, 'driver_profile'):
-                staff_type = 'driver'
-                driver: Driver = base_staff.driver_profile
-                specific_data = {
-                    'license_number': driver.license_number,
-                    'license_category': driver.license_category,
-                    'license_issue_date': driver.license_issue_date.isoformat() if driver.license_issue_date else None,
-                    'license_expiry_date': driver.license_expiry_date.isoformat() if driver.license_expiry_date else None,
-                    'blood_type': getattr(driver, 'blood_type', None),
-                    'signature_url': base_staff.signature if base_staff.signature else None
-                }
-            # Check Administrative
-            elif hasattr(base_staff, 'administrative_profile'):
-                staff_type = 'administrative'
-                administrative: Administrative = base_staff.administrative_profile
-                specific_data = {
-                    'department': administrative.department,
-                    'role': administrative.role,
-                    'access_level': administrative.access_level,
-                    'signature_url': base_staff.signature if base_staff.signature else None
-                }
             # Build response
             user_detail: UserDetailResponse = UserDetailResponse(
                 # System User data
@@ -130,10 +142,10 @@ class UserDomainService:
                 staff_type=staff_type or 'unknown',
                 specific_data=specific_data
             )
-            self.logger.info(f'Retrieved user detail for base_staff_id: {base_staff_id}')
+            self.logger.info(f'Retrieved user detail for system_user_id: {system_user_id}, staff_type: {staff_type}')
             return user_detail
-        except BaseStaff.DoesNotExist:
-            self.logger.warning(f'BaseStaff not found with id: {base_staff_id}')
+        except User.DoesNotExist:
+            self.logger.warning(f'User not found with system_user_id: {system_user_id}')
             return None
         except Exception as e:
             self.logger.error(f'Error retrieving user detail: {str(e)}', exc_info=True)
