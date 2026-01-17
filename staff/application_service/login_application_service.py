@@ -40,7 +40,7 @@ class LoginApplicationService:
                 return {
                     'response': 'Invalid credentials. Please check your username and password.',
                     'msg': -1,
-                    'status_code': 401
+                    'status_code_http': 401
                 }
             # Step 2: Generate tokens
             token: str = self.auth_domain_service.generate_token(user)
@@ -59,7 +59,7 @@ class LoginApplicationService:
             return {
                 'response': 'Login successful.',
                 'msg': 1,
-                'status_code': 200,
+                'status_code_http': 200,
                 'data': {
                     'access_token': login_response.access_token,
                     'user': {
@@ -76,5 +76,5 @@ class LoginApplicationService:
             return {
                 'response': 'An error occurred during login.',
                 'msg': -1,
-                'status_code': 500
+                'status_code_http': 500
             }

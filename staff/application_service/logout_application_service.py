@@ -42,7 +42,7 @@ class LogoutApplicationService:
                 return {
                     'response': 'Invalid user credentials.',
                     'msg': -1,
-                    'status': 403
+                    'status_code_http': 403
                 }
             # Check if user has an active token
             has_token: bool = self.auth_domain_service.verify_user_has_token(user)
@@ -51,7 +51,7 @@ class LogoutApplicationService:
                 return {
                     'response': 'No active session found.',
                     'msg': -1,
-                    'status': 400
+                    'status_code_http': 400
                 }
             # Revoke the token
             token_revoked: bool = self.auth_domain_service.revoke_token(user)
@@ -59,7 +59,7 @@ class LogoutApplicationService:
                 return {
                     'response': 'Failed to logout. Please try again.',
                     'msg': -1,
-                    'status': 500
+                    'status_code_http': 500
                 }
             # Build successful response
             logout_response: LogoutResponse = LogoutResponse(
@@ -70,7 +70,7 @@ class LogoutApplicationService:
             return {
                 'response': logout_response.message,
                 'msg': 1,
-                'status': 200,
+                'status_code_http': 200,
                 'data': {
                     'success': logout_response.success,
                     'username': user.username
@@ -81,5 +81,5 @@ class LogoutApplicationService:
             return {
                 'response': 'An error occurred during logout.',
                 'msg': -1,
-                'status': 500
+                'status_code_http': 500
             }

@@ -8,3 +8,4 @@ class UserListItem:
     is_active: bool
     document_type: str
     document_number: str
+    type_personnel: str

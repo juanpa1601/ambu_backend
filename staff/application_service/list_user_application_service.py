@@ -52,7 +52,8 @@ class ListUsersApplicationService:
                     'full_name': item.full_name,
                     'is_active': item.is_active,
                     'document_type': item.document_type,
-                    'document_number': item.document_number
+                    'document_number': item.document_number,
+                    'type_personnel': item.type_personnel
                 }
                 for item in user_items
             ]
