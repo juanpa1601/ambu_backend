@@ -41,7 +41,7 @@ class ListUsersApplicationService:
                 return {
                     'response': 'You do not have permission to access this resource.',
                     'msg': -1,
-                    'status_code': 403
+                    'status_code_http': 403
                 }
             # Step 2: Get all staff users
             user_items: list[UserListResponse] = self.user_domain_service.get_all_staff_users()
@@ -62,7 +62,7 @@ class ListUsersApplicationService:
             return {
                 'response': 'Users retrieved successfully.',
                 'msg': 1,
-                'status_code': 200,
+                'status_code_http': 200,
                 'data': {
                     'users': users_data,
                     'total_count': len(user_items)
@@ -76,5 +76,5 @@ class ListUsersApplicationService:
             return {
                 'response': 'An error occurred while retrieving users.',
                 'msg': -1,
-                'status_code': 500
+                'status_code_http': 500
             }
