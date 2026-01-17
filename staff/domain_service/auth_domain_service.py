@@ -50,6 +50,8 @@ class AuthDomainService:
         Returns:
             Token string
         '''
+        token: Token
+        created: bool   
         token, created = Token.objects.get_or_create(user=user)
         if created:
             self.logger.info(f'New token created for user: {user.username}')
@@ -77,6 +79,8 @@ class AuthDomainService:
                     return 'driver'
                 elif hasattr(base_staff, 'administrative_profile'):
                     return 'administrative'
+            else:
+                return 'superuser' if user.is_superuser else None
         except Exception as e:
             self.logger.error(f'Error determining staff type: {str(e)}')
         return None
