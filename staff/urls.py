@@ -5,7 +5,8 @@ from staff.views import (
     ListUsersView,
     GetDetailUserView,
     ChangeUserStatusView,
-    GetProfileInformationView
+    GetProfileInformationView,
+    ValidateSessionView
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('<int:system_user_id>/get_detail_user/', GetDetailUserView.as_view(), name='staff_get_detail_user'),
     path('<int:system_user_id>/change_status/', ChangeUserStatusView.as_view(), name='staff_change_user_status'),
     path('get_profile_information/', GetProfileInformationView.as_view(), name='staff_get_profile_information'),
+    path('validate_session/', ValidateSessionView.as_view(), name='staff_validate_session'),
 ]

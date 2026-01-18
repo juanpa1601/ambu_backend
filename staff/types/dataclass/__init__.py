@@ -10,6 +10,7 @@ from .user_list_response import UserListResponse
 from .user_detail_response import UserDetailResponse
 from .change_user_status_response import ChangeUserStatusResponse
 from .profile_information_response import ProfileInformationResponse
+from .validate_session_response import ValidateSessionResponse
 
 # Other types
 from .user_list_item import UserListItem
@@ -25,7 +26,8 @@ __all__ = [
     'UserListResponse',
     'UserDetailResponse',
     'ChangeUserStatusResponse',
+    'ProfileInformationResponse',
+    'ValidateSessionResponse',
     # Other types
     'UserListItem',
-    'ProfileInformationResponse',
 ]
