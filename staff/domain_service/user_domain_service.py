@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.contrib.auth.models import User
 from staff.models.base_staff import BaseStaff
 from staff.models.healthcare import Healthcare
@@ -6,7 +7,9 @@ from staff.models.administrative import Administrative
 from staff.types.dataclass import (
     UserListItem, 
     UserDetailResponse,
-    ProfileInformationResponse
+    ProfileInformationResponse,
+    CreateUserRequest,
+    CreateUserResponse
 ) 
 import logging
 
@@ -291,3 +294,100 @@ class UserDomainService:
         except Exception as e:
             self.logger.error(f'Error retrieving profile information: {str(e)}', exc_info=True)
             raise
+
+    @transaction.atomic
+    def create_user_with_staff_profile(
+        self, 
+        user_request: CreateUserRequest
+    ) -> tuple[bool, str, CreateUserResponse | None]:
+        '''
+        Create a new user with BaseStaff and specific staff profile.
+        Uses database transaction to ensure data integrity.
+        
+        Args:
+            user_request: CreateUserRequest dataclass with user data
+            
+        Returns:
+            tuple of (success, message, CreateUserResponse or None)
+        '''
+        try:
+            # Step 1: Validate username uniqueness
+            if User.objects.filter(username=user_request.username).exists():
+                self.logger.warning(f'Username already exists: {user_request.username}')
+                return (False, 'Username already exists.', None)
+            # Step 2: Validate email uniqueness
+            if User.objects.filter(email=user_request.email).exists():
+                self.logger.warning(f'Email already exists: {user_request.email}')
+                return (False, 'Email already exists.', None)
+            # Step 3: Validate document_number uniqueness
+            if BaseStaff.objects.filter(document_number=user_request.document_number).exists():
+                self.logger.warning(f'Document number already exists: {user_request.document_number}')
+                return (False, 'Document number already exists.', None)
+            # Step 4: Create System User
+            user: User = User.objects.create_user(
+                username=user_request.username,
+                email=user_request.email,
+                password=user_request.password,
+                first_name=user_request.first_name,
+                last_name=user_request.last_name,
+                is_active=True,
+                is_staff=False
+            )
+            self.logger.info(f'Created system user: {user.username} (id: {user.id})')
+            # Step 5: Create Base Staff
+            base_staff: BaseStaff = BaseStaff.objects.create(
+                system_user=user,
+                document_type=user_request.document_type,
+                document_number=user_request.document_number,
+                type_personnel=user_request.type_personnel,
+                phone_number=user_request.phone_number,
+                address=user_request.address,
+                birth_date=user_request.birth_date
+                # signature will be handled separately if needed
+            )
+            self.logger.info(f'Created base staff profile: {base_staff.id} for user: {user.username}')
+            # Step 6: Create specific staff profile based on type_personnel
+            staff_type: str = user_request.type_personnel.lower()
+            if user_request.type_personnel == 'Healthcare':
+                healthcare: Healthcare = Healthcare.objects.create(
+                    base_staff=base_staff,
+                    professional_registration=user_request.professional_registration,
+                    professional_position=user_request.professional_position
+                )
+                self.logger.info(f'Created healthcare profile for user: {user.username}')
+            elif user_request.type_personnel == 'Driver':
+                driver: Driver = Driver.objects.create(
+                    base_staff=base_staff,
+                    license_number=user_request.license_number,
+                    license_category=user_request.license_category,
+                    license_issue_date=user_request.license_issue_date,
+                    license_expiry_date=user_request.license_expiry_date,
+                    blood_type=user_request.blood_type
+                )
+                self.logger.info(f'Created driver profile for user: {user.username}')
+            elif user_request.type_personnel == 'Administrative':
+                administrative: Administrative = Administrative.objects.create(
+                    base_staff=base_staff,
+                    department=user_request.department,
+                    role=user_request.role,
+                    access_level=user_request.access_level
+                )
+                self.logger.info(f'Created administrative profile for user: {user.username}')
+            # Step 7: Build response
+            response: CreateUserResponse = CreateUserResponse(
+                system_user_id=user.id,
+                username=user.username,
+                email=user.email,
+                base_staff_id=base_staff.id,
+                staff_type=staff_type,
+                created_at=user.date_joined.isoformat()
+            )
+            self.logger.info(
+                f'Successfully created complete user profile: {user.username}, '
+                f'type: {user_request.type_personnel}'
+            )
+            return (True, 'User created successfully.', response)
+        except Exception as e:
+            self.logger.error(f'Error creating user: {str(e)}', exc_info=True)
+            # Transaction will be rolled back automatically
+            return (False, f'Error creating user: {str(e)}', None)

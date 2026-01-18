@@ -157,9 +157,7 @@ class GetProfileInformationView(BaseView):
         '''
         def service_callback(user: User) -> dict[str, Any]:
             get_profile_service: GetProfileInformationApplicationService = GetProfileInformationApplicationService()
-            return get_profile_service.get_profile_information(
-                authenticated_user=user
-            )
+            return get_profile_service.get_profile_information(user)
         
         return self._handle_request(
             request=request,

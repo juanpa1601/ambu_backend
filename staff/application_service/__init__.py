@@ -5,6 +5,7 @@ from .get_detail_user_application_service import GetDetailUserApplicationService
 from .change_user_status_application_service import ChangeUserStatusApplicationService
 from .get_profile_information_application_service import GetProfileInformationApplicationService
 from .validate_session_application_service import ValidateSessionApplicationService
+from .create_user_application_service import CreateUserApplicationService
 
 __all__ = [
     'LoginApplicationService',
@@ -13,5 +14,6 @@ __all__ = [
     'GetDetailUserApplicationService',
     'ChangeUserStatusApplicationService',
     'GetProfileInformationApplicationService',
-    'ValidateSessionApplicationService'
+    'ValidateSessionApplicationService',
+    'CreateUserApplicationService'
 ]
