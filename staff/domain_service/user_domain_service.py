@@ -5,7 +5,8 @@ from staff.models.driver import Driver
 from staff.models.administrative import Administrative
 from staff.types.dataclass import (
     UserListItem, 
-    UserDetailResponse
+    UserDetailResponse,
+    ProfileInformationResponse
 ) 
 import logging
 
@@ -193,4 +194,100 @@ class UserDomainService:
             return (False, 'User not found.', None)
         except Exception as e:
             self.logger.error(f'Error changing user status: {str(e)}', exc_info=True)
+            raise
+
+    def get_profile_information(
+        self, 
+        user: User
+    ) -> ProfileInformationResponse | None:
+        '''
+        Retrieve profile information for the authenticated user.
+        Excludes sensitive fields like password, last_login, is_staff, is_active, is_superuser.
+        
+        Args:
+            user: Authenticated User object
+            
+        Returns:
+            ProfileInformationResponse dataclass with user profile information or None
+        '''
+        try:
+            # Check if user has a BaseStaff profile
+            try:
+                base_staff: BaseStaff = BaseStaff.objects.select_related('system_user').get(system_user=user)
+            except BaseStaff.DoesNotExist:
+                self.logger.warning(f'User {user.username} (id: {user.id}) does not have a staff profile')
+                return None
+            # Build full name
+            full_name: str = user.get_full_name() or user.username
+            # Get signature URL
+            signature_url: str | None = base_staff.signature.url if base_staff.signature else None
+            # Determine staff type and get specific data
+            staff_type: str | None = None
+            specific_data: dict | None = None
+            # Check if user is superuser
+            if user.is_superuser:
+                staff_type = 'superuser'
+                specific_data = {
+                    'is_superuser': True,
+                    'permissions': 'full_access',
+                    'role': 'System Administrator'
+                }
+                self.logger.info(f'Retrieved superuser profile for user: {user.username}')
+            # Check Healthcare
+            elif hasattr(base_staff, 'healthcare_profile'):
+                staff_type = 'healthcare'
+                healthcare: Healthcare = base_staff.healthcare_profile
+                specific_data = {
+                    'professional_registration': healthcare.professional_registration,
+                    'professional_position': healthcare.professional_position
+                }
+            # Check Driver
+            elif hasattr(base_staff, 'driver_profile'):
+                staff_type = 'driver'
+                driver: Driver = base_staff.driver_profile
+                specific_data = {
+                    'license_number': driver.license_number,
+                    'license_category': driver.license_category,
+                    'license_issue_date': driver.license_issue_date.isoformat() if driver.license_issue_date else None,
+                    'license_expiry_date': driver.license_expiry_date.isoformat() if driver.license_expiry_date else None,
+                    'blood_type': getattr(driver, 'blood_type', None)
+                }
+            # Check Administrative
+            elif hasattr(base_staff, 'administrative_profile'):
+                staff_type = 'administrative'
+                administrative: Administrative = base_staff.administrative_profile
+                specific_data = {
+                    'department': administrative.department,
+                    'role': administrative.role,
+                    'access_level': administrative.access_level
+                }
+            # Build response
+            profile_info: ProfileInformationResponse = ProfileInformationResponse(
+                # System User data (sin campos sensibles)
+                system_user_id=user.id,
+                username=user.username,
+                email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                full_name=full_name,
+                date_joined=user.date_joined.isoformat(),
+                # Base Staff data
+                base_staff_id=base_staff.id,
+                document_type=base_staff.document_type,
+                document_number=base_staff.document_number,
+                type_personnel=base_staff.type_personnel,
+                phone_number=base_staff.phone_number,
+                address=base_staff.address,
+                birth_date=base_staff.birth_date.isoformat() if base_staff.birth_date else None,
+                signature_url=signature_url,
+                created_at=base_staff.created_at.isoformat(),
+                updated_at=base_staff.updated_at.isoformat(),
+                # Specific profile data
+                staff_type=staff_type or 'unknown',
+                specific_data=specific_data
+            )
+            self.logger.info(f'Retrieved profile information for user: {user.username}, staff_type: {staff_type}')
+            return profile_info
+        except Exception as e:
+            self.logger.error(f'Error retrieving profile information: {str(e)}', exc_info=True)
             raise
