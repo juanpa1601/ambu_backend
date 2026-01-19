@@ -9,8 +9,11 @@ from staff.types.dataclass import (
     UserDetailResponse,
     ProfileInformationResponse,
     CreateUserRequest,
-    CreateUserResponse
+    CreateUserResponse,
+    EditProfileRequest,
+    EditProfileResponse
 ) 
+from datetime import datetime
 import logging
 
 class UserDomainService:
@@ -391,3 +394,143 @@ class UserDomainService:
             self.logger.error(f'Error creating user: {str(e)}', exc_info=True)
             # Transaction will be rolled back automatically
             return (False, f'Error creating user: {str(e)}', None)
+        
+    @transaction.atomic
+    def update_user_profile(
+        self, 
+        user: User,
+        profile_request: EditProfileRequest
+    ) -> tuple[bool, str, EditProfileResponse | None]:
+        '''
+        Update user's own profile information.
+        Uses database transaction to ensure data integrity.
+        
+        Args:
+            user: Authenticated User object
+            profile_request: EditProfileRequest dataclass with fields to update
+            
+        Returns:
+            Tuple of (success, message, EditProfileResponse or None)
+        '''
+        try:
+            fields_updated: list[str] = []
+            # Step 1: Get BaseStaff profile
+            try:
+                base_staff: BaseStaff = BaseStaff.objects.select_related('system_user').get(system_user=user)
+            except BaseStaff.DoesNotExist:
+                self.logger.warning(f'User {user.username} does not have a staff profile')
+                return (False, 'User profile not found.', None)
+            # Step 2: Determine staff type
+            staff_type: str | None = None
+            if hasattr(base_staff, 'healthcare_profile'):
+                staff_type = 'healthcare'
+                specific_profile = base_staff.healthcare_profile
+            elif hasattr(base_staff, 'driver_profile'):
+                staff_type = 'driver'
+                specific_profile = base_staff.driver_profile
+            elif hasattr(base_staff, 'administrative_profile'):
+                staff_type = 'administrative'
+                specific_profile = base_staff.administrative_profile
+            else:
+                self.logger.warning(f'User {user.username} has no specific profile type')
+                return (False, 'User has no specific profile type.', None)
+            # Step 3: Update System User fields
+            if profile_request.email is not None:
+                # Validate email uniqueness (exclude current user)
+                if User.objects.filter(email=profile_request.email).exclude(id=user.id).exists():
+                    self.logger.warning(f'Email already exists: {profile_request.email}')
+                    return (False, 'Email already exists.', None)
+                user.email = profile_request.email
+                fields_updated.append('email')
+            if profile_request.first_name is not None:
+                user.first_name = profile_request.first_name
+                fields_updated.append('first_name')
+            if profile_request.last_name is not None:
+                user.last_name = profile_request.last_name
+                fields_updated.append('last_name')
+            if profile_request.password is not None:
+                user.set_password(profile_request.password)
+                fields_updated.append('password')
+            # Save user if any field was updated
+            if any(field in fields_updated for field in ['email', 'first_name', 'last_name', 'password']):
+                user.save()
+                self.logger.info(f'Updated system user fields for: {user.username}')
+            # Step 4: Update Base Staff fields
+            if profile_request.phone_number is not None:
+                base_staff.phone_number = profile_request.phone_number
+                fields_updated.append('phone_number')
+            if profile_request.address is not None:
+                base_staff.address = profile_request.address
+                fields_updated.append('address')
+            if profile_request.birth_date is not None:
+                base_staff.birth_date = profile_request.birth_date
+                fields_updated.append('birth_date')
+            if profile_request.signature is not None:
+                base_staff.signature = profile_request.signature
+                fields_updated.append('signature')
+            # Save base_staff if any field was updated
+            if any(field in fields_updated for field in ['phone_number', 'address', 'birth_date', 'signature']):
+                base_staff.save()
+                self.logger.info(f'Updated base staff fields for: {user.username}')
+            # Step 5: Update specific profile fields based on staff type
+            if staff_type == 'healthcare':
+                if profile_request.professional_registration is not None:
+                    specific_profile.professional_registration = profile_request.professional_registration
+                    fields_updated.append('professional_registration')
+                if profile_request.professional_position is not None:
+                    specific_profile.professional_position = profile_request.professional_position
+                    fields_updated.append('professional_position')
+                if any(field in fields_updated for field in ['professional_registration', 'professional_position']):
+                    specific_profile.save()
+                    self.logger.info(f'Updated healthcare profile for: {user.username}')
+            elif staff_type == 'driver':
+                if profile_request.license_number is not None:
+                    specific_profile.license_number = profile_request.license_number
+                    fields_updated.append('license_number')
+                if profile_request.license_category is not None:
+                    specific_profile.license_category = profile_request.license_category
+                    fields_updated.append('license_category')
+                if profile_request.license_issue_date is not None:
+                    specific_profile.license_issue_date = profile_request.license_issue_date
+                    fields_updated.append('license_issue_date')
+                if profile_request.license_expiry_date is not None:
+                    specific_profile.license_expiry_date = profile_request.license_expiry_date
+                    fields_updated.append('license_expiry_date')
+                if profile_request.blood_type is not None:
+                    specific_profile.blood_type = profile_request.blood_type
+                    fields_updated.append('blood_type')
+                if any(field in fields_updated for field in ['license_number', 'license_category', 'license_issue_date', 'license_expiry_date', 'blood_type']):
+                    specific_profile.save()
+                    self.logger.info(f'Updated driver profile for: {user.username}')
+            elif staff_type == 'administrative':
+                if profile_request.department is not None:
+                    specific_profile.department = profile_request.department
+                    fields_updated.append('department')
+                if profile_request.role is not None:
+                    specific_profile.role = profile_request.role
+                    fields_updated.append('role')
+                if profile_request.access_level is not None:
+                    specific_profile.access_level = profile_request.access_level
+                    fields_updated.append('access_level')
+                if any(field in fields_updated for field in ['department', 'role', 'access_level']):
+                    specific_profile.save()
+                    self.logger.info(f'Updated administrative profile for: {user.username}')
+            # Step 6: Build response
+            response: EditProfileResponse = EditProfileResponse(
+                system_user_id=user.id,
+                username=user.username,
+                email=user.email,
+                base_staff_id=base_staff.id,
+                staff_type=staff_type,
+                updated_at=datetime.now().isoformat(),
+                fields_updated=fields_updated
+            )
+            self.logger.info(
+                f'Successfully updated profile for user: {user.username}, '
+                f'fields: {", ".join(fields_updated)}'
+            )
+            return (True, 'Profile updated successfully.', response)
+        except Exception as e:
+            self.logger.error(f'Error updating user profile: {str(e)}', exc_info=True)
+            # Transaction will be rolled back automatically
+            return (False, f'Error updating profile: {str(e)}', None)
