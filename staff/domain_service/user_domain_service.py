@@ -94,7 +94,6 @@ class UserDomainService:
                     specific_data = {
                         'professional_registration': healthcare.professional_registration,
                         'professional_position': healthcare.professional_position,
-                        'signature_url': base_staff.signature.url if base_staff.signature else None
                     }
                 # Check Driver
                 elif hasattr(base_staff, 'driver_profile'):
@@ -105,8 +104,7 @@ class UserDomainService:
                         'license_category': driver.license_category,
                         'license_issue_date': driver.license_issue_date.isoformat() if driver.license_issue_date else None,
                         'license_expiry_date': driver.license_expiry_date.isoformat() if driver.license_expiry_date else None,
-                        'blood_type': getattr(driver, 'blood_type', None),
-                        'signature_url': base_staff.signature.url if base_staff.signature else None
+                        'blood_type': getattr(driver, 'blood_type', None)
                     }
                 # Check Administrative
                 elif hasattr(base_staff, 'administrative_profile'):
@@ -115,13 +113,12 @@ class UserDomainService:
                     specific_data = {
                         'department': administrative.department,
                         'role': administrative.role,
-                        'access_level': administrative.access_level,
-                        'signature_url': base_staff.signature.url if base_staff.signature else None
+                        'access_level': administrative.access_level
                     }
             # Build full name
             full_name: str = user.get_full_name() or user.username
             # Get signature URL
-            signature_url: str | None = base_staff.signature.url if base_staff.signature else None
+            signature_url: str | None = base_staff.signature if base_staff.signature else None
             # Build response
             user_detail: UserDetailResponse = UserDetailResponse(
                 # System User data
@@ -227,7 +224,7 @@ class UserDomainService:
             # Build full name
             full_name: str = user.get_full_name() or user.username
             # Get signature URL
-            signature_url: str | None = base_staff.signature.url if base_staff.signature else None
+            signature_url: str | None = base_staff.signature if base_staff.signature else None
             # Determine staff type and get specific data
             staff_type: str | None = None
             specific_data: dict | None = None
