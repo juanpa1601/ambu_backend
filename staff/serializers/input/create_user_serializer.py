@@ -63,7 +63,7 @@ class CreateUserSerializer(serializers.Serializer):
     signature: serializers.CharField = serializers.CharField(
         required=False,
         allow_null=True,
-        blank=True,
+        allow_blank=True,
         help_text='Signature image (base64 or file)'
     )
     
