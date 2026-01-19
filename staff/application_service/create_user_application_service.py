@@ -42,7 +42,7 @@ class CreateUserApplicationService:
                     f'User {requesting_user.username} attempted to create user without permission'
                 )
                 return {
-                    'response': 'You do not have permission to create users.',
+                    'response': 'No tienes permiso para crear usuarios.',
                     'msg': -1,
                     'status_code_http': 403
                 }
@@ -55,7 +55,7 @@ class CreateUserApplicationService:
             )
             if not success:
                 # Check specific error types
-                if 'already exists' in message.lower():
+                if 'ya existe' in message.lower():
                     return {
                         'response': message,
                         'msg': -1,
@@ -91,7 +91,7 @@ class CreateUserApplicationService:
                 exc_info=True
             )
             return {
-                'response': 'An error occurred while creating user.',
+                'response': 'Ocurrió un error al crear el usuario.',
                 'msg': -1,
                 'status_code_http': 500
             }

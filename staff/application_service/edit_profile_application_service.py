@@ -27,7 +27,7 @@ class EditProfileApplicationService:
             authenticated_user: User authenticated via token
             
         Returns:
-            Dictionary with response data and status
+            dictionary with response data and status
         '''
         try:
             # Update profile through domain service
@@ -40,14 +40,14 @@ class EditProfileApplicationService:
             )
             if not success:
                 # Check specific error types
-                if 'already exists' in message.lower():
+                if 'ya existe' in message.lower():
                     return {
                         'response': message,
                         'msg': -1,
                         'status_code_http': 400
                     }
                 
-                if 'not found' in message.lower():
+                if 'no encontrado' in message.lower():
                     return {
                         'response': message,
                         'msg': -1,
@@ -84,7 +84,7 @@ class EditProfileApplicationService:
                 exc_info=True
             )
             return {
-                'response': 'An error occurred while updating profile.',
+                'response': 'Ocurrió un error al actualizar el perfil.',
                 'msg': -1,
                 'status_code_http': 500
             }

@@ -171,7 +171,7 @@ class UserDomainService:
             new_status: New active status (True/False)
             
         Returns:
-            Tuple of (success, message, user_object)
+            tuple of (success, message, user_object)
         '''
         try:
             user: User = User.objects.get(id=system_user_id)
@@ -180,24 +180,25 @@ class UserDomainService:
                 self.logger.warning(
                     f'Attempted to change status of superuser: {user.username} (system_user_id: {system_user_id})'
                 )
-                return (False, 'Cannot change status of superuser accounts.', None)
+                return (False, 'No se puede cambiar el estado de cuentas de superusuario.', None)
             # Check if status is already the same
+            status_text: str
             if user.is_active == new_status:
-                status_text = 'active' if new_status else 'inactive'
+                status_text = 'activo' if new_status else 'inactivo'
                 self.logger.info(f'User {user.username} is already {status_text}')
-                return (False, f'User is already {status_text}.', user)
+                return (False, f'Usuario ya está {status_text}.', user)
             # Update user status
             old_status: bool = user.is_active
             user.is_active = new_status
             user.save()
-            status_text = 'activated' if new_status else 'deactivated'
+            status_text = 'activo' if new_status else 'inactivo'
             self.logger.info(
                 f'User {user.username} (system_user_id: {system_user_id}) status changed from {old_status} to {new_status}'
             )
-            return (True, f'User successfully {status_text}.', user)
+            return (True, f'Usuario {status_text} exitosamente.', user)
         except User.DoesNotExist:
             self.logger.warning(f'User not found with id: {system_user_id}')
-            return (False, 'User not found.', None)
+            return (False, 'Usuario no encontrado.', None)
         except Exception as e:
             self.logger.error(f'Error changing user status: {str(e)}', exc_info=True)
             raise
@@ -317,15 +318,15 @@ class UserDomainService:
             # Step 1: Validate username uniqueness
             if User.objects.filter(username=user_request.username).exists():
                 self.logger.warning(f'Username already exists: {user_request.username}')
-                return (False, 'Username already exists.', None)
+                return (False, 'Username ya existe. Intenta otro..', None)
             # Step 2: Validate email uniqueness
             if User.objects.filter(email=user_request.email).exists():
                 self.logger.warning(f'Email already exists: {user_request.email}')
-                return (False, 'Email already exists.', None)
+                return (False, 'El email ya existe. Intenta otro.', None)
             # Step 3: Validate document_number uniqueness
             if BaseStaff.objects.filter(document_number=user_request.document_number).exists():
                 self.logger.warning(f'Document number already exists: {user_request.document_number}')
-                return (False, 'Document number already exists.', None)
+                return (False, 'Número de documento ya existe. Intenta otro.', None)
             # Step 4: Create System User
             user: User = User.objects.create_user(
                 username=user_request.username,
@@ -389,11 +390,11 @@ class UserDomainService:
                 f'Successfully created complete user profile: {user.username}, '
                 f'type: {user_request.type_personnel}'
             )
-            return (True, 'User created successfully.', response)
+            return (True, 'Usuario creado correctamente.', response)
         except Exception as e:
             self.logger.error(f'Error creating user: {str(e)}', exc_info=True)
             # Transaction will be rolled back automatically
-            return (False, f'Error creating user: {str(e)}', None)
+            return (False, f'Ocurrió un error al crear el usuario: {str(e)}', None)
         
     @transaction.atomic
     def update_user_profile(
@@ -410,7 +411,7 @@ class UserDomainService:
             profile_request: EditProfileRequest dataclass with fields to update
             
         Returns:
-            Tuple of (success, message, EditProfileResponse or None)
+            tuple of (success, message, EditProfileResponse or None)
         '''
         try:
             fields_updated: list[str] = []
@@ -419,7 +420,7 @@ class UserDomainService:
                 base_staff: BaseStaff = BaseStaff.objects.select_related('system_user').get(system_user=user)
             except BaseStaff.DoesNotExist:
                 self.logger.warning(f'User {user.username} does not have a staff profile')
-                return (False, 'User profile not found.', None)
+                return (False, 'Perfil de usuario no encontrado.', None)
             # Step 2: Determine staff type
             staff_type: str | None = None
             if hasattr(base_staff, 'healthcare_profile'):
@@ -433,13 +434,13 @@ class UserDomainService:
                 specific_profile = base_staff.administrative_profile
             else:
                 self.logger.warning(f'User {user.username} has no specific profile type')
-                return (False, 'User has no specific profile type.', None)
+                return (False, 'El usuario no tiene un tipo de perfil específico.', None)
             # Step 3: Update System User fields
             if profile_request.email is not None:
                 # Validate email uniqueness (exclude current user)
                 if User.objects.filter(email=profile_request.email).exclude(id=user.id).exists():
                     self.logger.warning(f'Email already exists: {profile_request.email}')
-                    return (False, 'Email already exists.', None)
+                    return (False, 'El email ya existe. Intenta otro.', None)
                 user.email = profile_request.email
                 fields_updated.append('email')
             if profile_request.first_name is not None:
@@ -529,12 +530,12 @@ class UserDomainService:
                 f'Successfully updated profile for user: {user.username}, '
                 f'fields: {", ".join(fields_updated)}'
             )
-            return (True, 'Profile updated successfully.', response)
+            return (True, 'Perfil de usuario actualizado correctamente.', response)
         except Exception as e:
             self.logger.error(f'Error updating user profile: {str(e)}', exc_info=True)
             # Transaction will be rolled back automatically
-            return (False, f'Error updating profile: {str(e)}', None)
-
+            return (False, f'Ocurrió un error al actualizar el perfil de usuario: {str(e)}', None)
+        
     @transaction.atomic
     def update_user_profile_by_admin(
         self, 
@@ -553,7 +554,7 @@ class UserDomainService:
             admin_user: Administrator user performing the update
             
         Returns:
-            Tuple of (success, message, EditProfileResponse or None)
+            tuple of (success, message, EditProfileResponse or None)
         '''
         try:
             fields_updated: list[str] = []
@@ -562,13 +563,13 @@ class UserDomainService:
                 user: User = User.objects.get(id=system_user_id)
             except User.DoesNotExist:
                 self.logger.warning(f'User with id {system_user_id} not found')
-                return (False, 'User not found.', None)
+                return (False, 'Usuario no encontrado.', None)
             # Step 2: Get BaseStaff profile
             try:
                 base_staff: BaseStaff = BaseStaff.objects.select_related('system_user').get(system_user=user)
             except BaseStaff.DoesNotExist:
                 self.logger.warning(f'User {user.username} does not have a staff profile')
-                return (False, 'User profile not found.', None)
+                return (False, 'Perfil de usuario no encontrado.', None)
             # Step 3: Determine staff type
             staff_type: str | None = None
             if hasattr(base_staff, 'healthcare_profile'):
@@ -582,13 +583,13 @@ class UserDomainService:
                 specific_profile = base_staff.administrative_profile
             else:
                 self.logger.warning(f'User {user.username} has no specific profile type')
-                return (False, 'User has no specific profile type.', None)
+                return (False, 'El usuario no tiene un tipo de perfil específico.', None)
             # Step 4: Update System User fields
             if profile_request.email is not None:
                 # Validate email uniqueness (exclude current user)
                 if User.objects.filter(email=profile_request.email).exclude(id=user.id).exists():
                     self.logger.warning(f'Email already exists: {profile_request.email}')
-                    return (False, 'Email already exists.', None)
+                    return (False, 'El email ya existe. Intenta otro.', None)
                 user.email = profile_request.email
                 fields_updated.append('email')
             if profile_request.first_name is not None:
@@ -678,9 +679,9 @@ class UserDomainService:
                 f'Admin {admin_user.username} successfully updated user: {user.username}, '
                 f'fields: {", ".join(fields_updated)}'
             )
-            return (True, 'User profile updated successfully.', response)
+            return (True, 'Perfil de usuario actualizado correctamente.', response)
         except Exception as e:
             self.logger.error(f'Error updating user profile by admin: {str(e)}', exc_info=True)
             # Transaction will be rolled back automatically
-            return (False, f'Error updating user profile: {str(e)}', None)
+            return (False, f'Ocurrió un error al actualizar el perfil de usuario: {str(e)}', None)
         

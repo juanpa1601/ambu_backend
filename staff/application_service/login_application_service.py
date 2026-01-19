@@ -28,7 +28,7 @@ class LoginApplicationService:
             login_data: LoginRequest dataclass with username and password
             
         Returns:
-            Dictionary with response data and status
+            dictionary with response data and status
         '''
         try:
             # Step 1: Authenticate user
@@ -38,7 +38,7 @@ class LoginApplicationService:
             )
             if user is None:
                 return {
-                    'response': 'Invalid credentials. Please check your username and password.',
+                    'response': 'Credenciales invalidas. Por favor, verifica tu username y password.',
                     'msg': -1,
                     'status_code_http': 401
                 }
@@ -57,7 +57,7 @@ class LoginApplicationService:
             )
             self.logger.info(f'User {user.username} logged in successfully')
             return {
-                'response': 'Login successful.',
+                'response': 'Inicio de sesión exitoso.',
                 'msg': 1,
                 'status_code_http': 200,
                 'data': {
@@ -74,7 +74,7 @@ class LoginApplicationService:
         except Exception as e:
             self.logger.error(f'Error during login: {str(e)}', exc_info=True)
             return {
-                'response': 'An error occurred during login.',
+                'response': 'Ocurrió un error durante el inicio de sesión.',
                 'msg': -1,
                 'status_code_http': 500
             }

@@ -41,7 +41,7 @@ class ChangeUserStatusApplicationService:
                     f'Non-administrative user {requesting_user.username} attempted to change user status'
                 )
                 return {
-                    'response': 'You do not have permission to change user status.',
+                    'response': 'No tienes permiso para cambiar el estado del usuario.',
                     'msg': -1,
                     'status_code_http': 403
                 }
@@ -55,7 +55,7 @@ class ChangeUserStatusApplicationService:
             )
             if not success:
                 # Check if user not found
-                if 'not found' in message.lower():
+                if 'no encontrado' in message.lower():
                     return {
                         'response': message,
                         'msg': -1,
@@ -87,7 +87,7 @@ class ChangeUserStatusApplicationService:
                 exc_info=True
             )
             return {
-                'response': 'An error occurred while changing user status.',
+                'response': 'Ocurrió un error al cambiar el estado del usuario.',
                 'msg': -1,
                 'status_code_http': 500
             }

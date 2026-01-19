@@ -1,15 +1,13 @@
-from typing import Any
 import logging
 from django.contrib.auth.models import User
-
 from staff.domain_service import AuthDomainService
 from staff.types.dataclass import ValidateSessionResponse
 
 class ValidateSessionApplicationService:
-    """
+    '''
     Application service for validating user session.
     Checks if authentication token is still valid.
-    """
+    '''
     
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -26,7 +24,7 @@ class ValidateSessionApplicationService:
             authenticated_user: User authenticated via token
             
         Returns:
-            Dictionary with response data and status
+            dictionary with response data and status
         '''
         try:
             # Step 1: Validate session through domain service
@@ -46,9 +44,7 @@ class ValidateSessionApplicationService:
                     staff_type=None
                 ).to_dict()
             # Step 2: Get staff type
-            staff_type = self.auth_domain_service.get_staff_type(
-                user=authenticated_user
-            )
+            staff_type: str | None = self.auth_domain_service.get_staff_type(authenticated_user)
             # Step 3: Build success response
             self.logger.info(
                 f'Valid session confirmed for user: {authenticated_user.username}'

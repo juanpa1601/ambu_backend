@@ -37,7 +37,7 @@ class EditUserApplicationService:
             requesting_user: User making the request (must be admin or superuser)
             
         Returns:
-            Dictionary with response data and status
+            dictionary with response data and status
         '''
         try:
             # Step 1: Verify requesting user is administrative or superuser
@@ -48,7 +48,7 @@ class EditUserApplicationService:
                     f'User {requesting_user.username} attempted to edit user without permission'
                 )
                 return {
-                    'response': 'You do not have permission to edit users.',
+                    'response': 'No tienes permiso para editar usuarios.',
                     'msg': -1,
                     'status_code_http': 403
                 }
@@ -58,7 +58,7 @@ class EditUserApplicationService:
                     f'Admin {requesting_user.username} attempted to edit their own profile via edit_user endpoint'
                 )
                 return {
-                    'response': 'Use the edit_profile endpoint to edit your own profile.',
+                    'response': 'Usa la sección de editar perfil, para editar tu propio perfil.',
                     'msg': -1,
                     'status_code_http': 400
                 }
@@ -116,7 +116,7 @@ class EditUserApplicationService:
                 exc_info=True
             )
             return {
-                'response': 'An error occurred while updating user.',
+                'response': 'Ocurrió un error al actualizar el usuario.',
                 'msg': -1,
                 'status_code_http': 500
             }

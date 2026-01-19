@@ -31,7 +31,7 @@ class LogoutApplicationService:
             user: Authenticated User object from request
             
         Returns:
-            Dictionary with response data and status
+            dictionary with response data and status
         '''
         try:
             # Verify user consistency
@@ -40,7 +40,7 @@ class LogoutApplicationService:
                     f'User ID mismatch: token user {user.id} vs request user {logout_request.user_id}'
                 )
                 return {
-                    'response': 'Invalid user credentials.',
+                    'response': 'Credenciales inválidas.',
                     'msg': -1,
                     'status_code_http': 403
                 }
@@ -49,7 +49,7 @@ class LogoutApplicationService:
             if not has_token:
                 self.logger.info(f'User {user.username} attempted logout without active token')
                 return {
-                    'response': 'No active session found.',
+                    'response': 'No se encontró una sesión activa.',
                     'msg': -1,
                     'status_code_http': 400
                 }
@@ -57,14 +57,14 @@ class LogoutApplicationService:
             token_revoked: bool = self.auth_domain_service.revoke_token(user)
             if not token_revoked:
                 return {
-                    'response': 'Failed to logout. Please try again.',
+                    'response': 'Error al cerrar sesión. Por favor, inténtalo de nuevo.',
                     'msg': -1,
                     'status_code_http': 500
                 }
             # Build successful response
             logout_response: LogoutResponse = LogoutResponse(
                 success=True,
-                message='Logout successful'
+                message='Cierre de sesión exitoso'
             )
             self.logger.info(f'User {user.username} logged out successfully')
             return {
@@ -79,7 +79,7 @@ class LogoutApplicationService:
         except Exception as e:
             self.logger.error(f'Error during logout for user {user.username}: {str(e)}', exc_info=True)
             return {
-                'response': 'An error occurred during logout.',
+                'response': 'Ocurrió un error durante el cierre de sesión.',
                 'msg': -1,
                 'status_code_http': 500
             }

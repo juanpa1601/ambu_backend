@@ -23,7 +23,7 @@ class GetProfileInformationApplicationService:
             authenticated_user: User authenticated via token
             
         Returns:
-            Dictionary with response data and status
+            dictionary with response data and status
         '''
         try:
             # Step 1: Get profile information from domain service
@@ -33,7 +33,7 @@ class GetProfileInformationApplicationService:
                     f'User {authenticated_user.username} does not have a staff profile'
                 )
                 return {
-                    'response': 'User profile not found.',
+                    'response': 'Perfil de usuario no encontrado.',
                     'msg': -1,
                     'status_code_http': 404
                 }
@@ -67,7 +67,7 @@ class GetProfileInformationApplicationService:
                 f'User {authenticated_user.username} retrieved their profile information'
             )
             return {
-                'response': 'Profile information retrieved successfully.',
+                'response': 'Información del perfil recuperada exitosamente.',
                 'msg': 1,
                 'status_code_http': 200,
                 'data': response_data
@@ -78,7 +78,7 @@ class GetProfileInformationApplicationService:
                 exc_info=True
             )
             return {
-                'response': 'An error occurred while retrieving profile information.',
+                'response': 'Ocurrió un error al recuperar la información del perfil.',
                 'msg': -1,
                 'status_code_http': 500
             }
