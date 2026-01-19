@@ -8,7 +8,8 @@ from staff.views import (
     GetProfileInformationView,
     ValidateSessionView,
     CreateUserView,
-    EditProfileView
+    EditProfileView,
+    EditUserView
 )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
     path('validate_session/', ValidateSessionView.as_view(), name='staff_validate_session'),
     path('create_user/', CreateUserView.as_view(), name='staff_create_user'),
     path('edit_profile/', EditProfileView.as_view(), name='staff_edit_profile'),
+    path('<int:system_user_id>/edit_user/', EditUserView.as_view(), name='staff_edit_user'),
 ]

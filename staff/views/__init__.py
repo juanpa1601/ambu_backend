@@ -7,6 +7,7 @@ from .get_profile_information_view import GetProfileInformationView
 from .validate_session_view import ValidateSessionView
 from .create_user_view import CreateUserView
 from .edit_profile_view import EditProfileView
+from .edit_user_view import EditUserView
 
 __all__ = [
     'LoginView',
@@ -17,5 +18,6 @@ __all__ = [
     'GetProfileInformationView',
     'ValidateSessionView',
     'CreateUserView',
-    'EditProfileView'
+    'EditProfileView',
+    'EditUserView'
 ]
