@@ -51,6 +51,7 @@ class EditProfileSerializer(serializers.Serializer):
     signature: serializers.CharField = serializers.CharField(
         required=False,
         allow_null=True,
+        blank=True,
         help_text='Signature image (base64 or file)'
     )
     
