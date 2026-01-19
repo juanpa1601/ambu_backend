@@ -39,7 +39,7 @@ class ListUsersApplicationService:
                     f'Non-administrative user {requesting_user.username} attempted to list users'
                 )
                 return {
-                    'response': 'You do not have permission to access this resource.',
+                    'response': 'No tienes permiso para acceder a este recurso.',
                     'msg': -1,
                     'status_code_http': 403
                 }
@@ -61,7 +61,7 @@ class ListUsersApplicationService:
                 f'User {requesting_user.username} successfully retrieved {len(user_items)} users'
             )
             return {
-                'response': 'Users retrieved successfully.',
+                'response': 'Usuarios recuperados exitosamente.',
                 'msg': 1,
                 'status_code_http': 200,
                 'data': {
@@ -75,7 +75,7 @@ class ListUsersApplicationService:
                 exc_info=True
             )
             return {
-                'response': 'An error occurred while retrieving users.',
+                'response': 'Ocurrió un error al recuperar los usuarios.',
                 'msg': -1,
                 'status_code_http': 500
             }

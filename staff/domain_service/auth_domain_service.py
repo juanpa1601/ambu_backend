@@ -164,22 +164,22 @@ class AuthDomainService:
             user: Authenticated user object
             
         Returns:
-            Tuple of (is_valid, message)
+            tuple of (is_valid, message)
         '''
         try:
             # Check if user is active
             if not user.is_active:
                 self.logger.warning(f'Inactive user attempted to validate session: {user.username}')
-                return (False, 'User account is inactive.')
+                return (False, 'La cuenta de usuario está inactiva.')
             # Check if user has a valid token
             try:
                 token = Token.objects.get(user=user)
                 self.logger.info(f'Valid session for user: {user.username}')
-                return (True, 'Session is valid.')
+                return (True, 'La sesión es válida.')
             except Token.DoesNotExist:
                 self.logger.warning(f'User {user.username} has no token')
-                return (False, 'No valid token found.')
+                return (False, 'No se encontró un token válido.')
             
         except Exception as e:
             self.logger.error(f'Error validating session: {str(e)}', exc_info=True)
-            return (False, 'Error validating session.')
+            return (False, 'Error al validar la sesión.')

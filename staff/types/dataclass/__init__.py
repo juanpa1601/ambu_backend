@@ -2,6 +2,8 @@
 from .login_request import LoginRequest
 from .logout_request import LogoutRequest
 from .change_user_status_request import ChangeUserStatusRequest
+from .create_user_request import CreateUserRequest
+from .edit_profile_request import EditProfileRequest
 
 # Response
 from .login_response import LoginResponse
@@ -11,6 +13,8 @@ from .user_detail_response import UserDetailResponse
 from .change_user_status_response import ChangeUserStatusResponse
 from .profile_information_response import ProfileInformationResponse
 from .validate_session_response import ValidateSessionResponse
+from .create_user_response import CreateUserResponse
+from .edit_profile_response import EditProfileResponse
 
 # Other types
 from .user_list_item import UserListItem
@@ -20,6 +24,8 @@ __all__ = [
     'LoginRequest',
     'LogoutRequest',
     'ChangeUserStatusRequest',
+    'CreateUserRequest',
+    'EditProfileRequest',
     # Response
     'LoginResponse',
     'LogoutResponse',
@@ -28,6 +34,8 @@ __all__ = [
     'ChangeUserStatusResponse',
     'ProfileInformationResponse',
     'ValidateSessionResponse',
+    'CreateUserResponse',
+    'EditProfileResponse',
     # Other types
     'UserListItem',
 ]

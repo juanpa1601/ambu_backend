@@ -6,7 +6,10 @@ from staff.views import (
     GetDetailUserView,
     ChangeUserStatusView,
     GetProfileInformationView,
-    ValidateSessionView
+    ValidateSessionView,
+    CreateUserView,
+    EditProfileView,
+    EditUserView
 )
 
 urlpatterns = [
@@ -17,4 +20,7 @@ urlpatterns = [
     path('<int:system_user_id>/change_status/', ChangeUserStatusView.as_view(), name='staff_change_user_status'),
     path('get_profile_information/', GetProfileInformationView.as_view(), name='staff_get_profile_information'),
     path('validate_session/', ValidateSessionView.as_view(), name='staff_validate_session'),
+    path('create_user/', CreateUserView.as_view(), name='staff_create_user'),
+    path('edit_profile/', EditProfileView.as_view(), name='staff_edit_profile'),
+    path('<int:system_user_id>/edit_user/', EditUserView.as_view(), name='staff_edit_user'),
 ]

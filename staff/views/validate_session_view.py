@@ -72,9 +72,7 @@ class ValidateSessionView(BaseView):
         '''
         def service_callback(user: User) -> dict[str, Any]:
             validate_session_service: ValidateSessionApplicationService = ValidateSessionApplicationService()
-            return validate_session_service.validate_session(
-                authenticated_user=user
-            )
+            return validate_session_service.validate_session(user)
         
         return self._handle_request(
             request=request,

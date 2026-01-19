@@ -38,7 +38,7 @@ class GetDetailUserApplicationService:
                     f'Non-administrative user {requesting_user.username} attempted to list users'
                 )
                 return {
-                    'response': 'You do not have permission to access this resource.',
+                    'response': 'No tienes permiso para acceder a este recurso.',
                     'msg': -1,
                     'status_code_http': 403
                 }
@@ -49,7 +49,7 @@ class GetDetailUserApplicationService:
                     f'User {requesting_user.username} requested non-existent system_user_id: {system_user_id}'
                 )
                 return {
-                    'response': 'User not found.',
+                    'response': 'Usuario no encontrado.',
                     'msg': -1,
                     'status_code_http': 404
                 }
@@ -85,7 +85,7 @@ class GetDetailUserApplicationService:
                 f'User {requesting_user.username} retrieved detail for system_user_id: {system_user_id}'
             )
             return {
-                'response': 'User detail retrieved successfully.',
+                'response': 'Detalle del usuario recuperado exitosamente.',
                 'msg': 1,
                 'status_code_http': 200,
                 'data': response_data
@@ -96,7 +96,7 @@ class GetDetailUserApplicationService:
                 exc_info=True
             )
             return {
-                'response': 'An error occurred while retrieving user details.',
+                'response': 'Ocurrió un error al recuperar el detalle del usuario.',
                 'msg': -1,
                 'status_code_http': 500
             }
