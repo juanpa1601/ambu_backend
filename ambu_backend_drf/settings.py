@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'staff',
     'core',
+    'daily_monthly_inventory'
 ]
 
 REST_FRAMEWORK = {
