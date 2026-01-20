@@ -343,7 +343,8 @@ class UserDomainService:
                 type_personnel=user_request.type_personnel,
                 phone_number=user_request.phone_number,
                 address=user_request.address,
-                birth_date=user_request.birth_date
+                birth_date=user_request.birth_date,
+                signature=user_request.signature
                 # signature will be handled separately if needed
             )
             self.logger.info(f'Created base staff profile: {base_staff.id} for user: {user.username}')
