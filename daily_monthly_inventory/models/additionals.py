@@ -3,6 +3,11 @@ from django.core.validators import MaxValueValidator
 
 
 class Additionals(models.Model):
+    tablet = models.IntegerField(
+        default=0,
+        validators=[MaxValueValidator(10)],
+        help_text="Tablet quantity"
+    )
     charger = models.IntegerField(
         default=0,
         validators=[MaxValueValidator(10)],
