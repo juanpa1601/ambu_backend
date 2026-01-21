@@ -15,9 +15,9 @@ from daily_monthly_inventory.serializers.input.update_inventory_serializer impor
 
 class UpdateInventoryView(BaseView):
     '''
-    API endpoint to update an existing daily/monthly inventory.
+    API endpoint to partially update an existing daily/monthly inventory.
     
-    PUT /api/daily_monthly_inventory/<inventory_id>/update_inventory/
+    PATCH /daily_monthly_inventory/<inventory_id>/update_inventory/
     
     Headers:
         Authorization: Token 9944b09199c62bcf9418ad846dd0e4bbdfc6ee4b
@@ -91,9 +91,9 @@ class UpdateInventoryView(BaseView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     
-    def put(self, request: Request, inventory_id: int) -> Response:
+    def patch(self, request: Request, inventory_id: int) -> Response:
         '''
-        Handle PUT request to update an inventory.
+        Handle PATCH request to partially update an inventory.
         
         Args:
             request: HTTP request object

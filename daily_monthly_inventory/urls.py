@@ -4,7 +4,8 @@ from daily_monthly_inventory.views import (
     CreateInventoryView,
     GetInventoryDetailView,
     ListAmbulancesView,
-    UpdateInventoryView
+    UpdateInventoryView,
+    DeleteInventoryView
 )
 
 urlpatterns = [
@@ -13,4 +14,5 @@ urlpatterns = [
     path('<int:inventory_id>/get_detail/', GetInventoryDetailView.as_view(), name='get_inventory_detail'),
     path('list_ambulances/', ListAmbulancesView.as_view(), name='list_ambulances'),
     path('<int:inventory_id>/update_inventory/', UpdateInventoryView.as_view(), name='update_inventory'),
+    path('<int:inventory_id>/delete_inventory/', DeleteInventoryView.as_view(), name='delete_inventory'),
 ]
