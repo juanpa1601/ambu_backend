@@ -1,6 +1,8 @@
-from typing import Any
 import logging
+from typing import Any
+
 from django.contrib.auth.models import User
+
 from daily_monthly_inventory.models import DailyMonthlyInventory
 
 
@@ -10,8 +12,8 @@ class DeleteInventoryApplicationService:
     Handles orchestration of inventory deletion operations.
     """
 
-    def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+    def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
 
     def delete_inventory(
         self, inventory_id: int, requesting_user: User
@@ -29,7 +31,9 @@ class DeleteInventoryApplicationService:
         try:
             # Step 1: Get the inventory
             try:
-                inventory = DailyMonthlyInventory.objects.get(id=inventory_id)
+                inventory: DailyMonthlyInventory = DailyMonthlyInventory.objects.get(
+                    id=inventory_id
+                )
             except DailyMonthlyInventory.DoesNotExist:
                 self.logger.warning(
                     f"User {requesting_user.username} attempted to delete non-existent inventory {inventory_id}"

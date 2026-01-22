@@ -1,11 +1,13 @@
-from rest_framework.request import Request
-from rest_framework.response import Response
+from typing import Any
+
+from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import User
-from typing import Any
+from rest_framework.request import Request
+from rest_framework.response import Response
+
 from core.views.base_view import BaseView
-from daily_monthly_inventory.application_service.delete_inventory_application_service import (
+from daily_monthly_inventory.application_service import (
     DeleteInventoryApplicationService,
 )
 
@@ -79,7 +81,9 @@ class DeleteInventoryView(BaseView):
         )
 
     def _delete_inventory_callback(
-        self, user: User, inventory_id: int
+        self,
+        user: User,
+        inventory_id: int,
     ) -> dict[str, Any]:
         """
         Callback to execute delete inventory application service.
@@ -91,7 +95,9 @@ class DeleteInventoryView(BaseView):
         Returns:
             dictionary with response data
         """
-        application_service = DeleteInventoryApplicationService()
-        return application_service.delete_inventory(
+        delete_inventory_service: DeleteInventoryApplicationService = (
+            DeleteInventoryApplicationService()
+        )
+        return delete_inventory_service.delete_inventory(
             inventory_id=inventory_id, requesting_user=user
         )

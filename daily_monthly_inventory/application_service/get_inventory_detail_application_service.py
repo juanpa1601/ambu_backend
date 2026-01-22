@@ -1,6 +1,8 @@
-from typing import Any
 import logging
+from typing import Any
+
 from django.contrib.auth.models import User
+
 from daily_monthly_inventory.domain_service import InventoryDomainService
 from daily_monthly_inventory.types.dataclass import InventoryDetailResponse
 
@@ -8,8 +10,8 @@ from daily_monthly_inventory.types.dataclass import InventoryDetailResponse
 class GetInventoryDetailApplicationService:
     """Application service for retrieving inventory details."""
 
-    def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+    def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
         self.inventory_domain_service: InventoryDomainService = InventoryDomainService()
 
     def get_inventory_detail(
@@ -42,7 +44,7 @@ class GetInventoryDetailApplicationService:
                 }
 
             # Build response data
-            inventory_data = {
+            inventory_data: dict[str, Any] = {
                 "inventory_id": detail_response.inventory_id,
                 "system_user_id": detail_response.system_user_id,
                 "person_name": detail_response.person_name,

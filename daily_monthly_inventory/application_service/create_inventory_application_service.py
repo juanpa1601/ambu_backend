@@ -1,7 +1,13 @@
-from typing import Any
 import logging
+from typing import Any
+
 from django.contrib.auth.models import User
+
 from daily_monthly_inventory.domain_service import InventoryDomainService
+from daily_monthly_inventory.domain_service.inventory_domain_service import (
+    UserNotFoundError,
+    AmbulanceNotFoundError,
+)
 from daily_monthly_inventory.types.dataclass import (
     CreateInventoryRequest,
     CreateInventoryResponse,
@@ -11,16 +17,18 @@ from daily_monthly_inventory.types.dataclass import (
 class CreateInventoryApplicationService:
     """Application service for creating a single inventory."""
 
-    def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+    def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
         self.inventory_domain_service: InventoryDomainService = InventoryDomainService()
 
     def create_inventory(
-        self, requesting_user: User, validated_data: dict[str, Any]
+        self,
+        requesting_user: User,
+        validated_data: dict[str, Any],
     ) -> dict[str, Any]:
         try:
             # Build request DTO using the authenticated user as system_user
-            request_dto = CreateInventoryRequest(
+            request_dto: CreateInventoryRequest = CreateInventoryRequest(
                 system_user_id=requesting_user.id,
                 date=validated_data["date"],
                 ambulance_id=validated_data.get("ambulance_id"),
@@ -48,6 +56,16 @@ class CreateInventoryApplicationService:
                 "msg": 1,
                 "status_code_http": 201,
                 "data": {"inventory_id": response_dto.inventory_id},
+            }
+        except (UserNotFoundError, AmbulanceNotFoundError) as e:
+            # Validation-level errors (missing required entities)
+            self.logger.warning(
+                f"Validation error creating inventory for user {requesting_user.username}: {str(e)}"
+            )
+            return {
+                "response": str(e),
+                "msg": -1,
+                "status_code_http": 400,
             }
         except Exception as e:
             self.logger.error(

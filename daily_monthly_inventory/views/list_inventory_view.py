@@ -1,9 +1,11 @@
-from rest_framework.request import Request
-from rest_framework.response import Response
+from typing import Any
+
+from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import User
-from typing import Any
+from rest_framework.request import Request
+from rest_framework.response import Response
+
 from core.views.base_view import BaseView
 from daily_monthly_inventory.application_service import ListInventoryApplicationService
 
@@ -86,5 +88,7 @@ class ListInventoryView(BaseView):
         Returns:
             Dictionary with response data
         """
-        service: ListInventoryApplicationService = ListInventoryApplicationService()
-        return service.list_inventories(requesting_user=user)
+        list_inventory_service: ListInventoryApplicationService = (
+            ListInventoryApplicationService()
+        )
+        return list_inventory_service.list_inventories(requesting_user=user)

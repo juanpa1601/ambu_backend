@@ -1,6 +1,8 @@
-from typing import Any
 import logging
+from typing import Any
+
 from django.contrib.auth.models import User
+
 from daily_monthly_inventory.domain_service import InventoryDomainService
 from daily_monthly_inventory.types.dataclass import InventoryListResponse
 
@@ -11,8 +13,8 @@ class ListInventoryApplicationService:
     Handles orchestration of inventory retrieval.
     """
 
-    def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+    def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
         self.inventory_domain_service: InventoryDomainService = InventoryDomainService()
 
     def list_inventories(self, requesting_user: User) -> dict[str, Any]:

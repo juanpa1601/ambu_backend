@@ -1,19 +1,21 @@
-from typing import Any
 import logging
+from typing import Any
+
 from django.contrib.auth.models import User
+
 from daily_monthly_inventory.models import (
-    DailyMonthlyInventory,
-    Ambulance,
-    BiomedicalEquipment,
-    Surgical,
-    AccessoriesCase,
-    Respiratory,
-    ImmobilizationAndSafety,
     Accessories,
+    AccessoriesCase,
     Additionals,
-    Pediatric,
-    Circulatory,
+    Ambulance,
     AmbulanceKit,
+    BiomedicalEquipment,
+    Circulatory,
+    DailyMonthlyInventory,
+    ImmobilizationAndSafety,
+    Pediatric,
+    Respiratory,
+    Surgical,
 )
 
 
@@ -23,8 +25,8 @@ class UpdateInventoryApplicationService:
     Handles orchestration of inventory update operations.
     """
 
-    def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+    def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
 
     def update_inventory(
         self, inventory_id: int, update_data: dict[str, Any], requesting_user: User
@@ -43,19 +45,21 @@ class UpdateInventoryApplicationService:
         try:
             # Step 1: Get the inventory
             try:
-                inventory = DailyMonthlyInventory.objects.select_related(
-                    "biomedical_equipment",
-                    "surgical",
-                    "accessories_case",
-                    "respiratory",
-                    "immobilization_and_safety",
-                    "accessories",
-                    "additionals",
-                    "pediatric",
-                    "circulatory",
-                    "ambulance_kit",
-                    "ambulance",
-                ).get(id=inventory_id)
+                inventory: DailyMonthlyInventory = (
+                    DailyMonthlyInventory.objects.select_related(
+                        "biomedical_equipment",
+                        "surgical",
+                        "accessories_case",
+                        "respiratory",
+                        "immobilization_and_safety",
+                        "accessories",
+                        "additionals",
+                        "pediatric",
+                        "circulatory",
+                        "ambulance_kit",
+                        "ambulance",
+                    ).get(id=inventory_id)
+                )
             except DailyMonthlyInventory.DoesNotExist:
                 self.logger.warning(
                     f"User {requesting_user.username} attempted to update non-existent inventory {inventory_id}"
@@ -67,7 +71,7 @@ class UpdateInventoryApplicationService:
                 }
 
             # Step 2: Track which fields are being updated
-            updated_fields = []
+            updated_fields: list[str] = []
 
             # Step 3: Update simple fields
             if "date" in update_data:
@@ -85,7 +89,7 @@ class UpdateInventoryApplicationService:
                     updated_fields.append("ambulance")
                 else:
                     try:
-                        ambulance = Ambulance.objects.get(
+                        ambulance: Ambulance = Ambulance.objects.get(
                             pk=update_data["ambulance_id"]
                         )
                         inventory.ambulance = ambulance

@@ -1,11 +1,12 @@
 from django.urls import path
+
 from daily_monthly_inventory.views import (
-    ListInventoryView,
     CreateInventoryView,
+    DeleteInventoryView,
     GetInventoryDetailView,
     ListAmbulancesView,
+    ListInventoryView,
     UpdateInventoryView,
-    DeleteInventoryView,
 )
 
 urlpatterns = [

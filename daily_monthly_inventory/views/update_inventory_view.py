@@ -1,11 +1,13 @@
-from rest_framework.request import Request
-from rest_framework.response import Response
+from typing import Any
+
+from django.contrib.auth.models import User
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-from django.contrib.auth.models import User
-from typing import Any
+from rest_framework.request import Request
+from rest_framework.response import Response
+
 from core.views.base_view import BaseView
-from daily_monthly_inventory.application_service.update_inventory_application_service import (
+from daily_monthly_inventory.application_service import (
     UpdateInventoryApplicationService,
 )
 from daily_monthly_inventory.serializers.input.update_inventory_serializer import (
@@ -111,7 +113,10 @@ class UpdateInventoryView(BaseView):
         )
 
     def _update_inventory_callback(
-        self, validated_data: dict[str, Any], user: User, inventory_id: int
+        self,
+        validated_data: dict[str, Any],
+        user: User,
+        inventory_id: int,
     ) -> dict[str, Any]:
         """
         Callback to execute update inventory application service.
@@ -124,7 +129,9 @@ class UpdateInventoryView(BaseView):
         Returns:
             dictionary with response data
         """
-        application_service = UpdateInventoryApplicationService()
-        return application_service.update_inventory(
+        update_inventory_service: UpdateInventoryApplicationService = (
+            UpdateInventoryApplicationService()
+        )
+        return update_inventory_service.update_inventory(
             inventory_id=inventory_id, update_data=validated_data, requesting_user=user
         )

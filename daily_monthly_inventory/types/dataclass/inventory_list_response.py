@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+
 from .inventory_list_item import InventoryListItem
 
 

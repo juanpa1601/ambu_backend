@@ -1,6 +1,8 @@
-from typing import Any
 import logging
+from typing import Any
+
 from django.contrib.auth.models import User
+
 from daily_monthly_inventory.models import Ambulance
 
 
@@ -10,8 +12,8 @@ class ListAmbulancesApplicationService:
     Handles orchestration of ambulance retrieval for dropdown menus.
     """
 
-    def __init__(self):
-        self.logger = logging.getLogger(self.__class__.__name__)
+    def __init__(self) -> None:
+        self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
 
     def list_ambulances(self, requesting_user: User) -> dict[str, Any]:
         """
@@ -25,8 +27,8 @@ class ListAmbulancesApplicationService:
         """
         try:
             # Get all active ambulances
-            ambulances = Ambulance.objects.filter(is_active=True).order_by(
-                "mobile_number"
+            ambulances: list[Ambulance] = list(
+                Ambulance.objects.filter(is_active=True).order_by("mobile_number")
             )
 
             # Build response
