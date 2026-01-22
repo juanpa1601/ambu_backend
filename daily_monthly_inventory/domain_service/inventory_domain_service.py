@@ -6,7 +6,7 @@ from daily_monthly_inventory.types.dataclass import (
     InventoryListResponse,
     CreateInventoryRequest,
     CreateInventoryResponse,
-    InventoryDetailResponse
+    InventoryDetailResponse,
 )
 from daily_monthly_inventory.models.ambulance import Ambulance
 from daily_monthly_inventory.models.biomedical_equipment import BiomedicalEquipment
@@ -20,63 +20,66 @@ from daily_monthly_inventory.models.pediatric import Pediatric
 from daily_monthly_inventory.models.circulatory import Circulatory
 from daily_monthly_inventory.models.ambulance_kit import AmbulanceKit
 
+
 class InventoryDomainService:
-    '''Domain service for inventory-related operations.'''
-    
+    """Domain service for inventory-related operations."""
+
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
-    
+
     def get_all_inventories(self) -> InventoryListResponse:
-        '''
+        """
         Retrieve all daily/monthly inventories with basic information.
-        
+
         Returns:
             InventoryListResponse with list of inventory items
-        '''
+        """
         try:
             # Query all DailyMonthlyInventory with related system_user and ambulance
-            inventories: list[DailyMonthlyInventory] = DailyMonthlyInventory.objects.select_related(
-                'system_user',
-                'ambulance'
-            ).all()
-            
+            inventories: list[DailyMonthlyInventory] = (
+                DailyMonthlyInventory.objects.select_related(
+                    "system_user", "ambulance"
+                ).all()
+            )
+
             inventory_items: list[InventoryListItem] = []
-            
+
             for inventory in inventories:
                 # Get person name from system_user
-                person_name: str = ''
+                person_name: str = ""
                 if inventory.system_user:
                     user: User = inventory.system_user
                     person_name = user.get_full_name() or user.username
-                
+
                 # Get mobile_number from ambulance
-                mobile_number: str = ''
+                mobile_number: str = ""
                 if inventory.ambulance:
                     mobile_number = str(inventory.ambulance.mobile_number)
-                
+
                 inventory_item: InventoryListItem = InventoryListItem(
                     inventory_id=inventory.pk,
                     person_name=person_name,
                     mobile_number=mobile_number,
-                    date=inventory.date
+                    date=inventory.date,
                 )
                 inventory_items.append(inventory_item)
-            
-            self.logger.info(f'Retrieved {len(inventory_items)} inventories')
-            return InventoryListResponse(inventories=inventory_items, total_count=len(inventory_items))
-            
-        except Exception as e:
-            self.logger.error(
-                f'Error retrieving inventories: {str(e)}', 
-                exc_info=True
+
+            self.logger.info(f"Retrieved {len(inventory_items)} inventories")
+            return InventoryListResponse(
+                inventories=inventory_items, total_count=len(inventory_items)
             )
+
+        except Exception as e:
+            self.logger.error(f"Error retrieving inventories: {str(e)}", exc_info=True)
             raise
 
-    def create_inventory(self, request: CreateInventoryRequest) -> CreateInventoryResponse:
-        '''
+    def create_inventory(
+        self, request: CreateInventoryRequest
+    ) -> CreateInventoryResponse:
+        """
         Create a DailyMonthlyInventory using the provided request DTO.
         Creates new records for all related foreign key models.
-        '''
+        """
         try:
             # Resolve system user
             user = User.objects.get(id=request.system_user_id)
@@ -87,12 +90,14 @@ class InventoryDomainService:
                 try:
                     ambulance = Ambulance.objects.get(pk=request.ambulance_id)
                 except Ambulance.DoesNotExist:
-                    self.logger.warning(f'Ambulance {request.ambulance_id} not found')
+                    self.logger.warning(f"Ambulance {request.ambulance_id} not found")
 
             # Create all optional foreign key records from provided data
             biomedical_equipment = None
             if request.biomedical_equipment:
-                biomedical_equipment = BiomedicalEquipment.objects.create(**request.biomedical_equipment)
+                biomedical_equipment = BiomedicalEquipment.objects.create(
+                    **request.biomedical_equipment
+                )
 
             surgical = None
             if request.surgical:
@@ -100,7 +105,9 @@ class InventoryDomainService:
 
             accessories_case = None
             if request.accessories_case:
-                accessories_case = AccessoriesCase.objects.create(**request.accessories_case)
+                accessories_case = AccessoriesCase.objects.create(
+                    **request.accessories_case
+                )
 
             respiratory = None
             if request.respiratory:
@@ -108,7 +115,9 @@ class InventoryDomainService:
 
             immobilization_and_safety = None
             if request.immobilization_and_safety:
-                immobilization_and_safety = ImmobilizationAndSafety.objects.create(**request.immobilization_and_safety)
+                immobilization_and_safety = ImmobilizationAndSafety.objects.create(
+                    **request.immobilization_and_safety
+                )
 
             accessories = None
             if request.accessories:
@@ -145,61 +154,63 @@ class InventoryDomainService:
                 circulatory=circulatory,
                 ambulance_kit=ambulance_kit,
                 date=request.date,
-                observations=request.observations or ''
+                observations=request.observations or "",
             )
 
-            self.logger.info(f'Created inventory {inventory.pk} by user {user.username}')
+            self.logger.info(
+                f"Created inventory {inventory.pk} by user {user.username}"
+            )
             return CreateInventoryResponse(inventory_id=inventory.pk)
         except Exception as e:
-            self.logger.error(f'Error creating inventory: {str(e)}', exc_info=True)
+            self.logger.error(f"Error creating inventory: {str(e)}", exc_info=True)
             raise
 
     def get_inventory_by_id(self, inventory_id: int) -> InventoryDetailResponse | None:
-        '''
+        """
         Retrieve complete inventory details by ID.
-        
+
         Args:
             inventory_id: ID of the DailyMonthlyInventory
-            
+
         Returns:
             InventoryDetailResponse with all inventory information or None if not found
-        '''
+        """
         try:
             # Get inventory with all related objects
             inventory = DailyMonthlyInventory.objects.select_related(
-                'system_user',
-                'ambulance',
-                'biomedical_equipment',
-                'surgical',
-                'accessories_case',
-                'respiratory',
-                'immobilization_and_safety',
-                'accessories',
-                'additionals',
-                'pediatric',
-                'circulatory',
-                'ambulance_kit'
+                "system_user",
+                "ambulance",
+                "biomedical_equipment",
+                "surgical",
+                "accessories_case",
+                "respiratory",
+                "immobilization_and_safety",
+                "accessories",
+                "additionals",
+                "pediatric",
+                "circulatory",
+                "ambulance_kit",
             ).get(pk=inventory_id)
-            
+
             # Get person name from system_user
-            person_name: str = ''
+            person_name: str = ""
             system_user_id: int | None = None
             if inventory.system_user:
                 user: User = inventory.system_user
                 person_name = user.get_full_name() or user.username
                 system_user_id = user.id
-            
+
             # Helper function to serialize model to dict
             def model_to_dict(instance):
                 if instance is None:
                     return None
-                data = {'id': instance.pk}
+                data = {"id": instance.pk}
                 for field in instance._meta.fields:
-                    if field.name != 'id':
+                    if field.name != "id":
                         value = getattr(instance, field.name)
                         data[field.name] = value
                 return data
-            
+
             # Build detail response with complete related objects
             detail_response = InventoryDetailResponse(
                 inventory_id=inventory.pk,
@@ -212,24 +223,25 @@ class InventoryDomainService:
                 surgical=model_to_dict(inventory.surgical),
                 accessories_case=model_to_dict(inventory.accessories_case),
                 respiratory=model_to_dict(inventory.respiratory),
-                immobilization_and_safety=model_to_dict(inventory.immobilization_and_safety),
+                immobilization_and_safety=model_to_dict(
+                    inventory.immobilization_and_safety
+                ),
                 accessories=model_to_dict(inventory.accessories),
                 additionals=model_to_dict(inventory.additionals),
                 pediatric=model_to_dict(inventory.pediatric),
                 circulatory=model_to_dict(inventory.circulatory),
                 ambulance_kit=model_to_dict(inventory.ambulance_kit),
-                created_at=inventory.created_at.isoformat()
+                created_at=inventory.created_at.isoformat(),
             )
-            
-            self.logger.info(f'Retrieved inventory detail for ID {inventory_id}')
+
+            self.logger.info(f"Retrieved inventory detail for ID {inventory_id}")
             return detail_response
-            
+
         except DailyMonthlyInventory.DoesNotExist:
-            self.logger.warning(f'Inventory {inventory_id} not found')
+            self.logger.warning(f"Inventory {inventory_id} not found")
             return None
         except Exception as e:
             self.logger.error(
-                f'Error retrieving inventory {inventory_id}: {str(e)}',
-                exc_info=True
+                f"Error retrieving inventory {inventory_id}: {str(e)}", exc_info=True
             )
             raise

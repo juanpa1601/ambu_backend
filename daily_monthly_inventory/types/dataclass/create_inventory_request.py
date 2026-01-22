@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
+
 @dataclass
 class CreateInventoryRequest:
     system_user_id: int
@@ -17,4 +18,4 @@ class CreateInventoryRequest:
     pediatric: dict[str, Any] | None = None
     circulatory: dict[str, Any] | None = None
     ambulance_kit: dict[str, Any] | None = None
-    observations: str = ''
+    observations: str = ""

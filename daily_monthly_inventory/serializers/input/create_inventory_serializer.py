@@ -14,4 +14,4 @@ class CreateInventorySerializer(serializers.Serializer):
     pediatric = serializers.DictField(required=False, allow_null=True)
     circulatory = serializers.DictField(required=False, allow_null=True)
     ambulance_kit = serializers.DictField(required=False, allow_null=True)
-    observations = serializers.CharField(required=False, allow_blank=True, default='')
+    observations = serializers.CharField(required=False, allow_blank=True, default="")

@@ -2,9 +2,11 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any
 
+
 @dataclass
 class InventoryDetailResponse:
-    '''Data Transfer Object for inventory detail response'''
+    """Data Transfer Object for inventory detail response"""
+
     inventory_id: int
     system_user_id: int | None
     person_name: str

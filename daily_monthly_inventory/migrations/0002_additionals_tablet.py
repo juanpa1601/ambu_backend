@@ -5,15 +5,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('daily_monthly_inventory', '0001_initial'),
+        ("daily_monthly_inventory", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='additionals',
-            name='tablet',
-            field=models.IntegerField(default=0, help_text='Tablet quantity', validators=[django.core.validators.MaxValueValidator(10)]),
+            model_name="additionals",
+            name="tablet",
+            field=models.IntegerField(
+                default=0,
+                help_text="Tablet quantity",
+                validators=[django.core.validators.MaxValueValidator(10)],
+            ),
         ),
     ]

@@ -16,84 +16,51 @@ from .ambulance import Ambulance
 
 class DailyMonthlyInventory(models.Model):
     biomedical_equipment = models.ForeignKey(
-        BiomedicalEquipment,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        BiomedicalEquipment, on_delete=models.CASCADE, null=True, blank=True
     )
     accessories_case = models.ForeignKey(
-        AccessoriesCase,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        AccessoriesCase, on_delete=models.CASCADE, null=True, blank=True
     )
     respiratory = models.ForeignKey(
-        Respiratory,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        Respiratory, on_delete=models.CASCADE, null=True, blank=True
     )
     immobilization_and_safety = models.ForeignKey(
-        ImmobilizationAndSafety,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        ImmobilizationAndSafety, on_delete=models.CASCADE, null=True, blank=True
     )
     surgical = models.ForeignKey(
-        Surgical,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        Surgical, on_delete=models.CASCADE, null=True, blank=True
     )
     accessories = models.ForeignKey(
-        Accessories,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        Accessories, on_delete=models.CASCADE, null=True, blank=True
     )
     additionals = models.ForeignKey(
-        Additionals,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        Additionals, on_delete=models.CASCADE, null=True, blank=True
     )
     pediatric = models.ForeignKey(
-        Pediatric,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        Pediatric, on_delete=models.CASCADE, null=True, blank=True
     )
     circulatory = models.ForeignKey(
-        Circulatory,
-         on_delete=models.CASCADE,
-          null=True,
-           blank=True
+        Circulatory, on_delete=models.CASCADE, null=True, blank=True
     )
     ambulance_kit = models.ForeignKey(
-        AmbulanceKit,
-         on_delete=models.CASCADE,
-          null=True,
-           blank=True
+        AmbulanceKit, on_delete=models.CASCADE, null=True, blank=True
     )
 
     system_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
     )
     ambulance = models.ForeignKey(
         Ambulance,
         on_delete=models.SET_NULL,
-        null = True,
+        null=True,
         max_length=128,
         blank=True,
-        default=''
+        default="",
     )
 
     date = models.DateField()
 
-    observations = models.TextField(blank=True, default='')
+    observations = models.TextField(blank=True, default="")
 
     created_at = models.DateTimeField(auto_now_add=True)
 

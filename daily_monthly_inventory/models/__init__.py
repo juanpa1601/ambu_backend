@@ -1,5 +1,3 @@
-
-
 from .biomedical_equipment import BiomedicalEquipment
 from .surgical import Surgical
 from .accessories_case import AccessoriesCase
@@ -14,18 +12,17 @@ from .daily_monthly_inventory import DailyMonthlyInventory
 from .ambulance import Ambulance
 
 __all__ = [
-	'BiomedicalEquipment',
-	'Surgical',
-	'AccessoriesCase',
-	'Respiratory',
-	'ImmobilizationAndSafety',
-	'Accessories',
-	'Additionals',
-	'Pediatric',
-	'Circulatory',
-	'AmbulanceKit',
-	'DailyMonthlyInventory',
-	'DailyMonthlyInventory',
-	'Ambulance',
+    "BiomedicalEquipment",
+    "Surgical",
+    "AccessoriesCase",
+    "Respiratory",
+    "ImmobilizationAndSafety",
+    "Accessories",
+    "Additionals",
+    "Pediatric",
+    "Circulatory",
+    "AmbulanceKit",
+    "DailyMonthlyInventory",
+    "DailyMonthlyInventory",
+    "Ambulance",
 ]
-

@@ -5,9 +5,9 @@ from .create_inventory_response import CreateInventoryResponse
 from .inventory_detail_response import InventoryDetailResponse
 
 __all__ = [
-    'InventoryListItem',
-    'InventoryListResponse',
-    'CreateInventoryRequest',
-    'CreateInventoryResponse',
-    'InventoryDetailResponse'
+    "InventoryListItem",
+    "InventoryListResponse",
+    "CreateInventoryRequest",
+    "CreateInventoryResponse",
+    "InventoryDetailResponse",
 ]

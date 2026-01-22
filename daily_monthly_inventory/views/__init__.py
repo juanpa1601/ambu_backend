@@ -6,10 +6,10 @@ from .update_inventory_view import UpdateInventoryView
 from .delete_inventory_view import DeleteInventoryView
 
 __all__ = [
-    'ListInventoryView',
-    'CreateInventoryView',
-    'GetInventoryDetailView',
-    'ListAmbulancesView',
-    'UpdateInventoryView',
-    'DeleteInventoryView'
+    "ListInventoryView",
+    "CreateInventoryView",
+    "GetInventoryDetailView",
+    "ListAmbulancesView",
+    "UpdateInventoryView",
+    "DeleteInventoryView",
 ]

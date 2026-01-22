@@ -5,68 +5,63 @@ from daily_monthly_inventory.models import DailyMonthlyInventory
 
 
 class DeleteInventoryApplicationService:
-    '''
+    """
     Application service for deleting inventory.
     Handles orchestration of inventory deletion operations.
-    '''
-    
+    """
+
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
-    
+
     def delete_inventory(
-        self, 
-        inventory_id: int,
-        requesting_user: User
+        self, inventory_id: int, requesting_user: User
     ) -> dict[str, Any]:
-        '''
+        """
         Delete inventory by ID.
-        
+
         Args:
             inventory_id: ID of the inventory to delete
             requesting_user: User making the request
-            
+
         Returns:
             dictionary with response data and status
-        '''
+        """
         try:
             # Step 1: Get the inventory
             try:
                 inventory = DailyMonthlyInventory.objects.get(id=inventory_id)
             except DailyMonthlyInventory.DoesNotExist:
                 self.logger.warning(
-                    f'User {requesting_user.username} attempted to delete non-existent inventory {inventory_id}'
+                    f"User {requesting_user.username} attempted to delete non-existent inventory {inventory_id}"
                 )
                 return {
-                    'response': f'Inventario con ID {inventory_id} no encontrado.',
-                    'msg': -1,
-                    'status_code_http': 404
+                    "response": f"Inventario con ID {inventory_id} no encontrado.",
+                    "msg": -1,
+                    "status_code_http": 404,
                 }
-            
+
             # Step 2: Delete the inventory (cascade will delete related objects)
             inventory.delete()
-            
+
             # Step 3: Build response
             self.logger.info(
-                f'User {requesting_user.username} successfully deleted inventory {inventory_id}'
+                f"User {requesting_user.username} successfully deleted inventory {inventory_id}"
             )
-            
+
             return {
-                'response': 'Inventario eliminado exitosamente.',
-                'msg': 1,
-                'status_code_http': 200,
-                'data': {
-                    'inventory_id': inventory_id,
-                    'deleted': True
-                }
+                "response": "Inventario eliminado exitosamente.",
+                "msg": 1,
+                "status_code_http": 200,
+                "data": {"inventory_id": inventory_id, "deleted": True},
             }
-            
+
         except Exception as e:
             self.logger.error(
-                f'Error deleting inventory {inventory_id} for {requesting_user.username}: {str(e)}',
-                exc_info=True
+                f"Error deleting inventory {inventory_id} for {requesting_user.username}: {str(e)}",
+                exc_info=True,
             )
             return {
-                'response': 'Ocurrió un error al eliminar el inventario.',
-                'msg': -1,
-                'status_code_http': 500
+                "response": "Ocurrió un error al eliminar el inventario.",
+                "msg": -1,
+                "status_code_http": 500,
             }
