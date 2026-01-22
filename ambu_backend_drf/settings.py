@@ -56,6 +56,18 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',  # For anonymous users
+        'rest_framework.throttling.UserRateThrottle',  # For authenticated users
+        'rest_framework.throttling.ScopedRateThrottle',  # For per-view throttling
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        # Global throttling rates
+        'anon': '50/minute',      
+        'user': '1000/hour',
+        # Specific throttling rates for certain views
+        'login': '10/minute'   
+    }     
 }
 
 MIDDLEWARE = [
