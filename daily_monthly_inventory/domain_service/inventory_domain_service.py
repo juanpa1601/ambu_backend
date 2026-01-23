@@ -101,8 +101,8 @@ class InventoryDomainService:
 
             # Resolve ambulance by ID (required)
             if not request.ambulance_id:
-                self.logger.error("Ambulance ID is required to create inventory")
-                raise ValueError("Ambulance ID is required to create inventory")
+                self.logger.error("Se requiere el ID de la ambulancia para crear el inventario")
+                raise ValueError("Se requiere el ID de la ambulancia para crear el inventario")
 
             try:
                 ambulance: Ambulance = Ambulance.objects.get(id=request.ambulance_id)

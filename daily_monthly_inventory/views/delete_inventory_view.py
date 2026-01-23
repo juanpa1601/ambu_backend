@@ -44,7 +44,7 @@ class DeleteInventoryView(BaseView):
 
     Error Response (401 Unauthorized):
         {
-            "response": "Authentication credentials were not provided.",
+            "response": "No se proporcionaron credenciales de autenticación.",
             "msg": -1,
             "status_code": 401
         }
