@@ -111,7 +111,8 @@ class UpdateInventoryView(BaseView):
         return self._handle_request(
             request=request,
             serializer_class=UpdateInventorySerializer,
-            service_method_callback=lambda validated_data, user: self._update_inventory_callback(
+            service_method_callback=lambda validated_data,
+            user: self._update_inventory_callback(
                 validated_data,
                 user,
                 inventory_id,

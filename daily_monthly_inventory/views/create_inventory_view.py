@@ -5,20 +5,11 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-
 from core.views.base_view import BaseView
 from daily_monthly_inventory.application_service import (
     CreateInventoryApplicationService,
 )
-
-# from daily_monthly_inventory.application_service.create_inventory_application_service import (
-#     CreateInventoryApplicationService,
-# )
 from daily_monthly_inventory.serializers.input import CreateInventorySerializer
-
-# from daily_monthly_inventory.serializers.input.create_inventory_serializer import (
-#     CreateInventorySerializer,
-# )
 
 
 class CreateInventoryView(BaseView):

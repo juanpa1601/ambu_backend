@@ -93,7 +93,7 @@ class UpdateInventoryApplicationService:
                 f"Ambulance not found while updating inventory {inventory_id}"
             )
             return {
-                "response": f"Ambulancia especificada no encontrada.",
+                "response": "Ambulancia especificada no encontrada.",
                 "msg": -1,
                 "status_code_http": 400,
             }

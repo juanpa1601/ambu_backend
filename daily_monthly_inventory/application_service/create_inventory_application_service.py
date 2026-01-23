@@ -56,9 +56,7 @@ class CreateInventoryApplicationService:
             }
         except User.DoesNotExist:
             # User entity not found - should rarely happen since requesting_user is authenticated
-            self.logger.warning(
-                f"User {requesting_user.id} does not exist"
-            )
+            self.logger.warning(f"User {requesting_user.id} does not exist")
             return {
                 "response": "El usuario especificado no existe.",
                 "msg": -1,

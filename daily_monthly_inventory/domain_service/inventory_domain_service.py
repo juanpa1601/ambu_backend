@@ -277,15 +277,15 @@ class InventoryDomainService:
     ) -> UpdateInventoryResponse:
         """
         Update an existing inventory with new data.
-        
+
         This method contains the domain logic for updating inventory and equipment.
-        
+
         Args:
             request: UpdateInventoryRequest DTO with update data
-            
+
         Returns:
             UpdateInventoryResponse with updated data
-            
+
         Raises:
             DailyMonthlyInventory.DoesNotExist: If inventory not found
             Ambulance.DoesNotExist: If ambulance_id provided but not found

@@ -6,7 +6,7 @@ from typing import Any
 @dataclass
 class UpdateInventoryRequest:
     """DTO for updating an inventory."""
-    
+
     inventory_id: int
     date: date | None = None
     observations: str | None = None
