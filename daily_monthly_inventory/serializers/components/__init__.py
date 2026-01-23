@@ -16,6 +16,7 @@ from .pediatric_serializer import PediatricSerializer
 from .circulatory_serializer import CirculatorySerializer
 from .ambulance_kit_serializer import AmbulanceKitSerializer
 from .accessories_case_serializer import AccessoriesCaseSerializer
+from .shift_serializer import ShiftSerializer
 
 __all__ = [
     "AdditionalsSerializer",
@@ -28,4 +29,5 @@ __all__ = [
     "CirculatorySerializer",
     "AmbulanceKitSerializer",
     "AccessoriesCaseSerializer",
+    "ShiftSerializer",
 ]

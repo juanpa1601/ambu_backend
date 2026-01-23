@@ -10,6 +10,7 @@ from .immobilization_safety import ImmobilizationAndSafety
 from .pediatric import Pediatric
 from .respiratory import Respiratory
 from .surgical import Surgical
+from .shift import Shift
 
 __all__ = [
     "BiomedicalEquipment",
@@ -25,4 +26,5 @@ __all__ = [
     "DailyMonthlyInventory",
     "DailyMonthlyInventory",
     "Ambulance",
+    "Shift",
 ]

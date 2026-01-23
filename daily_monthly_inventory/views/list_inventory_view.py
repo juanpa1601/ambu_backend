@@ -45,7 +45,7 @@ class ListInventoryView(BaseView):
 
     Error Response (401 Unauthorized):
         {
-            "response": "No se proporcionaron credenciales de autenticación.",
+            "response": "Authentication credentials were not provided.",
             "msg": -1,
             "status_code": 401
         }
@@ -94,7 +94,25 @@ class ListInventoryView(BaseView):
         Returns:
             Dictionary with response data
         """
+
+        # Parse optional query params and convert to ints when possible
+        def _parse_int(qs, key):
+            val = qs.get(key)
+            if val is None or val == "":
+                return None
+            try:
+                return int(val)
+            except (TypeError, ValueError):
+                return None
+
+        qp = self.request.query_params
+        ambulance_id = _parse_int(qp, "ambulance_id")
+        month = _parse_int(qp, "month")
+        year = _parse_int(qp, "year")
+
         list_inventory_service: ListInventoryApplicationService = (
             ListInventoryApplicationService()
         )
-        return list_inventory_service.list_inventories(requesting_user=user)
+        return list_inventory_service.list_inventories(
+            requesting_user=user, ambulance_id=ambulance_id, month=month, year=year
+        )

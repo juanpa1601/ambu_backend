@@ -3,17 +3,19 @@ from typing import Any
 
 from django.contrib.auth.models import User
 
-from daily_monthly_inventory.models import Ambulance
+from daily_monthly_inventory.domain_service import InventoryDomainService
+from daily_monthly_inventory.types.dataclass import AmbulanceListResponse
 
 
 class ListAmbulancesApplicationService:
     """
     Application service for listing ambulances.
-    Handles orchestration of ambulance retrieval for dropdown menus.
+    Orchestrates ambulance retrieval and formats HTTP responses.
     """
 
     def __init__(self) -> None:
         self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
+        self.inventory_domain_service: InventoryDomainService = InventoryDomainService()
 
     def list_ambulances(
         self,
@@ -29,27 +31,24 @@ class ListAmbulancesApplicationService:
             dictionary with response data and status
         """
         try:
-            # Get all active ambulances
-            ambulances: list[Ambulance] = list(
-                Ambulance.objects.filter(is_active=True).order_by("mobile_number")
+            ambulance_response: AmbulanceListResponse = (
+                self.inventory_domain_service.get_all_ambulances()
             )
 
-            # Build response
-            ambulances_data: list[dict[str, Any]] = [
+            # Convert dataclass to dict for JSON response
+            ambulances_list: list[dict[str, Any]] = [
                 {
                     "id": ambulance.id,
                     "mobile_number": ambulance.mobile_number,
                     "license_plate": ambulance.license_plate,
-                    "display_name": f"Móvil {ambulance.mobile_number} - {ambulance.license_plate}"
-                    if ambulance.license_plate
-                    else f"Móvil {ambulance.mobile_number}",
+                    "display_name": ambulance.display_name,
                 }
-                for ambulance in ambulances
+                for ambulance in ambulance_response.ambulances
             ]
 
             self.logger.info(
                 f"User {requesting_user.username} successfully retrieved "
-                f"{len(ambulances_data)} ambulances"
+                f"{ambulance_response.total_count} ambulances"
             )
 
             return {
@@ -57,8 +56,8 @@ class ListAmbulancesApplicationService:
                 "msg": 1,
                 "status_code_http": 200,
                 "data": {
-                    "ambulances": ambulances_data,
-                    "total_count": len(ambulances_data),
+                    "ambulances": ambulances_list,
+                    "total_count": ambulance_response.total_count,
                 },
             }
 
