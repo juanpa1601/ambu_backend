@@ -115,10 +115,13 @@ class EditProfileView(BaseView):
         ) -> dict[str, Any]:
             # Create request dataclass
             profile_request: EditProfileRequest = EditProfileRequest(
+                username=validated_data.get('username'),
                 email=validated_data.get('email'),
                 first_name=validated_data.get('first_name'),
                 last_name=validated_data.get('last_name'),
                 password=validated_data.get('password'),
+                document_type=validated_data.get('document_type'),
+                document_number=validated_data.get('document_number'),
                 phone_number=validated_data.get('phone_number'),
                 address=validated_data.get('address'),
                 birth_date=validated_data.get('birth_date'),

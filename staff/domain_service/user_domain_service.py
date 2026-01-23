@@ -440,6 +440,13 @@ class UserDomainService:
                     return (False, 'El email ya existe. Intenta otro.', None)
                 user.email = profile_request.email
                 fields_updated.append('email')
+            if profile_request.username is not None:
+                # Validate username uniqueness (exclude current user)
+                if User.objects.filter(username=profile_request.username).exclude(id=user.id).exists():
+                    self.logger.warning(f'Username already exists: {profile_request.username}')
+                    return (False, 'El nombre de usuario ya existe. Intenta otro.', None)
+                user.username = profile_request.username
+                fields_updated.append('username')
             if profile_request.first_name is not None:
                 user.first_name = profile_request.first_name
                 fields_updated.append('first_name')
@@ -450,11 +457,24 @@ class UserDomainService:
                 user.set_password(profile_request.password)
                 fields_updated.append('password')
             # Save user if any field was updated
-            if any(field in fields_updated for field in ['email', 'first_name', 'last_name', 'password']):
+            if any(field in fields_updated for field in ['username', 'email', 'first_name', 'last_name', 'password']):
                 user.save()
                 self.logger.info(f'Updated system user fields for: {user.username}')
             # Step 4: Update Base Staff fields
+            if profile_request.document_type is not None:
+                base_staff.document_type = profile_request.document_type
+                fields_updated.append('document_type')
+            if profile_request.document_number is not None:
+                # Validate document_number uniqueness (exclude current base_staff)
+                if BaseStaff.objects.filter(document_number=profile_request.document_number).exclude(id=base_staff.id).exists():
+                    self.logger.warning(f'Document number already exists: {profile_request.document_number}')
+                    return (False, 'Número de documento ya existe. Intenta otro.', None)
+                base_staff.document_number = profile_request.document_number
+                fields_updated.append('document_number')
             if profile_request.phone_number is not None:
+                if BaseStaff.objects.filter(phone_number=profile_request.phone_number).exclude(id=base_staff.id).exists():
+                    self.logger.warning(f'Phone number already exists: {profile_request.phone_number}')
+                    return (False, 'El número de teléfono ya existe. Intenta otro.', None)
                 base_staff.phone_number = profile_request.phone_number
                 fields_updated.append('phone_number')
             if profile_request.address is not None:
@@ -467,12 +487,15 @@ class UserDomainService:
                 base_staff.signature = profile_request.signature
                 fields_updated.append('signature')
             # Save base_staff if any field was updated
-            if any(field in fields_updated for field in ['phone_number', 'address', 'birth_date', 'signature']):
+            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date', 'signature']):
                 base_staff.save()
                 self.logger.info(f'Updated base staff fields for: {user.username}')
             # Step 5: Update specific profile fields based on staff type
             if staff_type == 'healthcare':
                 if profile_request.professional_registration is not None:
+                    if Healthcare.objects.filter(professional_registration=profile_request.professional_registration).exclude(base_staff=specific_profile.base_staff).exists():
+                        self.logger.warning(f'Professional registration already exists: {profile_request.professional_registration}')
+                        return (False, 'La matrícula profesional ya existe. Intenta otra.', None)
                     specific_profile.professional_registration = profile_request.professional_registration
                     fields_updated.append('professional_registration')
                 if profile_request.professional_position is not None:
@@ -483,6 +506,9 @@ class UserDomainService:
                     self.logger.info(f'Updated healthcare profile for: {user.username}')
             elif staff_type == 'driver':
                 if profile_request.license_number is not None:
+                    if Driver.objects.filter(license_number=profile_request.license_number).exclude(base_staff=specific_profile.base_staff).exists():
+                        self.logger.warning(f'License number already exists: {profile_request.license_number}')
+                        return (False, 'El número de licencia ya existe. Intenta otro.', None)
                     specific_profile.license_number = profile_request.license_number
                     fields_updated.append('license_number')
                 if profile_request.license_category is not None:
@@ -589,6 +615,13 @@ class UserDomainService:
                     return (False, 'El email ya existe. Intenta otro.', None)
                 user.email = profile_request.email
                 fields_updated.append('email')
+            if profile_request.username is not None:
+                # Validate username uniqueness (exclude current user)
+                if User.objects.filter(username=profile_request.username).exclude(id=user.id).exists():
+                    self.logger.warning(f'Username already exists: {profile_request.username}')
+                    return (False, 'El nombre de usuario ya existe. Intenta otro.', None)
+                user.username = profile_request.username
+                fields_updated.append('username')
             if profile_request.first_name is not None:
                 user.first_name = profile_request.first_name
                 fields_updated.append('first_name')
@@ -599,11 +632,24 @@ class UserDomainService:
                 user.set_password(profile_request.password)
                 fields_updated.append('password')
             # Save user if any field was updated
-            if any(field in fields_updated for field in ['email', 'first_name', 'last_name', 'password']):
+            if any(field in fields_updated for field in ['username', 'email', 'first_name', 'last_name', 'password']):
                 user.save()
                 self.logger.info(f'Admin {admin_user.username} updated system user fields for: {user.username}')
             # Step 5: Update Base Staff fields
+            if profile_request.document_type is not None:
+                base_staff.document_type = profile_request.document_type
+                fields_updated.append('document_type')
+            if profile_request.document_number is not None:
+                # Validate document_number uniqueness (exclude current base_staff)
+                if BaseStaff.objects.filter(document_number=profile_request.document_number).exclude(id=base_staff.id).exists():
+                    self.logger.warning(f'Document number already exists: {profile_request.document_number}')
+                    return (False, 'Número de documento ya existe. Intenta otro.', None)
+                base_staff.document_number = profile_request.document_number
+                fields_updated.append('document_number')
             if profile_request.phone_number is not None:
+                if BaseStaff.objects.filter(phone_number=profile_request.phone_number).exclude(id=base_staff.id).exists():
+                    self.logger.warning(f'Phone number already exists: {profile_request.phone_number}')
+                    return (False, 'El número de teléfono ya existe. Intenta otro.', None)
                 base_staff.phone_number = profile_request.phone_number
                 fields_updated.append('phone_number')
             if profile_request.address is not None:
@@ -616,12 +662,15 @@ class UserDomainService:
                 base_staff.signature = profile_request.signature
                 fields_updated.append('signature')
             # Save base_staff if any field was updated
-            if any(field in fields_updated for field in ['phone_number', 'address', 'birth_date', 'signature']):
+            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date', 'signature']):
                 base_staff.save()
                 self.logger.info(f'Admin {admin_user.username} updated base staff fields for: {user.username}')
             # Step 6: Update specific profile fields based on staff type
             if staff_type == 'healthcare':
                 if profile_request.professional_registration is not None:
+                    if Healthcare.objects.filter(professional_registration=profile_request.professional_registration).exclude(base_staff=specific_profile.base_staff).exists():
+                        self.logger.warning(f'Professional registration already exists: {profile_request.professional_registration}')
+                        return (False, 'La matrícula profesional ya existe. Intenta otra.', None)
                     specific_profile.professional_registration = profile_request.professional_registration
                     fields_updated.append('professional_registration')
                 if profile_request.professional_position is not None:
@@ -632,6 +681,9 @@ class UserDomainService:
                     self.logger.info(f'Admin {admin_user.username} updated healthcare profile for: {user.username}')
             elif staff_type == 'driver':
                 if profile_request.license_number is not None:
+                    if Driver.objects.filter(license_number=profile_request.license_number).exclude(base_staff=specific_profile.base_staff).exists():
+                        self.logger.warning(f'License number already exists: {profile_request.license_number}')
+                        return (False, 'El número de licencia ya existe. Intenta otro.', None)
                     specific_profile.license_number = profile_request.license_number
                     fields_updated.append('license_number')
                 if profile_request.license_category is not None:

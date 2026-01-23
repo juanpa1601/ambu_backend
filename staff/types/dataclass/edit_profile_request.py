@@ -4,12 +4,15 @@ from dataclasses import dataclass
 class EditProfileRequest:
     '''Data Transfer Object for edit profile request'''
     # System User fields (optional)
+    username: str | None = None
     email: str | None = None
     first_name: str | None = None
     last_name: str | None = None
-    password: str | None = None  # Para cambiar contraseña
+    password: str | None = None # New password
     
     # Base Staff fields (optional)
+    document_type: str | None = None
+    document_number: str | None = None
     phone_number: str | None = None
     address: str | None = None
     birth_date: str | None = None  # Format: YYYY-MM-DD
