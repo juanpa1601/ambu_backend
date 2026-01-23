@@ -4,10 +4,7 @@ from typing import Any
 from django.contrib.auth.models import User
 
 from daily_monthly_inventory.domain_service import InventoryDomainService
-from daily_monthly_inventory.domain_service.inventory_domain_service import (
-    UserNotFoundError,
-    AmbulanceNotFoundError,
-)
+from daily_monthly_inventory.models import Ambulance
 from daily_monthly_inventory.types.dataclass import (
     CreateInventoryRequest,
     CreateInventoryResponse,
@@ -57,8 +54,28 @@ class CreateInventoryApplicationService:
                 "status_code_http": 201,
                 "data": {"inventory_id": response_dto.inventory_id},
             }
-        except (UserNotFoundError, AmbulanceNotFoundError) as e:
-            # Validation-level errors (missing required entities)
+        except User.DoesNotExist:
+            # User entity not found - should rarely happen since requesting_user is authenticated
+            self.logger.warning(
+                f"User {requesting_user.id} does not exist"
+            )
+            return {
+                "response": "El usuario especificado no existe.",
+                "msg": -1,
+                "status_code_http": 404,
+            }
+        except Ambulance.DoesNotExist:
+            # Ambulance not found - invalid ambulance_id provided by user
+            self.logger.warning(
+                f"Ambulance not found for user {requesting_user.username}"
+            )
+            return {
+                "response": "La ambulancia especificada no existe.",
+                "msg": -1,
+                "status_code_http": 404,
+            }
+        except ValueError as e:
+            # Validation errors (e.g., missing required fields)
             self.logger.warning(
                 f"Validation error creating inventory for user {requesting_user.username}: {str(e)}"
             )

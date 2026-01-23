@@ -59,7 +59,11 @@ class GetInventoryDetailView(BaseView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Request, inventory_id: int) -> Response:
+    def get(
+        self,
+        request: Request,
+        inventory_id: int,
+    ) -> Response:
         """
         Handle GET request to retrieve inventory details.
 
@@ -74,12 +78,17 @@ class GetInventoryDetailView(BaseView):
             request=request,
             serializer_class=None,
             service_method_callback=lambda user: self._get_detail_callback(
-                user, inventory_id
+                user,
+                inventory_id,
             ),
             requires_auth=True,
         )
 
-    def _get_detail_callback(self, user: User, inventory_id: int) -> dict[str, Any]:
+    def _get_detail_callback(
+        self,
+        user: User,
+        inventory_id: int,
+    ) -> dict[str, Any]:
         """
         Callback to execute inventory detail retrieval logic.
 

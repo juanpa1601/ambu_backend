@@ -17,7 +17,10 @@ class ListInventoryApplicationService:
         self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
         self.inventory_domain_service: InventoryDomainService = InventoryDomainService()
 
-    def list_inventories(self, requesting_user: User) -> dict[str, Any]:
+    def list_inventories(
+        self,
+        requesting_user: User,
+    ) -> dict[str, Any]:
         """
         List all daily/monthly inventories.
 

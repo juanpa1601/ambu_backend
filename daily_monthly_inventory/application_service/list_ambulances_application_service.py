@@ -15,7 +15,10 @@ class ListAmbulancesApplicationService:
     def __init__(self) -> None:
         self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
 
-    def list_ambulances(self, requesting_user: User) -> dict[str, Any]:
+    def list_ambulances(
+        self,
+        requesting_user: User,
+    ) -> dict[str, Any]:
         """
         List all active ambulances for dropdown selection.
 

@@ -61,7 +61,10 @@ class ListAmbulancesView(BaseView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Request) -> Response:
+    def get(
+        self,
+        request: Request,
+    ) -> Response:
         """
         Handle GET request to list all active ambulances.
 
@@ -78,7 +81,10 @@ class ListAmbulancesView(BaseView):
             requires_auth=True,
         )
 
-    def _list_ambulances_callback(self, user: User) -> dict[str, Any]:
+    def _list_ambulances_callback(
+        self,
+        user: User,
+    ) -> dict[str, Any]:
         """
         Callback to execute list ambulances application service.
 

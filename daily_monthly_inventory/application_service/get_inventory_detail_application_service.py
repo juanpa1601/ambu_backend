@@ -15,7 +15,9 @@ class GetInventoryDetailApplicationService:
         self.inventory_domain_service: InventoryDomainService = InventoryDomainService()
 
     def get_inventory_detail(
-        self, requesting_user: User, inventory_id: int
+        self,
+        requesting_user: User,
+        inventory_id: int,
     ) -> dict[str, Any]:
         """
         Get detailed information for a specific inventory.

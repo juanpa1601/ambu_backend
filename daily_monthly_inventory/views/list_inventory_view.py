@@ -61,7 +61,10 @@ class ListInventoryView(BaseView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request: Request) -> Response:
+    def get(
+        self,
+        request: Request,
+    ) -> Response:
         """
         Handle GET request to list all inventories.
 
@@ -78,7 +81,10 @@ class ListInventoryView(BaseView):
             requires_auth=True,
         )
 
-    def _list_inventories_callback(self, user: User) -> dict[str, Any]:
+    def _list_inventories_callback(
+        self,
+        user: User,
+    ) -> dict[str, Any]:
         """
         Callback to execute inventory listing logic.
 

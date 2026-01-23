@@ -16,7 +16,9 @@ class DeleteInventoryApplicationService:
         self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
 
     def delete_inventory(
-        self, inventory_id: int, requesting_user: User
+        self,
+        inventory_id: int,
+        requesting_user: User,
     ) -> dict[str, Any]:
         """
         Delete inventory by ID.

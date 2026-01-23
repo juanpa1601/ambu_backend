@@ -93,7 +93,11 @@ class UpdateInventoryView(BaseView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def patch(self, request: Request, inventory_id: int) -> Response:
+    def patch(
+        self,
+        request: Request,
+        inventory_id: int,
+    ) -> Response:
         """
         Handle PATCH request to partially update an inventory.
 
@@ -107,8 +111,11 @@ class UpdateInventoryView(BaseView):
         return self._handle_request(
             request=request,
             serializer_class=UpdateInventorySerializer,
-            service_method_callback=lambda validated_data,
-            user: self._update_inventory_callback(validated_data, user, inventory_id),
+            service_method_callback=lambda validated_data, user: self._update_inventory_callback(
+                validated_data,
+                user,
+                inventory_id,
+            ),
             requires_auth=True,
         )
 
@@ -133,5 +140,7 @@ class UpdateInventoryView(BaseView):
             UpdateInventoryApplicationService()
         )
         return update_inventory_service.update_inventory(
-            inventory_id=inventory_id, update_data=validated_data, requesting_user=user
+            inventory_id=inventory_id,
+            update_data=validated_data,
+            requesting_user=user,
         )

@@ -30,7 +30,10 @@ class CreateInventoryView(BaseView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request: Request) -> Response:
+    def post(
+        self,
+        request: Request,
+    ) -> Response:
         return self._handle_request(
             request=request,
             serializer_class=CreateInventorySerializer,

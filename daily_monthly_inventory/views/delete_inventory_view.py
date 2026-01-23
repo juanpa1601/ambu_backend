@@ -60,7 +60,11 @@ class DeleteInventoryView(BaseView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request: Request, inventory_id: int) -> Response:
+    def delete(
+        self,
+        request: Request,
+        inventory_id: int,
+    ) -> Response:
         """
         Handle DELETE request to remove an inventory.
 
@@ -75,7 +79,8 @@ class DeleteInventoryView(BaseView):
             request=request,
             serializer_class=None,
             service_method_callback=lambda user: self._delete_inventory_callback(
-                user, inventory_id
+                user,
+                inventory_id,
             ),
             requires_auth=True,
         )
@@ -99,5 +104,6 @@ class DeleteInventoryView(BaseView):
             DeleteInventoryApplicationService()
         )
         return delete_inventory_service.delete_inventory(
-            inventory_id=inventory_id, requesting_user=user
+            inventory_id=inventory_id,
+            requesting_user=user,
         )

@@ -24,19 +24,9 @@ from daily_monthly_inventory.types.dataclass import (
     InventoryDetailResponse,
     InventoryListItem,
     InventoryListResponse,
+    UpdateInventoryRequest,
+    UpdateInventoryResponse,
 )
-
-
-class EntityNotFoundError(Exception):
-    """Base exception raised when a required domain entity is not found."""
-
-
-class UserNotFoundError(EntityNotFoundError):
-    """Raised when the requested user does not exist."""
-
-
-class AmbulanceNotFoundError(EntityNotFoundError):
-    """Raised when the requested ambulance does not exist or is missing."""
 
 
 class InventoryDomainService:
@@ -105,30 +95,22 @@ class InventoryDomainService:
                 user: User = User.objects.get(id=request.system_user_id)
             except User.DoesNotExist:
                 self.logger.error(
-                    f"User with ID {request.system_user_id} does not exist",
-                    exc_info=True,
-                )
-                raise UserNotFoundError(
                     f"User with ID {request.system_user_id} does not exist"
                 )
+                raise  # Re-raise Django's native exception
 
             # Resolve ambulance by ID (required)
             if not request.ambulance_id:
-                self.logger.error("Ambulance id is required to create inventory")
-                raise AmbulanceNotFoundError(
-                    "Ambulance id is required to create inventory"
-                )
+                self.logger.error("Ambulance ID is required to create inventory")
+                raise ValueError("Ambulance ID is required to create inventory")
 
             try:
                 ambulance: Ambulance = Ambulance.objects.get(id=request.ambulance_id)
             except Ambulance.DoesNotExist:
                 self.logger.error(
-                    f"Ambulance with ID {request.ambulance_id} does not exist",
-                    exc_info=True,
-                )
-                raise AmbulanceNotFoundError(
                     f"Ambulance with ID {request.ambulance_id} does not exist"
                 )
+                raise  # Re-raise Django's native exception
 
             # Create all optional foreign key records from provided data
             biomedical_equipment: BiomedicalEquipment | None = None
@@ -203,7 +185,10 @@ class InventoryDomainService:
             self.logger.error(f"Error creating inventory: {str(e)}", exc_info=True)
             raise
 
-    def get_inventory_by_id(self, inventory_id: int) -> InventoryDetailResponse | None:
+    def get_inventory_by_id(
+        self,
+        inventory_id: int,
+    ) -> InventoryDetailResponse | None:
         """
         Retrieve complete inventory details by ID.
 
@@ -283,5 +268,190 @@ class InventoryDomainService:
         except Exception as e:
             self.logger.error(
                 f"Error retrieving inventory {inventory_id}: {str(e)}", exc_info=True
+            )
+            raise
+
+    def update_inventory(
+        self,
+        request: UpdateInventoryRequest,
+    ) -> UpdateInventoryResponse:
+        """
+        Update an existing inventory with new data.
+        
+        This method contains the domain logic for updating inventory and equipment.
+        
+        Args:
+            request: UpdateInventoryRequest DTO with update data
+            
+        Returns:
+            UpdateInventoryResponse with updated data
+            
+        Raises:
+            DailyMonthlyInventory.DoesNotExist: If inventory not found
+            Ambulance.DoesNotExist: If ambulance_id provided but not found
+        """
+        try:
+            # Get the inventory with all related objects
+            inventory: DailyMonthlyInventory = (
+                DailyMonthlyInventory.objects.select_related(
+                    "biomedical_equipment",
+                    "surgical",
+                    "accessories_case",
+                    "respiratory",
+                    "immobilization_and_safety",
+                    "accessories",
+                    "additionals",
+                    "pediatric",
+                    "circulatory",
+                    "ambulance_kit",
+                    "ambulance",
+                ).get(id=request.inventory_id)
+            )
+
+            # Track which fields are being updated
+            updated_fields: list[str] = []
+
+            # Update simple fields
+            if request.date is not None:
+                inventory.date = request.date
+                updated_fields.append("date")
+
+            if request.observations is not None:
+                inventory.observations = request.observations
+                updated_fields.append("observations")
+
+            # Update ambulance if provided
+            if request.ambulance_id is not None:
+                ambulance: Ambulance = Ambulance.objects.get(pk=request.ambulance_id)
+                inventory.ambulance = ambulance
+                updated_fields.append("ambulance")
+
+            # Update equipment entities (create new or update existing)
+            if request.biomedical_equipment is not None:
+                if inventory.biomedical_equipment:
+                    for key, value in request.biomedical_equipment.items():
+                        setattr(inventory.biomedical_equipment, key, value)
+                    inventory.biomedical_equipment.save()
+                else:
+                    inventory.biomedical_equipment = BiomedicalEquipment.objects.create(
+                        **request.biomedical_equipment
+                    )
+                updated_fields.append("biomedical_equipment")
+
+            if request.surgical is not None:
+                if inventory.surgical:
+                    for key, value in request.surgical.items():
+                        setattr(inventory.surgical, key, value)
+                    inventory.surgical.save()
+                else:
+                    inventory.surgical = Surgical.objects.create(**request.surgical)
+                updated_fields.append("surgical")
+
+            if request.accessories_case is not None:
+                if inventory.accessories_case:
+                    for key, value in request.accessories_case.items():
+                        setattr(inventory.accessories_case, key, value)
+                    inventory.accessories_case.save()
+                else:
+                    inventory.accessories_case = AccessoriesCase.objects.create(
+                        **request.accessories_case
+                    )
+                updated_fields.append("accessories_case")
+
+            if request.respiratory is not None:
+                if inventory.respiratory:
+                    for key, value in request.respiratory.items():
+                        setattr(inventory.respiratory, key, value)
+                    inventory.respiratory.save()
+                else:
+                    inventory.respiratory = Respiratory.objects.create(
+                        **request.respiratory
+                    )
+                updated_fields.append("respiratory")
+
+            if request.immobilization_and_safety is not None:
+                if inventory.immobilization_and_safety:
+                    for key, value in request.immobilization_and_safety.items():
+                        setattr(inventory.immobilization_and_safety, key, value)
+                    inventory.immobilization_and_safety.save()
+                else:
+                    inventory.immobilization_and_safety = (
+                        ImmobilizationAndSafety.objects.create(
+                            **request.immobilization_and_safety
+                        )
+                    )
+                updated_fields.append("immobilization_and_safety")
+
+            if request.accessories is not None:
+                if inventory.accessories:
+                    for key, value in request.accessories.items():
+                        setattr(inventory.accessories, key, value)
+                    inventory.accessories.save()
+                else:
+                    inventory.accessories = Accessories.objects.create(
+                        **request.accessories
+                    )
+                updated_fields.append("accessories")
+
+            if request.additionals is not None:
+                if inventory.additionals:
+                    for key, value in request.additionals.items():
+                        setattr(inventory.additionals, key, value)
+                    inventory.additionals.save()
+                else:
+                    inventory.additionals = Additionals.objects.create(
+                        **request.additionals
+                    )
+                updated_fields.append("additionals")
+
+            if request.pediatric is not None:
+                if inventory.pediatric:
+                    for key, value in request.pediatric.items():
+                        setattr(inventory.pediatric, key, value)
+                    inventory.pediatric.save()
+                else:
+                    inventory.pediatric = Pediatric.objects.create(**request.pediatric)
+                updated_fields.append("pediatric")
+
+            if request.circulatory is not None:
+                if inventory.circulatory:
+                    for key, value in request.circulatory.items():
+                        setattr(inventory.circulatory, key, value)
+                    inventory.circulatory.save()
+                else:
+                    inventory.circulatory = Circulatory.objects.create(
+                        **request.circulatory
+                    )
+                updated_fields.append("circulatory")
+
+            if request.ambulance_kit is not None:
+                if inventory.ambulance_kit:
+                    for key, value in request.ambulance_kit.items():
+                        setattr(inventory.ambulance_kit, key, value)
+                    inventory.ambulance_kit.save()
+                else:
+                    inventory.ambulance_kit = AmbulanceKit.objects.create(
+                        **request.ambulance_kit
+                    )
+                updated_fields.append("ambulance_kit")
+
+            # Save inventory
+            inventory.save()
+
+            self.logger.info(
+                f"Updated inventory {inventory.pk}. Fields updated: {', '.join(updated_fields)}"
+            )
+
+            return UpdateInventoryResponse(
+                inventory_id=inventory.pk,
+                date=inventory.date.isoformat(),
+                observations=inventory.observations,
+                fields_updated=updated_fields,
+            )
+
+        except Exception as e:
+            self.logger.error(
+                f"Error updating inventory {request.inventory_id}: {str(e)}",
+                exc_info=True,
             )
             raise
