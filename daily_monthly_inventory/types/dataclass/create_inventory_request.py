@@ -8,6 +8,8 @@ class CreateInventoryRequest:
     system_user_id: int
     date: date
     ambulance_id: int | None = None
+    shift_id: int | None = None
+    support_staff: str = ""
     biomedical_equipment: dict[str, Any] | None = None
     surgical: dict[str, Any] | None = None
     accessories_case: dict[str, Any] | None = None

@@ -29,6 +29,10 @@ class CreateInventoryApplicationService:
                 system_user_id=requesting_user.id,
                 date=validated_data["date"],
                 ambulance_id=validated_data.get("ambulance_id"),
+                shift_id=validated_data.get("shift", {}).get("id")
+                if validated_data.get("shift")
+                else None,
+                support_staff=validated_data.get("support_staff", ""),
                 biomedical_equipment=validated_data.get("biomedical_equipment"),
                 surgical=validated_data.get("surgical"),
                 accessories_case=validated_data.get("accessories_case"),

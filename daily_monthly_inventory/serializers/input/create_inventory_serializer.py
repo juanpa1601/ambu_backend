@@ -1,53 +1,49 @@
 from rest_framework import serializers
-from daily_monthly_inventory.serializers.components import (
-    AdditionalsSerializer,
-    SurgicalSerializer,
-    RespiratorySerializer,
-    BiomedicalEquipmentSerializer,
-    AccessoriesSerializer,
-    ImmobilizationAndSafetySerializer,
-    PediatricSerializer,
-    CirculatorySerializer,
-    AmbulanceKitSerializer,
-    AccessoriesCaseSerializer,
-)
 
 
 class CreateInventorySerializer(serializers.Serializer):
-    """
-    Input serializer for creating a new inventory.
-    Uses component serializers for proper field-level validation.
+    """Serializer para crear un nuevo inventario."""
 
-    All category fields are optional to allow partial inventory creation.
-    The 'date' field is required.
-    """
+    # Campos obligatorios
+    date = serializers.DateField(required=True)
+    ambulance_id = serializers.IntegerField(required=True)
+    shift = serializers.DictField(required=True)  # {"id": int}
 
-    date = serializers.DateField(required=True, help_text="Date of the inventory")
-    ambulance_id = serializers.IntegerField(
-        required=False,
-        allow_null=True,
-        help_text="ID of the ambulance this inventory belongs to",
+    # Campos opcionales del header
+    support_staff = serializers.CharField(
+        required=False, allow_blank=True, allow_null=True
     )
-
-    # Nested category serializers with proper validation
-    biomedical_equipment = BiomedicalEquipmentSerializer(
-        required=False, allow_null=True
-    )
-    surgical = SurgicalSerializer(required=False, allow_null=True)
-    accessories_case = AccessoriesCaseSerializer(required=False, allow_null=True)
-    respiratory = RespiratorySerializer(required=False, allow_null=True)
-    immobilization_and_safety = ImmobilizationAndSafetySerializer(
-        required=False, allow_null=True
-    )
-    accessories = AccessoriesSerializer(required=False, allow_null=True)
-    additionals = AdditionalsSerializer(required=False, allow_null=True)
-    pediatric = PediatricSerializer(required=False, allow_null=True)
-    circulatory = CirculatorySerializer(required=False, allow_null=True)
-    ambulance_kit = AmbulanceKitSerializer(required=False, allow_null=True)
-
     observations = serializers.CharField(
-        required=False,
-        allow_blank=True,
-        default="",
-        help_text="General observations and comments about the inventory",
+        required=False, allow_blank=True, allow_null=True
     )
+
+    # Secciones del inventario (opcionales)
+    biomedical_equipment = serializers.DictField(required=False, allow_null=True)
+    surgical = serializers.DictField(required=False, allow_null=True)
+    accessories_case = serializers.DictField(required=False, allow_null=True)
+    respiratory = serializers.DictField(required=False, allow_null=True)
+    immobilization_and_safety = serializers.DictField(required=False, allow_null=True)
+    accessories = serializers.DictField(required=False, allow_null=True)
+    additionals = serializers.DictField(required=False, allow_null=True)
+    pediatric = serializers.DictField(required=False, allow_null=True)
+    circulatory = serializers.DictField(required=False, allow_null=True)
+    ambulance_kit = serializers.DictField(required=False, allow_null=True)
+
+    def validate(self, attrs):
+        """Validar que campos requeridos estén presentes. 0 es un valor válido."""
+        if not attrs.get("ambulance_id"):
+            raise serializers.ValidationError(
+                {"response": 'El campo "ambulance_id" es obligatorio.', "msg": -1}
+            )
+
+        if not attrs.get("date"):
+            raise serializers.ValidationError(
+                {"response": 'El campo "date" es obligatorio.', "msg": -1}
+            )
+
+        if not attrs.get("shift"):
+            raise serializers.ValidationError(
+                {"response": 'El campo "shift" es obligatorio.', "msg": -1}
+            )
+
+        return attrs

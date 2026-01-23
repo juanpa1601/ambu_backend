@@ -20,6 +20,9 @@ class ListInventoryApplicationService:
     def list_inventories(
         self,
         requesting_user: User,
+        ambulance_id: int | None = None,
+        month: int | None = None,
+        year: int | None = None,
     ) -> dict[str, Any]:
         """
         List all daily/monthly inventories.
@@ -31,9 +34,11 @@ class ListInventoryApplicationService:
             dictionary with response data and status
         """
         try:
-            # Get all inventories
+            # Get all inventories with optional filters
             inventory_response: InventoryListResponse = (
-                self.inventory_domain_service.get_all_inventories()
+                self.inventory_domain_service.get_all_inventories(
+                    ambulance_id=ambulance_id, month=month, year=year
+                )
             )
             inventory_items = inventory_response.inventories
             total_count = inventory_response.total_count
@@ -45,6 +50,8 @@ class ListInventoryApplicationService:
                     "person_name": item.person_name,
                     "mobile_number": item.mobile_number,
                     "date": item.date.isoformat() if item.date else None,
+                    "is_completed": item.is_completed,
+                    "shift": item.shift,
                 }
                 for item in inventory_items
             ]

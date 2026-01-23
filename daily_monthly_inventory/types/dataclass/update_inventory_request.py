@@ -11,6 +11,8 @@ class UpdateInventoryRequest:
     date: date | None = None
     observations: str | None = None
     ambulance_id: int | None = None
+    shift_id: int | None = None
+    support_staff: str | None = None
     biomedical_equipment: dict[str, Any] | None = None
     surgical: dict[str, Any] | None = None
     accessories_case: dict[str, Any] | None = None

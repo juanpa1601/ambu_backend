@@ -15,15 +15,20 @@ from daily_monthly_inventory.models import (
     ImmobilizationAndSafety,
     Pediatric,
     Respiratory,
+    Shift,
     Surgical,
 )
 
 from daily_monthly_inventory.types.dataclass import (
+    AmbulanceListItem,
+    AmbulanceListResponse,
     CreateInventoryRequest,
     CreateInventoryResponse,
     InventoryDetailResponse,
     InventoryListItem,
     InventoryListResponse,
+    ShiftListItem,
+    ShiftListResponse,
     UpdateInventoryRequest,
     UpdateInventoryResponse,
 )
@@ -35,7 +40,12 @@ class InventoryDomainService:
     def __init__(self) -> None:
         self.logger: logging.Logger = logging.getLogger(self.__class__.__name__)
 
-    def get_all_inventories(self) -> InventoryListResponse:
+    def get_all_inventories(
+        self,
+        ambulance_id: int | None = None,
+        month: int | None = None,
+        year: int | None = None,
+    ) -> InventoryListResponse:
         """
         Retrieve all daily/monthly inventories with basic information.
 
@@ -43,14 +53,32 @@ class InventoryDomainService:
             InventoryListResponse with list of inventory items
         """
         try:
-            # Query all DailyMonthlyInventory with related system_user and ambulance
-            inventories: list[DailyMonthlyInventory] = (
-                DailyMonthlyInventory.objects.select_related(
-                    "system_user", "ambulance"
-                ).all()
+            # Query DailyMonthlyInventory with related system_user, ambulance and shift
+            inventories_qs = DailyMonthlyInventory.objects.select_related(
+                "system_user", "ambulance", "shift"
             )
 
+            if ambulance_id is not None:
+                inventories_qs = inventories_qs.filter(ambulance__id=ambulance_id)
+            if month is not None:
+                inventories_qs = inventories_qs.filter(date__month=month)
+            if year is not None:
+                inventories_qs = inventories_qs.filter(date__year=year)
+
+            inventories: list[DailyMonthlyInventory] = list(inventories_qs.all())
+
             inventory_items: list[InventoryListItem] = []
+
+            # Helper function to serialize model to dict
+            def model_to_dict(instance: Any) -> dict[str, Any] | None:
+                if instance is None:
+                    return None
+                data: dict[str, Any] = {"id": instance.pk}
+                for field in instance._meta.fields:
+                    if field.name != "id":
+                        value: Any = getattr(instance, field.name)
+                        data[field.name] = value
+                return data
 
             for inventory in inventories:
                 # Get person name from system_user
@@ -69,6 +97,8 @@ class InventoryDomainService:
                     person_name=person_name,
                     mobile_number=mobile_number,
                     date=inventory.date,
+                    is_completed=inventory.calculate_is_completed(),
+                    shift=model_to_dict(inventory.shift),
                 )
                 inventory_items.append(inventory_item)
 
@@ -101,8 +131,12 @@ class InventoryDomainService:
 
             # Resolve ambulance by ID (required)
             if not request.ambulance_id:
-                self.logger.error("Se requiere el ID de la ambulancia para crear el inventario")
-                raise ValueError("Se requiere el ID de la ambulancia para crear el inventario")
+                self.logger.error(
+                    "Se requiere el ID de la ambulancia para crear el inventario"
+                )
+                raise ValueError(
+                    "Se requiere el ID de la ambulancia para crear el inventario"
+                )
 
             try:
                 ambulance: Ambulance = Ambulance.objects.get(id=request.ambulance_id)
@@ -111,6 +145,36 @@ class InventoryDomainService:
                     f"Ambulance with ID {request.ambulance_id} does not exist"
                 )
                 raise  # Re-raise Django's native exception
+
+            # Resolve shift by ID (optional)
+            shift: Shift | None = None
+            if request.shift_id:
+                try:
+                    shift = Shift.objects.get(id=request.shift_id)
+                except Shift.DoesNotExist:
+                    self.logger.error(
+                        f"Shift with ID {request.shift_id} does not exist"
+                    )
+                    raise ValueError(f"La jornada con ID {request.shift_id} no existe")
+
+            # Validate no duplicate inventory exists (same ambulance, month/year, and shift)
+            if shift:
+                existing_inventory = DailyMonthlyInventory.objects.filter(
+                    ambulance=ambulance,
+                    date__year=request.date.year,
+                    date__month=request.date.month,
+                    shift=shift,
+                ).exists()
+
+                if existing_inventory:
+                    self.logger.warning(
+                        f"Duplicate inventory detected for ambulance {ambulance.id}, "
+                        f"date {request.date.year}-{request.date.month}, shift {shift.name}"
+                    )
+                    raise ValueError(
+                        f"Ya existe un inventario para la ambulancia {ambulance.mobile_number} "
+                        f"en la fecha {request.date.strftime('%B %Y')} para la jornada de {shift.name}."
+                    )
 
             # Create all optional foreign key records from provided data
             biomedical_equipment: BiomedicalEquipment | None = None
@@ -163,6 +227,8 @@ class InventoryDomainService:
             inventory: DailyMonthlyInventory = DailyMonthlyInventory.objects.create(
                 system_user=user,
                 ambulance=ambulance,
+                shift=shift,
+                support_staff=request.support_staff or "",
                 biomedical_equipment=biomedical_equipment,
                 surgical=surgical,
                 accessories_case=accessories_case,
@@ -176,6 +242,10 @@ class InventoryDomainService:
                 date=request.date,
                 observations=request.observations or "",
             )
+
+            # Compute and persist is_completed
+            inventory.is_completed = inventory.calculate_is_completed()
+            inventory.save()
 
             self.logger.info(
                 f"Created inventory {inventory.pk} by user {user.username}"
@@ -257,6 +327,8 @@ class InventoryDomainService:
                 circulatory=model_to_dict(inventory.circulatory),
                 ambulance_kit=model_to_dict(inventory.ambulance_kit),
                 created_at=inventory.created_at.isoformat(),
+                shift=model_to_dict(inventory.shift),
+                support_staff=inventory.support_staff or "",
             )
 
             self.logger.info(f"Retrieved inventory detail for ID {inventory_id}")
@@ -305,6 +377,7 @@ class InventoryDomainService:
                     "circulatory",
                     "ambulance_kit",
                     "ambulance",
+                    "shift",
                 ).get(id=request.inventory_id)
             )
 
@@ -325,6 +398,17 @@ class InventoryDomainService:
                 ambulance: Ambulance = Ambulance.objects.get(pk=request.ambulance_id)
                 inventory.ambulance = ambulance
                 updated_fields.append("ambulance")
+
+            # Update shift if provided
+            if request.shift_id is not None:
+                shift: Shift = Shift.objects.get(pk=request.shift_id)
+                inventory.shift = shift
+                updated_fields.append("shift")
+
+            # Update support_staff if provided
+            if request.support_staff is not None:
+                inventory.support_staff = request.support_staff
+                updated_fields.append("support_staff")
 
             # Update equipment entities (create new or update existing)
             if request.biomedical_equipment is not None:
@@ -438,6 +522,10 @@ class InventoryDomainService:
             # Save inventory
             inventory.save()
 
+            # Recompute and persist is_completed after saving other changes
+            inventory.is_completed = inventory.calculate_is_completed()
+            inventory.save()
+
             self.logger.info(
                 f"Updated inventory {inventory.pk}. Fields updated: {', '.join(updated_fields)}"
             )
@@ -454,4 +542,66 @@ class InventoryDomainService:
                 f"Error updating inventory {request.inventory_id}: {str(e)}",
                 exc_info=True,
             )
+            raise
+
+    def get_all_shifts(self) -> ShiftListResponse:
+        """
+        Retrieve all available shifts from the database.
+
+        Returns:
+            ShiftListResponse with list of shift items
+        """
+        try:
+            shifts: list[Shift] = Shift.objects.all()
+
+            shift_items: list[ShiftListItem] = []
+            for shift in shifts:
+                shift_item: ShiftListItem = ShiftListItem(
+                    id=shift.pk,
+                    name=shift.name,
+                )
+                shift_items.append(shift_item)
+
+            self.logger.info(f"Retrieved {len(shift_items)} shifts")
+            return ShiftListResponse(shifts=shift_items, total_count=len(shift_items))
+
+        except Exception as e:
+            self.logger.error(f"Error retrieving shifts: {str(e)}", exc_info=True)
+            raise
+
+    def get_all_ambulances(self) -> AmbulanceListResponse:
+        """
+        Retrieve all active ambulances from the database.
+
+        Returns:
+            AmbulanceListResponse with list of ambulance items
+        """
+        try:
+            ambulances: list[Ambulance] = list(
+                Ambulance.objects.filter(is_active=True).order_by("mobile_number")
+            )
+
+            ambulance_items: list[AmbulanceListItem] = []
+            for ambulance in ambulances:
+                display_name: str = (
+                    f"Móvil {ambulance.mobile_number} - {ambulance.license_plate}"
+                    if ambulance.license_plate
+                    else f"Móvil {ambulance.mobile_number}"
+                )
+
+                ambulance_item: AmbulanceListItem = AmbulanceListItem(
+                    id=ambulance.pk,
+                    mobile_number=ambulance.mobile_number,
+                    license_plate=ambulance.license_plate or "",
+                    display_name=display_name,
+                )
+                ambulance_items.append(ambulance_item)
+
+            self.logger.info(f"Retrieved {len(ambulance_items)} ambulances")
+            return AmbulanceListResponse(
+                ambulances=ambulance_items, total_count=len(ambulance_items)
+            )
+
+        except Exception as e:
+            self.logger.error(f"Error retrieving ambulances: {str(e)}", exc_info=True)
             raise

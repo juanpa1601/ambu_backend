@@ -10,6 +10,7 @@ from daily_monthly_inventory.serializers.components import (
     CirculatorySerializer,
     AmbulanceKitSerializer,
     AccessoriesCaseSerializer,
+    ShiftSerializer,
 )
 
 
@@ -27,6 +28,15 @@ class UpdateInventorySerializer(serializers.Serializer):
         required=False,
         allow_null=True,
         help_text="ID of the ambulance this inventory belongs to",
+    )
+    shift = ShiftSerializer(
+        required=False, allow_null=True, help_text="Shift information (day or night)"
+    )
+    support_staff = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        allow_null=True,
+        help_text="Names of support staff who participated in the inventory",
     )
 
     # Nested category serializers with proper validation

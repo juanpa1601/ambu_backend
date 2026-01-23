@@ -45,6 +45,10 @@ class UpdateInventoryApplicationService:
                 date=update_data.get("date"),
                 observations=update_data.get("observations"),
                 ambulance_id=update_data.get("ambulance_id"),
+                shift_id=update_data.get("shift", {}).get("id")
+                if update_data.get("shift")
+                else None,
+                support_staff=update_data.get("support_staff"),
                 biomedical_equipment=update_data.get("biomedical_equipment"),
                 surgical=update_data.get("surgical"),
                 accessories_case=update_data.get("accessories_case"),

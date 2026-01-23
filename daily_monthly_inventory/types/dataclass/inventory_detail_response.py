@@ -24,3 +24,5 @@ class InventoryDetailResponse:
     circulatory: dict[str, Any] | None
     ambulance_kit: dict[str, Any] | None
     created_at: str
+    shift: dict[str, Any] | None
+    support_staff: str

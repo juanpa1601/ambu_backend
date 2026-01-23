@@ -64,6 +64,8 @@ class GetInventoryDetailApplicationService:
                 "circulatory": detail_response.circulatory,
                 "ambulance_kit": detail_response.ambulance_kit,
                 "created_at": detail_response.created_at,
+                "shift": detail_response.shift,
+                "support_staff": detail_response.support_staff,
             }
 
             self.logger.info(
