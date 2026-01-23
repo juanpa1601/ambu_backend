@@ -6,11 +6,14 @@ from core.views.base_view import BaseView
 from staff.serializers.input import LoginSerializer
 from staff.application_service import LoginApplicationService
 from staff.types.dataclass import LoginRequest
+from rest_framework.throttling import ScopedRateThrottle
 
 class LoginView(BaseView):
     
     authentication_classes = []
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
 
     def post(
         self, 
