@@ -1,0 +1,10 @@
+from django.db import models
+
+class Diagnosis(models.Model):
+
+    cie_10 = models.CharField(max_length=10)
+    diagnosis_name = models.CharField(max_length=200)
+
+    class Meta:
+        verbose_name = 'Diagnosis'
+        verbose_name_plural = 'Diagnoses'
