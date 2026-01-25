@@ -64,23 +64,17 @@ class CareTransferReport(models.Model):
         related_name='ambulance_care_transfer_reports'  
     )
     
-    patient = models.ForeignKey(
-        Patient,
-        on_delete=models.CASCADE,
-        related_name='care_transfer_reports' 
-    )
-    
     # Companions
     companion_1 = models.ForeignKey(
         Companion,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='companion_1_care_transfer_reports', 
         blank=True,
         null=True
     )
     companion_2 = models.ForeignKey(
         Companion,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name='companion_2_care_transfer_reports',
         blank=True,
         null=True

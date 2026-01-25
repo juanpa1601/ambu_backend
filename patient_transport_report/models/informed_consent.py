@@ -1,12 +1,15 @@
 from django.db import models
 from .required_procedures import RequiredProcedures
 from .medication_administration import MedicationAdministration
-from .patient import Patient
 from .companion import Companion
 from ...staff.models import Healthcare
 from .outgoing_receiving_entity import OutgoingReceivingEntity
 
 class InformedConsent(models.Model):
+    '''
+    Informed consent form.
+    Now connected through PatientTransportReport instead of direct Patient reference.
+    '''
 
     consent_timestamp = models.DateTimeField(auto_now_add=True)
     guardian_type = models.CharField(max_length=100)
@@ -33,16 +36,11 @@ class InformedConsent(models.Model):
         null=True
     )
     patient_can_sign = models.BooleanField(default=True)
-    patient = models.OneToOneField(
-        Patient,
-        on_delete=models.CASCADE,
-        related_name='patient_informed_consent'
-    )
     responsible_can_sign = models.BooleanField(default=False)
-    responsible = models.OneToOneField(
+    responsible = models.ForeignKey(
         Companion,
         on_delete=models.CASCADE,
-        related_name='responsible_informed_consent',
+        related_name='responsible_informed_consents',
         blank=True,
         null=True
     )
