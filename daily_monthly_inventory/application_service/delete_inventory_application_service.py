@@ -46,8 +46,17 @@ class DeleteInventoryApplicationService:
                     "status_code_http": 404,
                 }
 
-            # Step 2: Delete the inventory (cascade will delete related objects)
-            inventory.delete()
+            # Step 2: Soft-delete the inventory
+            if getattr(inventory, "is_deleted", False):
+                # already deleted
+                return {
+                    "response": f"Inventario con ID {inventory_id} ya está eliminado.",
+                    "msg": -1,
+                    "status_code_http": 400,
+                }
+
+            inventory.is_deleted = True
+            inventory.save()
 
             # Step 3: Build response
             self.logger.info(

@@ -75,6 +75,7 @@ class DailyMonthlyInventory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     is_completed = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False, db_index=True)
 
     def __str__(self):
         return f"DailyMonthlyInventory {self.date} ({self.pk})"

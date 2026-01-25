@@ -55,8 +55,11 @@ class InventoryDomainService:
         """
         try:
             # Query DailyMonthlyInventory with related system_user, ambulance and shift
-            inventories_qs: QuerySet[DailyMonthlyInventory] = DailyMonthlyInventory.objects.select_related(
-                "system_user", "ambulance", "shift"
+            inventories_qs: QuerySet[DailyMonthlyInventory] = (
+                DailyMonthlyInventory.objects.select_related(
+                    "system_user", "ambulance", "shift"
+                )
+                .filter(is_deleted=False)
             )
 
             if ambulance_id is not None:
@@ -165,9 +168,10 @@ class InventoryDomainService:
                 existing_inventory: bool = DailyMonthlyInventory.objects.filter(
                     ambulance=ambulance,
                     date__year=request.date.year,
-                    date__day = request.date.day,
+                    date__day=request.date.day,
                     date__month=request.date.month,
                     shift=shift,
+                    is_deleted=False,
                 ).exists()
 
                 if existing_inventory:

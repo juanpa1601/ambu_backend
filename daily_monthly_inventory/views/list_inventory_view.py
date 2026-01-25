@@ -115,5 +115,9 @@ class ListInventoryView(BaseView):
             ListInventoryApplicationService()
         )
         return list_inventory_service.list_inventories(
-            requesting_user=user, ambulance_id=ambulance_id, month=month, year=year, day=day
+            requesting_user=user,
+            ambulance_id=ambulance_id,
+            month=month,
+            year=year,
+            day=day,
         )
