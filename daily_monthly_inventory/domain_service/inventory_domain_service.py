@@ -162,7 +162,7 @@ class InventoryDomainService:
 
             # Validate no duplicate inventory exists (same ambulance, day/month/year, and shift)
             if shift:
-                existing_inventory = DailyMonthlyInventory.objects.filter(
+                existing_inventory: bool = DailyMonthlyInventory.objects.filter(
                     ambulance=ambulance,
                     date__year=request.date.year,
                     date__day = request.date.day,
