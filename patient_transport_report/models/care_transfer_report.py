@@ -1,13 +1,11 @@
+from __future__ import annotations
 from django.db import models
-from ...staff.models import (
-    Driver,
+from staff.models import (
+    Driver, 
     Healthcare
 )
-from ...daily_monthly_inventory.models import Ambulance
-from core.models import (
-    AuditedModel,
-    ActiveManager
-)
+from daily_monthly_inventory.models import Ambulance
+from .patient import Patient
 from .companion import Companion
 from .physical_exam import PhysicalExam
 from .treatment import Treatment
@@ -17,11 +15,12 @@ from .complications_transfer import ComplicationsTransfer
 from .outgoing_receiving_entity import OutgoingReceivingEntity
 from .skin_condition import SkinCondition
 from .hemodynamic_status import HemodynamicStatus
+from core.models import AuditedModel, ActiveManager
 
 class CareTransferReport(AuditedModel):
     '''
     Report of patient care and transfer.
-    A patient can have multiple reports over time (historical records).
+    Connected to patient through PatientTransportReport.
     '''
     
     patient_one_of = models.IntegerField()
@@ -43,18 +42,18 @@ class CareTransferReport(AuditedModel):
     driver = models.ForeignKey(
         Driver,
         on_delete=models.CASCADE,
-        related_name='driver_care_transfer_reports' 
+        related_name='driver_care_transfer_reports'
     )
     attending_staff = models.ForeignKey(
         Healthcare,
         on_delete=models.CASCADE,
-        related_name='attending_staff_care_transfer_reports' 
+        related_name='attending_staff_care_transfer_reports'
     )
     reg_number = models.CharField(max_length=100)
     support_staff = models.ForeignKey(
         Healthcare,
         on_delete=models.CASCADE,
-        related_name='support_staff_care_transfer_reports',  
+        related_name='support_staff_care_transfer_reports',
         blank=True,
         null=True
     )
@@ -64,14 +63,14 @@ class CareTransferReport(AuditedModel):
     ambulance = models.ForeignKey(
         Ambulance,
         on_delete=models.CASCADE,
-        related_name='ambulance_care_transfer_reports'  
+        related_name='ambulance_care_transfer_reports'
     )
     
     # Companions
     companion_1 = models.ForeignKey(
         Companion,
         on_delete=models.SET_NULL,
-        related_name='companion_1_care_transfer_reports', 
+        related_name='companion_1_care_transfer_reports',
         blank=True,
         null=True
     )
@@ -95,7 +94,7 @@ class CareTransferReport(AuditedModel):
         related_name='final_physical_exam_care_transfer_report'
     )
     
-    # Conditions
+    # Status fields - ManyToMany
     skin_conditions = models.ManyToManyField(
         SkinCondition,
         related_name='care_transfer_reports',
@@ -106,7 +105,7 @@ class CareTransferReport(AuditedModel):
         related_name='care_transfer_reports',
         help_text='Select 1 or 2 hemodynamic statuses'
     )
-
+    
     # Medical information
     treatment = models.OneToOneField(
         Treatment,
@@ -116,12 +115,12 @@ class CareTransferReport(AuditedModel):
     diagnosis_1 = models.ForeignKey(
         Diagnosis,
         on_delete=models.CASCADE,
-        related_name='diagnosis_1_care_transfer_reports'  
+        related_name='diagnosis_1_care_transfer_reports'
     )
     diagnosis_2 = models.ForeignKey(
         Diagnosis,
         on_delete=models.CASCADE,
-        related_name='diagnosis_2_care_transfer_reports',  
+        related_name='diagnosis_2_care_transfer_reports',
         blank=True,
         null=True
     )
@@ -154,3 +153,11 @@ class CareTransferReport(AuditedModel):
         verbose_name = 'Care Transfer Report'
         verbose_name_plural = 'Care Transfer Reports'
         ordering = ['-created_at']
+    
+    def __str__(self) -> str:
+        return f'Care Transfer Report #{self.id} ({self.dispatch_time})'
+    
+    @property
+    def patient(self) -> Patient | None:
+        '''Access patient through PatientTransportReport'''
+        return self.transport_report.patient if hasattr(self, 'transport_report') else None

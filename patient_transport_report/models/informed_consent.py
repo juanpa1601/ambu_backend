@@ -2,7 +2,7 @@ from django.db import models
 from .required_procedures import RequiredProcedures
 from .medication_administration import MedicationAdministration
 from .companion import Companion
-from ...staff.models import Healthcare
+from staff.models import Healthcare
 from .outgoing_receiving_entity import OutgoingReceivingEntity
 from core.models import (
     AuditedModel, 
