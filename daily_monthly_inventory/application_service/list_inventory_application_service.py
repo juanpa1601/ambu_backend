@@ -4,7 +4,10 @@ from typing import Any
 from django.contrib.auth.models import User
 
 from daily_monthly_inventory.domain_service import InventoryDomainService
-from daily_monthly_inventory.types.dataclass import InventoryListResponse
+from daily_monthly_inventory.types.dataclass import (
+    InventoryListResponse,
+    InventoryListItem,
+)
 
 
 class ListInventoryApplicationService:
@@ -22,6 +25,7 @@ class ListInventoryApplicationService:
         requesting_user: User,
         ambulance_id: int | None = None,
         month: int | None = None,
+        day: int | None = None,
         year: int | None = None,
     ) -> dict[str, Any]:
         """
@@ -37,11 +41,11 @@ class ListInventoryApplicationService:
             # Get all inventories with optional filters
             inventory_response: InventoryListResponse = (
                 self.inventory_domain_service.get_all_inventories(
-                    ambulance_id=ambulance_id, month=month, year=year
+                    ambulance_id=ambulance_id, month=month, day=day, year=year
                 )
             )
-            inventory_items = inventory_response.inventories
-            total_count = inventory_response.total_count
+            inventory_items: list[InventoryListItem] = inventory_response.inventories
+            total_count: int = inventory_response.total_count
 
             # Build response
             inventories_data: list[dict[str, Any]] = [

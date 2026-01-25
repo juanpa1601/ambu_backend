@@ -24,7 +24,7 @@ class ListShiftsApplicationService:
             )
 
             # Convert dataclass to dict for JSON response
-            shifts_list = [
+            shifts_list: list[dict[str, int | str]] = [
                 {"id": shift.id, "name": shift.name} for shift in shift_response.shifts
             ]
 

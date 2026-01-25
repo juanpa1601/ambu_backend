@@ -109,10 +109,11 @@ class ListInventoryView(BaseView):
         ambulance_id = _parse_int(qp, "ambulance_id")
         month = _parse_int(qp, "month")
         year = _parse_int(qp, "year")
+        day = _parse_int(qp, "day")
 
         list_inventory_service: ListInventoryApplicationService = (
             ListInventoryApplicationService()
         )
         return list_inventory_service.list_inventories(
-            requesting_user=user, ambulance_id=ambulance_id, month=month, year=year
+            requesting_user=user, ambulance_id=ambulance_id, month=month, year=year, day=day
         )

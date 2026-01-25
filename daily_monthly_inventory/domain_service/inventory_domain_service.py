@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 from django.contrib.auth.models import User
-
+from django.db.models.query import QuerySet
 from daily_monthly_inventory.models import (
     Accessories,
     AccessoriesCase,
@@ -45,6 +45,7 @@ class InventoryDomainService:
         ambulance_id: int | None = None,
         month: int | None = None,
         year: int | None = None,
+        day: int | None = None,
     ) -> InventoryListResponse:
         """
         Retrieve all daily/monthly inventories with basic information.
@@ -54,7 +55,7 @@ class InventoryDomainService:
         """
         try:
             # Query DailyMonthlyInventory with related system_user, ambulance and shift
-            inventories_qs = DailyMonthlyInventory.objects.select_related(
+            inventories_qs: QuerySet[DailyMonthlyInventory] = DailyMonthlyInventory.objects.select_related(
                 "system_user", "ambulance", "shift"
             )
 
@@ -64,6 +65,8 @@ class InventoryDomainService:
                 inventories_qs = inventories_qs.filter(date__month=month)
             if year is not None:
                 inventories_qs = inventories_qs.filter(date__year=year)
+            if day is not None:
+                inventories_qs = inventories_qs.filter(date__day=day)
 
             inventories: list[DailyMonthlyInventory] = list(inventories_qs.all())
 
@@ -157,11 +160,12 @@ class InventoryDomainService:
                     )
                     raise ValueError(f"La jornada con ID {request.shift_id} no existe")
 
-            # Validate no duplicate inventory exists (same ambulance, month/year, and shift)
+            # Validate no duplicate inventory exists (same ambulance, day/month/year, and shift)
             if shift:
                 existing_inventory = DailyMonthlyInventory.objects.filter(
                     ambulance=ambulance,
                     date__year=request.date.year,
+                    date__day = request.date.day,
                     date__month=request.date.month,
                     shift=shift,
                 ).exists()
@@ -169,11 +173,11 @@ class InventoryDomainService:
                 if existing_inventory:
                     self.logger.warning(
                         f"Duplicate inventory detected for ambulance {ambulance.id}, "
-                        f"date {request.date.year}-{request.date.month}, shift {shift.name}"
+                        f"date {request.date.day}-{request.date.month}-{request.date.year}, shift {shift.name}"
                     )
                     raise ValueError(
                         f"Ya existe un inventario para la ambulancia {ambulance.mobile_number} "
-                        f"en la fecha {request.date.strftime('%B %Y')} para la jornada de {shift.name}."
+                        f"en la fecha {request.date.strftime('%d/%m/%Y')} para la jornada de {shift.name}."
                     )
 
             # Create all optional foreign key records from provided data
