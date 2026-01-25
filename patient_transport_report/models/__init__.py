@@ -15,6 +15,8 @@ from .physical_exam import PhysicalExam
 from .result import Result
 from .satisfaction_survey import SatisfactionSurvey
 from .treatment import Treatment
+from .skin_condition import SkinCondition
+from .hemodynamic_status import HemodynamicStatus
 
 __all__ = [
     'Companion',
@@ -33,5 +35,7 @@ __all__ = [
     'PhysicalExam',
     'Result',
     'SatisfactionSurvey',
-    'Treatment'
+    'Treatment',
+    'SkinCondition',
+    'HemodynamicStatus'
 ]
