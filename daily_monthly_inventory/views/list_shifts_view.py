@@ -27,8 +27,10 @@ class ListShiftsView(BaseView):
             Response with list of shifts or error
         """
         try:
-            list_shifts_service = ListShiftsApplicationService()
-            result = list_shifts_service.list_shifts()
+            list_shifts_service: ListShiftsApplicationService = (
+                ListShiftsApplicationService()
+            )
+            result: dict = list_shifts_service.list_shifts()
 
             return Response(
                 result,
