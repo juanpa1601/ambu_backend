@@ -4,7 +4,10 @@ from ...staff.models import (
     Healthcare
 )
 from ...daily_monthly_inventory.models import Ambulance
-from .patient import Patient
+from core.models import (
+    AuditedModel,
+    ActiveManager
+)
 from .companion import Companion
 from .physical_exam import PhysicalExam
 from .treatment import Treatment
@@ -15,7 +18,7 @@ from .outgoing_receiving_entity import OutgoingReceivingEntity
 from .skin_condition import SkinCondition
 from .hemodynamic_status import HemodynamicStatus
 
-class CareTransferReport(models.Model):
+class CareTransferReport(AuditedModel):
     '''
     Report of patient care and transfer.
     A patient can have multiple reports over time (historical records).
@@ -144,6 +147,10 @@ class CareTransferReport(models.Model):
         related_name='receiving_entity_care_transfer_report'
     )
     
+    objects = ActiveManager()
+    all_objects = models.Manager()
+    
     class Meta:
         verbose_name = 'Care Transfer Report'
         verbose_name_plural = 'Care Transfer Reports'
+        ordering = ['-created_at']

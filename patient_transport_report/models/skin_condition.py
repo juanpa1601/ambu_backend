@@ -1,23 +1,21 @@
 from django.db import models
+from core.models import TimeStampedModel
 
-class SkinCondition(models.Model):
+class SkinCondition(TimeStampedModel):
     '''
-    Catalog of possible skin conditions.
+    Catalog of skin conditions.
+    Lightweight audit (timestamps only, no user tracking).
     '''
     name = models.CharField(
         max_length=100,
-        unique=True,
-        help_text='Skin condition name (e.g., "Normal", "Pálida", "Cianótica", "Ictérica")'
+        unique=True
     )
-    is_active = models.BooleanField(
-        default=True,
-        help_text='Whether this option is available for selection'
-    )
+    is_active = models.BooleanField(default=True)
     
     class Meta:
         verbose_name = 'Skin Condition'
         verbose_name_plural = 'Skin Conditions'
         ordering = ['name']
     
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name

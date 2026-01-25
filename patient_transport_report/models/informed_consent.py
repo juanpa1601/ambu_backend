@@ -4,8 +4,12 @@ from .medication_administration import MedicationAdministration
 from .companion import Companion
 from ...staff.models import Healthcare
 from .outgoing_receiving_entity import OutgoingReceivingEntity
+from core.models import (
+    AuditedModel, 
+    ActiveManager
+)
 
-class InformedConsent(models.Model):
+class InformedConsent(AuditedModel):
     '''
     Informed consent form.
     Now connected through PatientTransportReport instead of direct Patient reference.
@@ -55,6 +59,13 @@ class InformedConsent(models.Model):
         related_name='outgoing_entity_informed_consent'
     )
 
+    objects = ActiveManager()
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = 'Informed Consent'
         verbose_name_plural = 'Informed Consents'
+        ordering = ['-created_at']
+
+    def __str__(self) -> str:
+        return f'Informed Consent #{self.id} - Guardian: {self.guardian_name}'

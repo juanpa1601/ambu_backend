@@ -1,8 +1,12 @@
 from django.db import models
 from .patient_history import PatientHistory
 from .insurance_provider import InsuranceProvider
+from core.models import (
+    AuditedModel,
+    ActiveManager
+)
 
-class Patient(models.Model):
+class Patient(AuditedModel):
     
     patient_name = models.CharField(max_length=200)
     identification_type = models.CharField(max_length=50)
@@ -11,7 +15,11 @@ class Patient(models.Model):
         blank=True, 
         null=True
     )
-    identification_number = models.CharField(max_length=100)
+    identification_number = models.CharField(
+        max_length=100,
+        unique=True,
+        db_index=True
+    )
     issue_date = models.DateField()
     issue_place = models.CharField(max_length=200)
     birth_date = models.DateField()
@@ -42,3 +50,20 @@ class Patient(models.Model):
         related_name='insurance_provider_patient'
     )
     membership_category = models.CharField(max_length=50)
+
+    # ✅ Manager personalizado
+    objects = ActiveManager()  # Excluye eliminados por defecto
+    all_objects = models.Manager()  # Incluye todos
+    
+    class Meta:
+        verbose_name = 'Patient'
+        verbose_name_plural = 'Patients'
+        ordering = ['-created_at']  # Heredado de AuditedModel
+        indexes = [
+            models.Index(fields=['identification_number']),
+            models.Index(fields=['created_at']),
+            models.Index(fields=['is_deleted']),
+        ]
+    
+    def __str__(self) -> str:
+        return f'{self.patient_name} - {self.identification_number}'    

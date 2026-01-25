@@ -1,6 +1,7 @@
 from django.db import models
+from core.models import TimeStampedModel
 
-class HemodynamicStatus(models.Model):
+class HemodynamicStatus(TimeStampedModel):
     '''
     Catalog of possible hemodynamic statuses.
     '''
