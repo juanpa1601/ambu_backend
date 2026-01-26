@@ -17,6 +17,10 @@ from .satisfaction_survey import SatisfactionSurvey
 from .treatment import Treatment
 from .skin_condition import SkinCondition
 from .hemodynamic_status import HemodynamicStatus
+from .arl import ARL
+from .soat import SOAT
+from .eps import EPS
+from .ips import IPS
 
 __all__ = [
     'Companion',
@@ -37,5 +41,9 @@ __all__ = [
     'SatisfactionSurvey',
     'Treatment',
     'SkinCondition',
-    'HemodynamicStatus'
+    'HemodynamicStatus',
+    'ARL',
+    'SOAT',
+    'EPS',
+    'IPS'
 ]
