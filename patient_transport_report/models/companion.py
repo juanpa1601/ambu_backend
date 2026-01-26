@@ -12,11 +12,6 @@ class Companion(models.Model):
         blank=True,
         null=True
     )
-    is_responsible = models.BooleanField(default=False)
-    signature = models.TextField(
-        blank=True,
-        null=True
-    )
 
     class Meta:
         verbose_name = 'Companion'

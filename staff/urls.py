@@ -9,7 +9,8 @@ from staff.views import (
     ValidateSessionView,
     CreateUserView,
     EditProfileView,
-    EditUserView
+    EditUserView,
+    ListDriversView
 )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path('create_user/', CreateUserView.as_view(), name='staff_create_user'),
     path('edit_profile/', EditProfileView.as_view(), name='staff_edit_profile'),
     path('<int:system_user_id>/edit_user/', EditUserView.as_view(), name='staff_edit_user'),
+    path('list_drivers/', ListDriversView.as_view(), name='staff_list_drivers'),
 ]

@@ -125,7 +125,6 @@ class EditProfileView(BaseView):
                 phone_number=validated_data.get('phone_number'),
                 address=validated_data.get('address'),
                 birth_date=validated_data.get('birth_date'),
-                signature=validated_data.get('signature'),
                 professional_registration=validated_data.get('professional_registration'),
                 professional_position=validated_data.get('professional_position'),
                 license_number=validated_data.get('license_number'),

@@ -143,7 +143,6 @@ class CreateUserView(BaseView):
                 phone_number=validated_data['phone_number'],
                 address=validated_data['address'],
                 birth_date=validated_data['birth_date'],
-                signature=validated_data.get('signature'),
                 professional_registration=validated_data.get('professional_registration'),
                 professional_position=validated_data.get('professional_position'),
                 license_number=validated_data.get('license_number'),

@@ -1,7 +1,8 @@
 from django.db import models
 from django.conf import settings
+from core.models import TimeStampedModel
 
-class BaseStaff(models.Model):
+class BaseStaff(TimeStampedModel):
 
     system_user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -33,15 +34,7 @@ class BaseStaff(models.Model):
         blank=True,
         null=True
     )
-    signature = models.TextField(
-        blank=True,
-        null=True,
-        help_text='Digital signature in base64 format'
-    )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
+    
     class Meta:
         verbose_name = 'Base Staff'
         verbose_name_plural = 'Base Staffs'
@@ -49,5 +42,5 @@ class BaseStaff(models.Model):
 
 
     def __str__(self):
-        return f"{self.system_user.get_full_name()} - {self.document_number}"
+        return f'{self.system_user.get_full_name()} - {self.document_number}'
     
