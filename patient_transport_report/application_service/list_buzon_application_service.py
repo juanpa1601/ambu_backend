@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.db.models import QuerySet
 from ..models import PatientTransportReport
 from ..serializers.out import PatientTransportReportSummarySerializer
+from staff.models import Healthcare
 
 class ListBuzonApplicationService:
     '''
@@ -48,6 +49,14 @@ class ListBuzonApplicationService:
             Exception: If database query fails
         '''
         try:
+            # Verify user has permission (Healthcare or Administrative)
+            is_healthcare: bool = Healthcare.objects.filter(user=user).exists()
+            if not (is_healthcare):
+                return {
+                    'response': 'Solamente el personal de salud puede acceder a este recurso.',
+                    'msg': -1,
+                    'status_code_http': 403
+                }                  
             # Calculate time threshold (48 hours ago)
             time_threshold: timezone.datetime = timezone.now() - timedelta(hours=48)
             # Base queryset: user's reports from last 48 hours
@@ -65,7 +74,7 @@ class ListBuzonApplicationService:
             draft_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(draft_reports, many=True)
             completed_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(completed_reports, many=True)
             return {
-                'response': 'Successfully retrieved user reports.',
+                'response': 'Exito al recuperar los informes del usuario.',
                 'msg': 1,
                 'status_code_http': 200,
                 'list_report_draft': draft_serializer.data,

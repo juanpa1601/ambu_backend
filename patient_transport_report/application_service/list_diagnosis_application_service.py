@@ -62,7 +62,7 @@ class ListDiagnosisApplicationService:
                 many=True
             )
             return {
-                'response': 'Successfully retrieved diagnoses.',
+                'response': 'Exito al recuperar los diagnósticos.',
                 'msg': 1,
                 'status_code_http': 200,
                 'diagnoses': serializer.data,
@@ -72,7 +72,7 @@ class ListDiagnosisApplicationService:
             }
         except Exception as e:
             return {
-                'response': f'Error retrieving diagnoses: {str(e)}',
+                'response': f'Error al recuperar los diagnósticos: {str(e)}',
                 'msg': -1,
                 'status_code_http': 500
             }

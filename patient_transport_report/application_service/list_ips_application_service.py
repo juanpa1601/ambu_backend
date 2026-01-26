@@ -35,7 +35,7 @@ class ListIPSApplicationService:
             # Serialize data
             serializer: IPSSerializer = IPSSerializer(ips_list, many=True)
             return {
-                'response': 'Successfully retrieved active institutions.',
+                'response': 'Exito al recuperar las instituciones activas.',
                 'msg': 1,
                 'status_code_http': 200,
                 'institutions': serializer.data,
@@ -43,7 +43,7 @@ class ListIPSApplicationService:
             }
         except Exception as e:
             return {
-                'response': f'Error retrieving institutions: {str(e)}',
+                'response': f'Error al recuperar las instituciones: {str(e)}',
                 'msg': -1,
                 'status_code_http': 500
             }
