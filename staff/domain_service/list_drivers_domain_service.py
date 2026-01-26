@@ -18,9 +18,10 @@ class ListDriversDomainService:
         Returns:
             list[DriverResponse]: List of active driver data dictionaries
         '''
-        drivers: QuerySet[Driver] = Driver.objects.filter(
-            is_active=True
-        ).select_related('user').order_by('id')
+        drivers: QuerySet[Driver] = Driver.objects.select_related(
+            'base_staff',
+            'base_staff__system_user'
+        ).order_by('base_staff__system_user__first_name')
         serializer: DriverSerializer = DriverSerializer(
             drivers, 
             many=True
