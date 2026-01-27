@@ -2,7 +2,6 @@
 Gunicorn configuration file for ambu_backend_drf project.
 """
 import multiprocessing
-import os
 
 # Server socket
 bind = "0.0.0.0:8000"
