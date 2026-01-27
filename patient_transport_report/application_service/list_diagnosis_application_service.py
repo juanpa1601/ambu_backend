@@ -3,6 +3,10 @@ from django.db.models import Q
 from django.db.models.query import QuerySet
 from ..models import Diagnosis
 from ..serializers.out import DiagnosisSerializer
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class ListDiagnosisApplicationService:
     '''
@@ -15,6 +19,9 @@ class ListDiagnosisApplicationService:
     - Serialize data for API response
     '''
     
+    SUCCESS: int = 1
+    FAILURE: int = -1  
+
     def list_diagnoses(
         self, 
         search_query: str | None = None
@@ -63,8 +70,8 @@ class ListDiagnosisApplicationService:
             )
             return {
                 'response': 'Exito al recuperar los diagnósticos.',
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'diagnoses': serializer.data,
                 'total': len(serializer.data),
                 'search_applied': search_applied,
@@ -73,6 +80,6 @@ class ListDiagnosisApplicationService:
         except Exception as e:
             return {
                 'response': f'Error al recuperar los diagnósticos: {str(e)}',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }

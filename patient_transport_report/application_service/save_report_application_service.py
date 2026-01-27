@@ -19,6 +19,12 @@ from patient_transport_report.models import (
     Diagnosis, 
     IPS
 )
+from rest_framework.status import (
+    HTTP_404_NOT_FOUND,
+    HTTP_400_BAD_REQUEST,
+    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class SaveReportApplicationService:
     '''
@@ -26,6 +32,9 @@ class SaveReportApplicationService:
     Orchestrates the complete save/update process with transaction support.
     '''
     
+    SUCCESS: int = 1
+    FAILURE: int = -1    
+
     def __init__(self) -> None:
         self.domain_service: SaveReportDomainService = SaveReportDomainService()
     
@@ -63,28 +72,28 @@ class SaveReportApplicationService:
                 )
             return {
                 'response': result['message'],
-                'msg': 1,
-                'status_code': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'report': result['report_data']
             }
         except PatientTransportReport.DoesNotExist:
             return {
                 'response': f'Report with ID {report_id} not found',
-                'msg': -1,
-                'status_code': 404
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_404_NOT_FOUND
             }
         except ValidationError as e:
             return {
                 'response': 'Validation error',
-                'msg': -1,
-                'status_code': 400,
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_400_BAD_REQUEST,
                 'errors': e.message_dict if hasattr(e, 'message_dict') else str(e)
             }
         except Exception as e:
             return {
                 'response': f'Error saving report: {str(e)}',
-                'msg': -1,
-                'status_code': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }
     
     def _create_new_report(
