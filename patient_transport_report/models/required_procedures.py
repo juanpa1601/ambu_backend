@@ -2,13 +2,30 @@ from django.db import models
 
 class RequiredProcedures(models.Model):
 
-    immovilization = models.BooleanField(default=False)
-    streatcher_transfer = models.BooleanField(default=False)
-    ambulance_transport = models.BooleanField(default=False)
-    assessment = models.BooleanField(default=False)
+    immovilization = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Indicates if immovilization was required'
+    )
+    streatcher_transfer = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Indicates if stretcher transfer was required'
+    )
+    ambulance_transport = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Indicates if ambulance transport was required'
+    )
+    assessment = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Indicates if patient assessment was required'
+    )
     other_procedures_details = models.TextField(
         blank=True, 
-        null=True
+        null=True,
+        help_text='Details of other required procedures'
     )
 
     class Meta:
