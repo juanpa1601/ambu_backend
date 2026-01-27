@@ -6,6 +6,12 @@ class EditProfileSerializer(serializers.Serializer):
     All fields are optional - only provided fields will be updated.
     '''
     # System User fields (optional)
+    username: serializers.CharField = serializers.CharField(
+        required=False,
+        allow_null=True,
+        max_length=150,
+        help_text='Unique username'
+    )
     email: serializers.EmailField = serializers.EmailField(
         required=False,
         allow_null=True,
@@ -32,6 +38,18 @@ class EditProfileSerializer(serializers.Serializer):
     )
     
     # Base Staff fields (optional)
+    document_type: serializers.CharField = serializers.CharField(
+        required=False,
+        allow_null=True,
+        max_length=50,
+        help_text='Type of identification document (DNI, Passport, etc.)'
+    )
+    document_number: serializers.CharField = serializers.CharField(
+        required=False,
+        allow_null=True,
+        max_length=50,
+        help_text='Identification document number'
+    )
     phone_number: serializers.CharField = serializers.CharField(
         required=False,
         allow_null=True,
@@ -47,12 +65,6 @@ class EditProfileSerializer(serializers.Serializer):
         required=False,
         allow_null=True,
         help_text='Date of birth (YYYY-MM-DD)'
-    )
-    signature: serializers.CharField = serializers.CharField(
-        required=False,
-        allow_null=True,
-        allow_blank=True,
-        help_text='Signature image (base64 or file)'
     )
     
     # Healthcare specific fields (optional)

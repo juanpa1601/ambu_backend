@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'staff',
     'core',
-    'daily_monthly_inventory'
+    'daily_monthly_inventory',
+    'patient_transport_report'
 ]
 
 REST_FRAMEWORK = {

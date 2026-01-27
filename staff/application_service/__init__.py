@@ -8,6 +8,7 @@ from .validate_session_application_service import ValidateSessionApplicationServ
 from .create_user_application_service import CreateUserApplicationService
 from .edit_profile_application_service import EditProfileApplicationService
 from .edit_user_application_service import EditUserApplicationService
+from .list_drivers_application_service import ListDriversApplicationService
 
 __all__ = [
     'LoginApplicationService',
@@ -19,5 +20,6 @@ __all__ = [
     'ValidateSessionApplicationService',
     'CreateUserApplicationService',
     'EditProfileApplicationService',
-    'EditUserApplicationService'
+    'EditUserApplicationService',
+    'ListDriversApplicationService'
 ]
