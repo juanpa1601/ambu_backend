@@ -2,14 +2,22 @@ import logging
 from django.contrib.auth.models import User
 from staff.domain_service import AuthDomainService
 from staff.types.dataclass import ValidateSessionResponse
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class ValidateSessionApplicationService:
     '''
     Application service for validating user session.
     Checks if authentication token is still valid.
     '''
-    
-    def __init__(self):
+
+    SUCCESS: int = 1
+    FAILURE: int = -1 
+
+    def __init__(self) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.auth_domain_service: AuthDomainService = AuthDomainService()
     
@@ -38,6 +46,9 @@ class ValidateSessionApplicationService:
                     f'Invalid session for user: {authenticated_user.username} - {message}'
                 )
                 return ValidateSessionResponse(
+                    response=message,
+                    msg=self.FAILURE,
+                    status_code_http=HTTP_403_FORBIDDEN,
                     is_valid=False,
                     username=authenticated_user.username,
                     user_id=authenticated_user.id,
@@ -50,6 +61,9 @@ class ValidateSessionApplicationService:
                 f'Valid session confirmed for user: {authenticated_user.username}'
             )
             return ValidateSessionResponse(
+                response=message,
+                msg=self.SUCCESS,
+                status_code_http=HTTP_200_OK,
                 is_valid=True,
                 username=authenticated_user.username,
                 user_id=authenticated_user.id,
@@ -61,6 +75,9 @@ class ValidateSessionApplicationService:
                 exc_info=True
             )
             return ValidateSessionResponse(
+                response='Ocurrió un error durante la validación de la sesión.',
+                msg=self.FAILURE,
+                status_code_http=HTTP_500_INTERNAL_SERVER_ERROR,
                 is_valid=False,
                 username=authenticated_user.username,
                 user_id=authenticated_user.id,

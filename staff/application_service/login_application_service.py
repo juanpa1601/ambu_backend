@@ -6,14 +6,22 @@ from staff.types.dataclass import (
 )
 from django.contrib.auth.models import User
 from staff.domain_service import AuthDomainService
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class LoginApplicationService:
     '''
     Application service for login operations.
     Orchestrates the login process using domain services.
     '''
-    
-    def __init__(self):
+
+    SUCCESS: int = 1
+    FAILURE: int = -1    
+
+    def __init__(self) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.auth_domain_service: AuthDomainService = AuthDomainService()
     
@@ -39,8 +47,8 @@ class LoginApplicationService:
             if user is None:
                 return {
                     'response': 'Credenciales invalidas. Por favor, verifica tu username y password.',
-                    'msg': -1,
-                    'status_code_http': 401
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_403_FORBIDDEN
                 }
             # Step 2: Generate tokens
             token: str = self.auth_domain_service.generate_token(user)
@@ -58,8 +66,8 @@ class LoginApplicationService:
             self.logger.info(f'User {user.username} logged in successfully')
             return {
                 'response': 'Inicio de sesión exitoso.',
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'data': {
                     'access_token': login_response.access_token,
                     'user': {
@@ -75,6 +83,6 @@ class LoginApplicationService:
             self.logger.error(f'Error during login: {str(e)}', exc_info=True)
             return {
                 'response': 'Ocurrió un error durante el inicio de sesión.',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }
