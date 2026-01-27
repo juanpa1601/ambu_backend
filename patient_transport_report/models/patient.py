@@ -33,7 +33,7 @@ class Patient(AuditedModel):
         null=True, 
         blank=True
     )
-    age = models.IntegerField(
+    patient_age = models.IntegerField(
         null=True, 
         blank=True
     )
