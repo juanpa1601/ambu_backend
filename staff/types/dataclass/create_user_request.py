@@ -18,9 +18,6 @@ class CreateUserRequest:
     address: str
     birth_date: str  # Format: YYYY-MM-DD
     
-    # Optional fields
-    signature: str | None = None  # Base64 or file path
-    
     # Specific profile data (depends on type_personnel)
     # Healthcare fields
     professional_registration: str | None = None

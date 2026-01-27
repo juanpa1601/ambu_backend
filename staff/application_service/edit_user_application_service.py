@@ -73,13 +73,13 @@ class EditUserApplicationService:
             )
             if not success:
                 # Check specific error types
-                if 'already exists' in message.lower():
+                if 'ya existe' in message.lower():
                     return {
                         'response': message,
                         'msg': -1,
                         'status_code_http': 400
                     }
-                if 'not found' in message.lower():
+                if 'no encontrado' in message.lower():
                     return {
                         'response': message,
                         'msg': -1,

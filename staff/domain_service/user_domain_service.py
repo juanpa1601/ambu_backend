@@ -315,7 +315,7 @@ class UserDomainService:
             # Step 1: Validate username uniqueness
             if User.objects.filter(username=user_request.username).exists():
                 self.logger.warning(f'Username already exists: {user_request.username}')
-                return (False, 'Username ya existe. Intenta otro..', None)
+                return (False, 'Username ya existe. Intenta otro.', None)
             # Step 2: Validate email uniqueness
             if User.objects.filter(email=user_request.email).exists():
                 self.logger.warning(f'Email already exists: {user_request.email}')
@@ -324,6 +324,14 @@ class UserDomainService:
             if BaseStaff.objects.filter(document_number=user_request.document_number).exists():
                 self.logger.warning(f'Document number already exists: {user_request.document_number}')
                 return (False, 'Número de documento ya existe. Intenta otro.', None)
+            if user_request.type_personnel == 'Healthcare':
+                if Healthcare.objects.filter(professional_registration=user_request.professional_registration).exists():
+                    self.logger.warning(f'Professional registration already exists: {user_request.professional_registration}')
+                    return (False, 'La matrícula profesional ya existe. Intenta otra.', None)
+            elif user_request.type_personnel == 'Driver':
+                if Driver.objects.filter(license_number=user_request.license_number).exists():
+                    self.logger.warning(f'License number already exists: {user_request.license_number}')
+                    return (False, 'El número de licencia ya existe. Intenta otro.', None)
             # Step 4: Create System User
             user: User = User.objects.create_user(
                 username=user_request.username,
@@ -343,9 +351,7 @@ class UserDomainService:
                 type_personnel=user_request.type_personnel,
                 phone_number=user_request.phone_number,
                 address=user_request.address,
-                birth_date=user_request.birth_date,
-                signature=user_request.signature
-                # signature will be handled separately if needed
+                birth_date=user_request.birth_date
             )
             self.logger.info(f'Created base staff profile: {base_staff.id} for user: {user.username}')
             # Step 6: Create specific staff profile based on type_personnel
@@ -484,11 +490,8 @@ class UserDomainService:
             if profile_request.birth_date is not None:
                 base_staff.birth_date = profile_request.birth_date
                 fields_updated.append('birth_date')
-            if profile_request.signature is not None:
-                base_staff.signature = profile_request.signature
-                fields_updated.append('signature')
             # Save base_staff if any field was updated
-            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date', 'signature']):
+            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date']):
                 base_staff.save()
                 self.logger.info(f'Updated base staff fields for: {user.username}')
             # Step 5: Update specific profile fields based on staff type
@@ -659,11 +662,8 @@ class UserDomainService:
             if profile_request.birth_date is not None:
                 base_staff.birth_date = profile_request.birth_date
                 fields_updated.append('birth_date')
-            if profile_request.signature is not None:
-                base_staff.signature = profile_request.signature
-                fields_updated.append('signature')
             # Save base_staff if any field was updated
-            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date', 'signature']):
+            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date']):
                 base_staff.save()
                 self.logger.info(f'Admin {admin_user.username} updated base staff fields for: {user.username}')
             # Step 6: Update specific profile fields based on staff type
