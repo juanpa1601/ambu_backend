@@ -351,8 +351,7 @@ class UserDomainService:
                 type_personnel=user_request.type_personnel,
                 phone_number=user_request.phone_number,
                 address=user_request.address,
-                birth_date=user_request.birth_date,
-                signature=user_request.signature
+                birth_date=user_request.birth_date
             )
             self.logger.info(f'Created base staff profile: {base_staff.id} for user: {user.username}')
             # Step 6: Create specific staff profile based on type_personnel
@@ -491,11 +490,8 @@ class UserDomainService:
             if profile_request.birth_date is not None:
                 base_staff.birth_date = profile_request.birth_date
                 fields_updated.append('birth_date')
-            if profile_request.signature is not None:
-                base_staff.signature = profile_request.signature
-                fields_updated.append('signature')
             # Save base_staff if any field was updated
-            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date', 'signature']):
+            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date']):
                 base_staff.save()
                 self.logger.info(f'Updated base staff fields for: {user.username}')
             # Step 5: Update specific profile fields based on staff type
@@ -666,11 +662,8 @@ class UserDomainService:
             if profile_request.birth_date is not None:
                 base_staff.birth_date = profile_request.birth_date
                 fields_updated.append('birth_date')
-            if profile_request.signature is not None:
-                base_staff.signature = profile_request.signature
-                fields_updated.append('signature')
             # Save base_staff if any field was updated
-            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date', 'signature']):
+            if any(field in fields_updated for field in ['document_type', 'document_number', 'phone_number', 'address', 'birth_date']):
                 base_staff.save()
                 self.logger.info(f'Admin {admin_user.username} updated base staff fields for: {user.username}')
             # Step 6: Update specific profile fields based on staff type

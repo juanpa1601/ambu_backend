@@ -67,17 +67,18 @@ class CareTransferReport(AuditedModel):
     )
     
     # Companions
-    companion_1 = models.ForeignKey(
+    companion = models.ForeignKey(
         Companion,
         on_delete=models.SET_NULL,
-        related_name='companion_1_care_transfer_reports',
+        related_name='companion_care_transfer_reports',
         blank=True,
         null=True
     )
-    companion_2 = models.ForeignKey(
+    companion_is_responsible = models.BooleanField(default=False)
+    responsible = models.ForeignKey(
         Companion,
         on_delete=models.SET_NULL,
-        related_name='companion_2_care_transfer_reports',
+        related_name='responsible_care_transfer_reports',
         blank=True,
         null=True
     )
@@ -140,10 +141,15 @@ class CareTransferReport(AuditedModel):
         blank=True,
         null=True
     )
-    receiving_entity = models.OneToOneField(
+    receiving_entity = models.ForeignKey(
         OutgoingReceivingEntity,
         on_delete=models.CASCADE,
         related_name='receiving_entity_care_transfer_report'
+    )
+    receiving_entity_signature = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Digital signature in base64 format'
     )
     
     objects = ActiveManager()

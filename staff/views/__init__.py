@@ -8,6 +8,7 @@ from .validate_session_view import ValidateSessionView
 from .create_user_view import CreateUserView
 from .edit_profile_view import EditProfileView
 from .edit_user_view import EditUserView
+from .list_drivers_view import ListDriversView
 
 __all__ = [
     'LoginView',
@@ -19,5 +20,6 @@ __all__ = [
     'ValidateSessionView',
     'CreateUserView',
     'EditProfileView',
-    'EditUserView'
+    'EditUserView',
+    'ListDriversView'
 ]

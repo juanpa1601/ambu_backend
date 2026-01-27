@@ -15,7 +15,7 @@ class InformedConsent(AuditedModel):
     Now connected through PatientTransportReport instead of direct Patient reference.
     '''
 
-    consent_timestamp = models.DateTimeField(auto_now_add=True)
+    consent_timestamp = models.DateTimeField()
     guardian_type = models.CharField(max_length=100)
     guardian_name = models.CharField(max_length=200)
     responsible_for = models.CharField(max_length=200)
@@ -40,7 +40,17 @@ class InformedConsent(AuditedModel):
         null=True
     )
     patient_can_sign = models.BooleanField(default=True)
+    patient_signature = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Digital signature in base64 format'
+    )
     responsible_can_sign = models.BooleanField(default=False)
+    responsible_signature = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Digital signature in base64 format'
+    )
     responsible = models.ForeignKey(
         Companion,
         on_delete=models.CASCADE,
@@ -51,12 +61,22 @@ class InformedConsent(AuditedModel):
     attending_staff = models.ForeignKey(
         Healthcare,
         on_delete=models.CASCADE,
-        related_name='attending_staff_informed_consent'
+        related_name='attending_staff_informed_consents'
     )
-    outgoing_entity = models.OneToOneField(
+    attending_staff_signature = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Digital signature in base64 format'
+    )
+    outgoing_entity = models.ForeignKey(
         OutgoingReceivingEntity,
         on_delete=models.CASCADE,
-        related_name='outgoing_entity_informed_consent'
+        related_name='outgoing_entity_informed_consents'
+    )
+    outgoing_entity_signature = models.TextField(
+        blank=True,
+        null=True,
+        help_text='Digital signature in base64 format'
     )
 
     objects = ActiveManager()

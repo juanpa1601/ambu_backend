@@ -66,12 +66,6 @@ class EditProfileSerializer(serializers.Serializer):
         allow_null=True,
         help_text='Date of birth (YYYY-MM-DD)'
     )
-    signature: serializers.CharField = serializers.CharField(
-        required=False,
-        allow_null=True,
-        allow_blank=True,
-        help_text='Signature image (base64 or file)'
-    )
     
     # Healthcare specific fields (optional)
     professional_registration: serializers.CharField = serializers.CharField(

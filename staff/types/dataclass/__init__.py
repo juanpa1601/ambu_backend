@@ -15,6 +15,7 @@ from .profile_information_response import ProfileInformationResponse
 from .validate_session_response import ValidateSessionResponse
 from .create_user_response import CreateUserResponse
 from .edit_profile_response import EditProfileResponse
+from .driver_response import DriverResponse
 
 # Other types
 from .user_list_item import UserListItem
@@ -36,6 +37,7 @@ __all__ = [
     'ValidateSessionResponse',
     'CreateUserResponse',
     'EditProfileResponse',
+    'DriverResponse',
     # Other types
-    'UserListItem',
+    'UserListItem'
 ]
