@@ -6,7 +6,15 @@ from patient_transport_report.models import (
     PatientTransportReport,
     InformedConsent,
     CareTransferReport,
-    SatisfactionSurvey
+    SatisfactionSurvey,
+    MedicationAdministration,
+    PhysicalExam,
+    Companion,
+    OutgoingReceivingEntity,
+    RequiredProcedures,
+    Treatment,
+    Result,
+    ComplicationsTransfer
 )
 from patient_transport_report.domain_service import SaveReportDomainService
 from patient_transport_report.types.typed_dict import SaveReportRequestData
@@ -55,7 +63,7 @@ class SaveReportApplicationService:
             dict: Response with report details and status
         '''
         try:
-            report_id = data.get('report_id')
+            report_id: int | None = data.get('report_id')
             result: dict
             if report_id:
                 # UPDATE MODE
@@ -106,7 +114,7 @@ class SaveReportApplicationService:
         # 1. Validate attending_staff exists
         attending_staff_id = data['care_transfer_report']['attending_staff']
         if not Healthcare.objects.filter(base_staff_id=attending_staff_id).exists():
-            raise ValidationError({'attending_staff': f'Healthcare staff with ID {attending_staff_id} not found'})
+            raise ValidationError({'attending_staff': f'Personal de Salud {attending_staff_id} no encontrado'})
         # 2. Create Patient
         patient = self.domain_service.create_or_update_patient(data['patient_data'])
         sections_created.append('patient')
@@ -139,7 +147,7 @@ class SaveReportApplicationService:
         # 6. Update tracking flags
         self.domain_service.update_tracking_flags(report)
         return {
-            'message': 'Report created successfully',
+            'message': 'Reporte creado exitosamente.',
             'report_data': self._build_response_data(report, sections_created)
         }
     
@@ -197,18 +205,11 @@ class SaveReportApplicationService:
                 sections_updated.append('satisfaction_survey')
             elif satisfaction:
                 sections_updated.append('satisfaction_survey')
-        # 5. Handle status change
-        if 'change_status_to' in data:
-            requested_status = data['change_status_to']
-            if requested_status == 'completado':
-                if not report.can_complete():
-                    raise ValidationError('Report cannot be completed. Missing required sections.')
-                report.status = 'completado'
-        # 6. Update tracking
+        # 5. Update tracking
         report.updated_by = user
         self.domain_service.update_tracking_flags(report)
         return {
-            'message': 'Report updated successfully',
+            'message': 'Reporte actualizado exitosamente.',
             'report_data': self._build_response_data(report, sections_updated)
         }
     
@@ -220,23 +221,47 @@ class SaveReportApplicationService:
     ) -> InformedConsent:
         '''Handle InformedConsent creation/update'''
         # Validate attending_staff
-        attending_staff_id = data['attending_staff']
-        attending_staff = Healthcare.objects.filter(base_staff_id=attending_staff_id).first()
+        attending_staff_id: int = data['attending_staff']
+        attending_staff: Healthcare | None = Healthcare.objects.filter(base_staff_id=attending_staff_id).first()
         if not attending_staff:
-            raise ValidationError({'attending_staff': f'Healthcare staff with ID {attending_staff_id} not found'})
+            raise ValidationError({'attending_staff': f'Personal de Salud con ID {attending_staff_id} no encontrado'})
         # Handle nested companion (responsible)
-        responsible_companion = None
+        responsible_companion: Companion | None = None
         if 'responsible' in data and data['responsible']:
             responsible_companion = self.domain_service.create_or_update_companion(data['responsible'])
         # Handle outgoing entity
-        outgoing_entity = None
+        outgoing_entity: OutgoingReceivingEntity | None = None
         if 'outgoing_entity' in data and data['outgoing_entity']:
             outgoing_entity = self.domain_service.create_or_update_entity(data['outgoing_entity'])
+        # Handle required procedures
+        required_procedures: RequiredProcedures | None = None
+        if 'procedure' in data and data['procedure']:
+            existing_procedures: RequiredProcedures | None = existing.required_procedures if existing else None
+            required_procedures: RequiredProcedures | None = self.domain_service.create_or_update_required_procedures(
+                data['procedure'],
+                existing_procedures
+            )
+        # Handle medication administration
+        medication_administration: MedicationAdministration | None = None
+        if 'medication_administration' in data and data['medication_administration']:
+            existing_medication = existing.medication_administration if existing else None
+            medication_administration = self.domain_service.create_or_update_medication_administration(
+                data['medication_administration'],
+                existing_medication
+            )
         # Prepare consent data
-        consent_data = {k: v for k, v in data.items() if k not in ['responsible', 'outgoing_entity', 'attending_staff']}
+        consent_data: dict = {
+            k: v for k, v in data.items() 
+            if k not in [
+                'responsible', 'outgoing_entity', 'attending_staff', 
+                'procedure', 'medication_administration'
+            ]
+        }
         consent_data['attending_staff'] = attending_staff
         consent_data['responsible'] = responsible_companion
         consent_data['outgoing_entity'] = outgoing_entity
+        consent_data['required_procedures'] = required_procedures
+        consent_data['medication_administration'] = medication_administration
         if existing:
             # Update existing
             for key, value in consent_data.items():
@@ -246,7 +271,11 @@ class SaveReportApplicationService:
             return existing
         else:
             # Create new
-            consent = InformedConsent.objects.create(**consent_data, created_by=user, updated_by=user)
+            consent: InformedConsent = InformedConsent.objects.create(
+                **consent_data, 
+                created_by=user, 
+                updated_by=user
+            )
             return consent
     
     def _handle_care_transfer_report(
@@ -257,64 +286,76 @@ class SaveReportApplicationService:
     ) -> CareTransferReport:
         '''Handle CareTransferReport creation/update'''
         # Validate FKs
-        errors = self.domain_service.validate_foreign_keys(data)
+        errors: dict[str, str] = self.domain_service.validate_foreign_keys(data)
         if errors:
             raise ValidationError(errors)
         # Resolve FKs
-        attending_staff = Healthcare.objects.get(base_staff_id=data['attending_staff'])
-        driver = Driver.objects.get(base_staff_id=data['driver']) if data.get('driver') else None
-        support_staff = Healthcare.objects.get(base_staff_id=data['support_staff']) if data.get('support_staff') else None
-        ambulance = Ambulance.objects.get(id=data['ambulance']) if data.get('ambulance') else None
-        # Handle nested objects
-        companion = None
+        attending_staff: Healthcare = Healthcare.objects.get(base_staff_id=data['attending_staff'])
+        driver: Driver | None = Driver.objects.get(base_staff_id=data['driver']) if data.get('driver') else None
+        support_staff: Healthcare | None = Healthcare.objects.get(base_staff_id=data['support_staff']) if data.get('support_staff') else None
+        ambulance: Ambulance | None = Ambulance.objects.get(id=data['ambulance']) if data.get('ambulance') else None
+        # Handle nested companion
+        companion: Companion | None = None
         if 'companion' in data and data['companion']:
             companion = self.domain_service.create_or_update_companion(data['companion'])
-        initial_exam = None
-        if 'initial_physicial_examination' in data and data['initial_physicial_examination']:
-            existing_initial = existing.initial_physicial_examination if existing else None
+        # Handle nested responsible
+        responsible: Companion | None = None
+        if 'responsible' in data and data['responsible']:
+            responsible = self.domain_service.create_or_update_companion(data['responsible'])
+        # Handle initial physical examination
+        initial_exam: PhysicalExam | None = None
+        if 'initial_physical_examination' in data and data['initial_physical_examination']:
+            existing_initial: PhysicalExam | None = existing.initial_physical_examination if existing else None
             initial_exam = self.domain_service.create_or_update_physical_exam(
-                data['initial_physicial_examination'],
+                data['initial_physical_examination'],
                 existing_initial
             )
-        final_exam = None
+        # Handle final physical examination
+        final_exam: PhysicalExam | None = None
         if 'final_physical_examination' in data and data['final_physical_examination']:
-            existing_final = existing.final_physical_examination if existing else None
+            existing_final: PhysicalExam | None = existing.final_physical_examination if existing else None
             final_exam = self.domain_service.create_or_update_physical_exam(
                 data['final_physical_examination'],
                 existing_final
             )
-        treatment = None
+        # Handle treatment
+        treatment: Treatment | None = None
         if 'treatment' in data and data['treatment']:
-            existing_treatment = existing.treatment if existing else None
+            existing_treatment: Treatment | None = existing.treatment if existing else None
             treatment = self.domain_service.create_or_update_treatment(
                 data['treatment'],
                 existing_treatment
             )
-        result = None
+        # Handle result
+        result: Result | None = None
         if 'result' in data and data['result']:
-            existing_result = existing.result if existing else None
+            existing_result: Result | None = existing.result if existing else None
             result = self.domain_service.create_or_update_result(
                 data['result'],
                 existing_result
             )
-        complications = None
+        # Handle complications
+        complications: ComplicationsTransfer | None = None
         if 'complications_transfer' in data and data['complications_transfer']:
-            existing_complications = existing.complications_transfer if existing else None
+            existing_complications: ComplicationsTransfer | None = existing.complications_transfer if existing else None
             complications = self.domain_service.create_or_update_complications(
                 data['complications_transfer'],
                 existing_complications
             )
-        receiving_entity = None
+        # Handle receiving entity
+        receiving_entity: OutgoingReceivingEntity | None = None
         if 'receiving_entity' in data and data['receiving_entity']:
             receiving_entity = self.domain_service.create_or_update_entity(data['receiving_entity'])
         # Prepare care transfer data
-        care_data = {
+        care_data: dict = {
             k: v for k, v in data.items()
             if k not in [
                 'attending_staff', 'driver', 'support_staff', 'ambulance', 'companion',
-                'initial_physicial_examination', 'final_physical_examination', 'treatment',
-                'result', 'complications_transfer', 'receiving_entity', 'skin_conditions',
-                'hemodynamic_statuses', 'diagnosis_1', 'diagnosis_2', 'ips'
+                'responsible',
+                'initial_physical_examination', 'final_physical_examination', 'treatment',
+                'result', 'complications_transfer', 'receiving_entity', 
+                'skin_condition', 'hemodynamic_stats',
+                'diagnosis_1', 'diagnosis_2', 'ips'
             ]
         }
         care_data.update({
@@ -323,7 +364,8 @@ class SaveReportApplicationService:
             'support_staff': support_staff,
             'ambulance': ambulance,
             'companion': companion,
-            'initial_physicial_examination': initial_exam,
+            'responsible': responsible,
+            'initial_physical_examination': initial_exam,
             'final_physical_examination': final_exam,
             'treatment': treatment,
             'result': result,
@@ -343,21 +385,24 @@ class SaveReportApplicationService:
                 setattr(existing, key, value)
             existing.updated_by = user
             existing.save()
-            
-            # Handle ManyToMany
-            if 'skin_conditions' in data:
-                existing.skin_conditions.set(data['skin_conditions'])
-            if 'hemodynamic_statuses' in data:
-                existing.hemodynamic_statuses.set(data['hemodynamic_statuses'])
+            # Handle ManyToMany (frontend names: skin_condition, hemodynamic_stats)
+            if 'skin_condition' in data:
+                existing.skin_conditions.set(data['skin_condition'])
+            if 'hemodynamic_stats' in data:
+                existing.hemodynamic_statuses.set(data['hemodynamic_stats'])
             return existing
         else:
             # Create new
-            care_transfer = CareTransferReport.objects.create(**care_data, created_by=user, updated_by=user)
+            care_transfer: CareTransferReport = CareTransferReport.objects.create(
+                **care_data, 
+                created_by=user, 
+                updated_by=user
+            )
             # Handle ManyToMany
-            if 'skin_conditions' in data:
-                care_transfer.skin_conditions.set(data['skin_conditions'])
-            if 'hemodynamic_statuses' in data:
-                care_transfer.hemodynamic_statuses.set(data['hemodynamic_statuses'])
+            if 'skin_condition' in data:
+                care_transfer.skin_conditions.set(data['skin_condition'])
+            if 'hemodynamic_stats' in data:
+                care_transfer.hemodynamic_statuses.set(data['hemodynamic_stats'])
             return care_transfer
     
     def _handle_satisfaction_survey(

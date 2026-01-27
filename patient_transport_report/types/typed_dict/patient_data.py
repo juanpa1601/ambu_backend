@@ -1,5 +1,7 @@
 from typing import TypedDict
 from datetime import datetime
+from .patient_history_data import PatientHistoryData
+from .insurence_provider_data import InsuranceProviderData
 
 # ==================== PATIENT DATA ====================
 class PatientData(TypedDict, total=False):
@@ -18,6 +20,6 @@ class PatientData(TypedDict, total=False):
     landline_phone: str
     marital_status: str
     occupation: str
-    patient_history: int # FK
-    insurance_provider: int  # FK
+    patient_history: PatientHistoryData
+    insurance_provider: InsuranceProviderData
     membership_category: str # Contributivo o Subsidiado

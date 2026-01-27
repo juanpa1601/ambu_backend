@@ -7,8 +7,7 @@ from .satisfaction_survey_data import SatisfactionSurveyData
 # ==================== MAIN REQUEST ====================
 class SaveReportRequestData(TypedDict, total=False):
     report_id: int | None
-    patient_data: PatientData
+    patient: PatientData
     informed_consent: InformedConsentData
     care_transfer_report: CareTransferReportData
     satisfaction_survey: SatisfactionSurveyData
-    change_status_to: str  # 'completado' o 'borrador'

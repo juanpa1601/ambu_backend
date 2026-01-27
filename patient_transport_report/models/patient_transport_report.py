@@ -52,15 +52,15 @@ class PatientTransportReport(AuditedModel):
         db_index=True
     )
 
-    # completion_percentage = models.IntegerField(
-    #     default=0,
-    #     help_text='Percentage of required fields completed (0-100)'
-    # )
+    completion_percentage = models.IntegerField(
+        default=0,
+        help_text='Percentage of required fields completed (0-100)'
+    )
     
-    # has_patient_info = models.BooleanField(default=False)
-    # has_informed_consent = models.BooleanField(default=False)
-    # has_care_transfer = models.BooleanField(default=False)
-    # has_satisfaction_survey = models.BooleanField(default=False)
+    has_patient_info = models.BooleanField(default=False)
+    has_informed_consent = models.BooleanField(default=False)
+    has_care_transfer = models.BooleanField(default=False)
+    has_satisfaction_survey = models.BooleanField(default=False)
 
     objects = ActiveManager()
     all_objects = models.Manager()

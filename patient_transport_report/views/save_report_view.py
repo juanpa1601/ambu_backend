@@ -14,7 +14,7 @@ class SaveReportView(BaseView):
     This is a protected endpoint that requires authentication.
     Supports progressive/partial completion of reports.
     
-    POST /api/patient-transport-report/reports/save/
+    POST /patient_transport_report/reports_save/
     
     Headers:
         Authorization: Token <token_value>
@@ -53,7 +53,7 @@ class SaveReportView(BaseView):
     
     Success Response (200 OK):
         {
-            "response": "Report created successfully",
+            "response": "Reporte creado exitosamente.",
             "msg": 1,
             "data": {
                 "report": {

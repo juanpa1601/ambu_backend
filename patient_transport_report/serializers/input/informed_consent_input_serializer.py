@@ -1,72 +1,90 @@
 from rest_framework import serializers
 from .companion_input_serializer import CompanionInputSerializer
 from .entity_input_serializer import EntityInputSerializer
+from .medication_administration_input_serializer import MedicationAdministrationInputSerializer
+from .required_procedures_input_serializer import RequiredProceduresInputSerializer
 
+# ==================== INFORMED CONSENT ====================
 class InformedConsentInputSerializer(serializers.Serializer):
-    '''Input serializer for Informed Consent'''
-    consent_timestamp: serializers.DateTimeField = serializers.DateTimeField(
-        required=False, 
+    consent_timestamp = serializers.DateTimeField(
+        required=False,
         allow_null=True
     )
-    guardian_type: serializers.CharField = serializers.CharField(
+    guardian_type = serializers.CharField(
         max_length=100, 
         required=False, 
         allow_blank=True
     )
-    guardian_name: serializers.CharField = serializers.CharField(
+    guardian_name = serializers.CharField(
         max_length=200, 
         required=False, 
         allow_blank=True
     )
-    responsible_for: serializers.CharField = serializers.CharField(
-        max_length=200,
-        required=False,
-        allow_blank=True
-    )
-    guardian_id_type: serializers.CharField = serializers.CharField(
-        max_length=50,
-        required=False,
-        allow_blank=True
-    )
-    guardian_id_number: serializers.CharField = serializers.CharField(
-        max_length=50,
-        required=False,
-        allow_blank=True
-    )
-    administers_medications: serializers.BooleanField = serializers.BooleanField(required=False)
-    service_type: serializers.CharField = serializers.CharField(
-        max_length=100,
-        required=False,
-        allow_blank=True
-    )
-    other_implications: serializers.CharField = serializers.CharField(
-        required=False,
-        allow_blank=True
-    )
-    patient_can_sign: serializers.BooleanField = serializers.BooleanField(required=False)
-    patient_signature: serializers.CharField = serializers.CharField(
+    responsible_for = serializers.CharField(
+        max_length=200, 
         required=False, 
         allow_blank=True
     )
-    responsible_can_sign: serializers.BooleanField = serializers.BooleanField(required=False)
-    responsible_signature: serializers.CharField = serializers.CharField(
+    guardian_id_type = serializers.CharField(
+        max_length=50, 
         required=False, 
         allow_blank=True
     )
-    responsible: CompanionInputSerializer = CompanionInputSerializer(
+    guardian_id_number = serializers.CharField(
+        max_length=50, 
+        required=False, 
+        allow_blank=True
+    )
+    procedure = RequiredProceduresInputSerializer(
         required=False, 
         allow_null=True
     )
-    attending_staff: serializers.IntegerField = serializers.IntegerField(required=True)  # OBLIGATORIO
-    attending_staff_signature: serializers.CharField = serializers.CharField(
+    administers_medications = serializers.BooleanField(
         required=False, 
-        allow_blank=True
+        default=False
     )
-    outgoing_entity: EntityInputSerializer = EntityInputSerializer(
+    medication_administration = MedicationAdministrationInputSerializer(
         required=False, 
         allow_null=True
     )
-    outgoing_entity_signature: serializers.CharField = serializers.CharField(
+    service_type = serializers.CharField(
+        required=False, 
+        allow_blank=True
+    )
+    other_implications = serializers.CharField(
+        required=False, 
+        allow_blank=True
+    )
+    patient_can_sign = serializers.BooleanField(
+        required=False, 
+        default=False
+    )
+    patient_signature = serializers.CharField(
+        required=False, 
+        allow_blank=True
+    )
+    responsible_can_sign = serializers.BooleanField(
+        required=False, 
+        default=False
+    )
+    responsible_signature = serializers.CharField(
+        required=False, 
+        allow_blank=True
+    )
+    responsible = CompanionInputSerializer(
+        required=False, 
+        allow_null=True
+    )
+    attending_staff = serializers.IntegerField(required=True)
+    attending_staff_signature = serializers.CharField(
+        required=False, 
+        allow_blank=True
+    )
+    outgoing_entity = EntityInputSerializer(
+        required=False, 
+        allow_null=True
+    )
+    outgoing_entity_signature = serializers.CharField(
         required=False, 
         allow_blank=True
     )

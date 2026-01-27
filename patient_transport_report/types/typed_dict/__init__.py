@@ -11,6 +11,10 @@ from .care_transfer_report_data import CareTransferReportData
 from .satisfaction_survey_data import SatisfactionSurveyData
 from .save_report_request_data import SaveReportRequestData
 from .save_report_response_data import SaveReportResponseData
+from .patient_history_data import PatientHistoryData
+from .insurence_provider_data import InsuranceProviderData
+from .required_procedures_data import RequiredProceduresData
+from .medication_administration_data import MedicationAdministrationData
 
 __all__ = [
     'PatientData',
@@ -25,5 +29,9 @@ __all__ = [
     'CareTransferReportData',
     'SatisfactionSurveyData',
     'SaveReportRequestData',
-    'SaveReportResponseData'
+    'SaveReportResponseData',
+    'PatientHistoryData',
+    'InsuranceProviderData',
+    'RequiredProceduresData',
+    'MedicationAdministrationData'
 ]

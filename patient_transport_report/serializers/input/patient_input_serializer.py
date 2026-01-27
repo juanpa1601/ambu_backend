@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from .patient_history_input_serializer import PatientHistoryInputSerializer
+from .insurance_provider_input_serializer import InsuranceProviderInputSerializer
 
 class PatientInputSerializer(serializers.Serializer):
     '''Input serializer for Patient data'''
@@ -70,11 +72,11 @@ class PatientInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    patient_history: serializers.IntegerField = serializers.IntegerField(
-        required=False,
+    patient_history = PatientHistoryInputSerializer(
+        required=False, 
         allow_null=True
     )
-    insurance_provider: serializers.IntegerField = serializers.IntegerField(
+    insurance_provider = InsuranceProviderInputSerializer(
         required=False, 
         allow_null=True
     )

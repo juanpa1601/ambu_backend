@@ -8,12 +8,6 @@ class Companion(models.Model):
         max_length=200,
         help_text='Full name of the companion'
     )
-    identification_type = models.CharField(
-        null=True,
-        blank=True,        
-        max_length=50,
-        help_text='Type of identification document'
-    )
     identification_number = models.CharField(
         null=True,
         blank=True,

@@ -10,6 +10,10 @@ from .informed_consent_input_serializer import InformedConsentInputSerializer
 from .care_transfer_report_input_serializer import CareTransferReportInputSerializer
 from .satisfaction_survey_input_serializer import SatisfactionSurveyInputSerializer
 from .save_report_input_serializer import SaveReportInputSerializer
+from .patient_history_input_serializer import PatientHistoryInputSerializer
+from .insurance_provider_input_serializer import InsuranceProviderInputSerializer
+from .required_procedures_input_serializer import RequiredProceduresInputSerializer
+from .medication_administration_input_serializer import MedicationAdministrationInputSerializer
 
 __all__ = [
     'GlasgowInputSerializer',
@@ -23,5 +27,9 @@ __all__ = [
     'InformedConsentInputSerializer',
     'CareTransferReportInputSerializer',
     'SatisfactionSurveyInputSerializer',
-    'SaveReportInputSerializer'
+    'SaveReportInputSerializer',
+    'PatientHistoryInputSerializer',
+    'InsuranceProviderInputSerializer',
+    'RequiredProceduresInputSerializer',
+    'MedicationAdministrationInputSerializer'
 ]

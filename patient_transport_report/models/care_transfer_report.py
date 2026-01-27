@@ -121,7 +121,7 @@ class CareTransferReport(AuditedModel):
         null=True,
         help_text='Support healthcare staff attending the patient'
     )
-    attending_staff_tittle = models.CharField(
+    attending_staff_title = models.CharField(
         max_length=100,
         null=True,
         blank=True,

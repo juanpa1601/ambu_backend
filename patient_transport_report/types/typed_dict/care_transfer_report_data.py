@@ -14,32 +14,32 @@ class CareTransferReportData(TypedDict, total=False):
     initial_address: str
     landmark: str
     service_type: str
-    dispatch_time: datetime
-    patient_arrival_time: datetime
-    patient_departure_time: datetime
-    arrival_time_patient: datetime
-    double_departure_time: datetime
-    double_arrival_time: datetime
-    end_attention_time: datetime
-    driver: int  # FK
-    attending_staff: int  # FK - OBLIGATORIO
+    dispatch_time: str
+    patient_arrival_time: str
+    patient_departure_time: str
+    arrival_time_patient: str
+    double_departure_time: str
+    double_arrival_time: str
+    end_attention_time: str
+    driver: int
+    attending_staff: int
     reg_number: str
-    support_staff: str
+    support_staff: int
     attending_staff_title: str
-    ambulance: int  # FK
+    ambulance: int
     companion: CompanionData
     companion_is_responsible: bool
     responsible: CompanionData
     initial_physical_examination: PhysicalExamData
-    skin_conditions: list[int]  # M2M
-    hemodynamic_statuses: list[int]  # M2M
+    final_physical_examination: PhysicalExamData
+    skin_condition: list[int]
+    hemodynamic_stats: list[int]
     treatment: TreatmentData
-    diagnosis_1: int  # FK
-    diagnosis_2: int  # FK
+    diagnosis_1: int
+    diagnosis_2: int
     result: ResultData
-    receiving_entity: EntityData
+    ips: int
     complications_transfer: ComplicationsTransferData
     notes: str
-    final_physical_examination: PhysicalExamData
+    receiving_entity: EntityData
     receiving_entity_signature: str
-    ips: int  # FK

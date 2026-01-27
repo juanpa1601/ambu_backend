@@ -7,11 +7,6 @@ class CompanionInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    identification_type: serializers.CharField = serializers.CharField(
-        max_length=50, 
-        required=False, 
-        allow_blank=True
-    )
     identification_number: serializers.CharField = serializers.CharField(
         max_length=50, 
         required=False, 
