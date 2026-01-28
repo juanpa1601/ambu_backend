@@ -46,7 +46,9 @@ class Additionals(models.Model):
         help_text="Artificial tears quantity",
     )
     observations_comments = models.TextField(
-        blank=True, default="", help_text="Observations and comments"
+        null=True,
+        blank=True,
+        help_text="Observations and comments",
     )
 
     def __str__(self):
