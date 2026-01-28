@@ -2,7 +2,7 @@ from typing import Any
 from django.db.models import Q
 from django.db.models.query import QuerySet
 from ..models import Diagnosis
-from ..serializers.out import DiagnosisSerializer
+from ..serializers.out import DiagnosisDetailSerializer
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_500_INTERNAL_SERVER_ERROR
@@ -64,7 +64,7 @@ class ListDiagnosisApplicationService:
             if search_applied:
                 diagnoses = diagnoses[:10]
             # Serialize data
-            serializer: DiagnosisSerializer = DiagnosisSerializer(
+            serializer: DiagnosisDetailSerializer = DiagnosisDetailSerializer(
                 diagnoses, 
                 many=True
             )

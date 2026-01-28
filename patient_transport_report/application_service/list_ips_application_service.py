@@ -1,7 +1,7 @@
 from typing import Any
 from django.db.models import QuerySet
 from ..models import IPS
-from ..serializers.out import IPSSerializer
+from ..serializers.out import IPSDetailSerializer
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_500_INTERNAL_SERVER_ERROR
@@ -40,7 +40,7 @@ class ListIPSApplicationService:
             # Get only active institutions ordered by name
             ips_list: QuerySet[IPS] = IPS.objects.filter(is_active=True).order_by('id')
             # Serialize data
-            serializer: IPSSerializer = IPSSerializer(ips_list, many=True)
+            serializer: IPSDetailSerializer = IPSDetailSerializer(ips_list, many=True)
             return {
                 'response': 'Exito al recuperar las instituciones activas.',
                 'msg': self.SUCCESS,

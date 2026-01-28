@@ -1,5 +1,3 @@
-from .diagnosis_serializer import DiagnosisSerializer
-from .ips_serializer import IPSSerializer
 from .patient_transport_report_summary_serializer import PatientTransportReportSummarySerializer
 from .patient_detail_serializer import PatientDetailSerializer
 from .informed_consent_detail_serializer import InformedConsentDetailSerializer
@@ -24,8 +22,6 @@ from .ips_detail_serializer import IPSDetailSerializer
 from .skin_condition_detail_serializer import SkinConditionDetailSerializer
 
 __all__ = [
-    'DiagnosisSerializer',
-    'IPSSerializer',
     'PatientTransportReportSummarySerializer',
     'PatientDetailSerializer',
     'InformedConsentDetailSerializer',
