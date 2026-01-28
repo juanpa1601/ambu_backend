@@ -14,11 +14,15 @@ class HemodynamicStatus(TimeStampedModel):
         default=True,
         help_text='Whether this option is available for selection'
     )
-    
+    order = models.IntegerField(
+        default=0,
+        help_text='Order for displaying hemodynamic statuses'
+    )
+
     class Meta:
         verbose_name = 'Hemodynamic Status'
         verbose_name_plural = 'Hemodynamic Statuses'
-        ordering = ['name']
+        ordering = ['order']
     
     def __str__(self):
         return self.name

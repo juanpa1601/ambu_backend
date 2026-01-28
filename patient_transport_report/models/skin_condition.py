@@ -14,12 +14,15 @@ class SkinCondition(TimeStampedModel):
         default=0,
         help_text='Order for displaying skin conditions'
     )
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        default=True,
+        help_text='Whether this option is available for selection'
+    )
     
     class Meta:
         verbose_name = 'Skin Condition'
         verbose_name_plural = 'Skin Conditions'
-        ordering = ['name']
+        ordering = ['order']
     
     def __str__(self) -> str:
         return self.name
