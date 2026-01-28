@@ -20,6 +20,7 @@ from .ambulance_detail_serializer import AmbulanceDetailSerializer
 from .diagnosis_detail_serializer import DiagnosisDetailSerializer
 from .ips_detail_serializer import IPSDetailSerializer
 from .skin_condition_detail_serializer import SkinConditionDetailSerializer
+from .hemodynamic_status_detail_serializer import HemodynamicStatusDetailSerializer
 
 __all__ = [
     'PatientTransportReportSummarySerializer',
@@ -43,5 +44,6 @@ __all__ = [
     'AmbulanceDetailSerializer',
     'DiagnosisDetailSerializer',
     'IPSDetailSerializer',
-    'SkinConditionDetailSerializer'
+    'SkinConditionDetailSerializer',
+    'HemodynamicStatusDetailSerializer'
 ]

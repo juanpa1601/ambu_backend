@@ -3,11 +3,15 @@ from .list_ips_view import ListIPSView
 from .list_buzon_view import ListBuzonView
 from .get_detail_report_view import GetDetailsReportView
 from .save_report_view import SaveReportView
+from .list_hemodynamic_status_view import ListHemodynamicStatusView
+from .list_skin_condition_view import ListSkinConditionView
 
 __all__ = [
     'ListDiagnosisView',
     'ListIPSView',
     'ListBuzonView',
     'GetDetailsReportView',
-    'SaveReportView'
+    'SaveReportView',
+    'ListHemodynamicStatusView',
+    'ListSkinConditionView'
 ]
