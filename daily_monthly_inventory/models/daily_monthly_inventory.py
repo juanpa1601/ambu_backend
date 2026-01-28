@@ -82,25 +82,53 @@ class DailyMonthlyInventory(models.Model):
 
     def calculate_is_completed(self) -> bool:
         """
-        Check if the inventory is complete.
-        An inventory is considered complete when all equipment categories have data,
-        excluding optional fields like support_staff and observations.
+        Determina si el inventario está completo.
 
-        Returns:
-            bool: True if all required fields are filled, False otherwise
+        Reglas:
+        - Exige que las relaciones principales no sean None (p. ej. biomedical_equipment, surgical, ...).
+        - Para cada objeto relacionado, valida todos sus campos de modelo:
+            - Los campos PK/autoincrement se ignoran.
+            - `None` o strings vacíos cuentan como "vacío" -> no completado.
+            - Valores numéricos (incluyendo 0) y booleanos se consideran válidos.
+        - No tiene en cuenta `support_staff` ni `observations` del propio inventario.
         """
-        # Check if all equipment categories exist (not None)
-        return all(
-            [
-                self.biomedical_equipment is not None,
-                self.surgical is not None,
-                self.accessories_case is not None,
-                self.respiratory is not None,
-                self.immobilization_and_safety is not None,
-                self.accessories is not None,
-                self.additionals is not None,
-                self.pediatric is not None,
-                self.circulatory is not None,
-                self.ambulance_kit is not None,
-            ]
-        )
+        # relaciones a revisar
+        related_attrs = [
+            "biomedical_equipment",
+            "surgical",
+            "accessories_case",
+            "respiratory",
+            "immobilization_and_safety",
+            "accessories",
+            "additionals",
+            "pediatric",
+            "circulatory",
+            "ambulance_kit",
+        ]
+
+        # date y ambulance son obligatorios para considerar completado
+        if self.date is None or self.ambulance is None:
+            return False
+
+        for attr in related_attrs:
+            rel_obj = getattr(self, attr, None)
+            if rel_obj is None:
+                return False
+
+            # inspeccionar cada campo del modelo relacionado
+            for field in rel_obj._meta.fields:
+                # ignorar PK/autoincrement y campos auto generados
+                if getattr(field, "primary_key", False):
+                    continue
+                # obtener valor
+                value = getattr(rel_obj, field.name, None)
+                # None => incompleto
+                if value is None:
+                    return False
+                # cadenas vacías => incompleto
+                if isinstance(value, str) and value.strip() == "":
+                    return False
+                # para otros tipos (int, bool, float, date, ...) asumimos que el valor presente es válido
+
+        # si pasó todas las comprobaciones, está completo
+        return True
