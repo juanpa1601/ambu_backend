@@ -4,15 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('daily_monthly_inventory', '0005_alter_accessories_adult_pediatric_stethoscope_and_more'),
+        (
+            "daily_monthly_inventory",
+            "0005_alter_accessories_adult_pediatric_stethoscope_and_more",
+        ),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='dailymonthlyinventory',
-            name='is_deleted',
+            model_name="dailymonthlyinventory",
+            name="is_deleted",
             field=models.BooleanField(db_index=True, default=False),
         ),
     ]
