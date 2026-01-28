@@ -6,6 +6,7 @@ from .save_report_application_service import SaveReportApplicationService
 from .list_skin_condition_application_service import ListSkinConditionApplicationService
 from .list_hemodynamic_status_application_service import ListHemodynamicStatusApplicationService
 from .list_reports_application_service import ListReportsApplicationService
+from .get_detail_patient_application_service import GetDetailPatientApplicationService
 
 __all__ = [
     'ListDiagnosisApplicationService',
@@ -15,5 +16,6 @@ __all__ = [
     'SaveReportApplicationService',
     'ListSkinConditionApplicationService',
     'ListHemodynamicStatusApplicationService',
-    'ListReportsApplicationService'
+    'ListReportsApplicationService',
+    'GetDetailPatientApplicationService'
 ]

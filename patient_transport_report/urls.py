@@ -7,7 +7,8 @@ from .views import (
     SaveReportView,
     ListHemodynamicStatusView,
     ListSkinConditionView,
-    ListReportsView
+    ListReportsView,
+    GetDetailPatientView
 )
 
 urlpatterns = [
@@ -19,4 +20,5 @@ urlpatterns = [
     path('list_hemodynamic_statuses/', ListHemodynamicStatusView.as_view(), name='list_hemodynamic_statuses'),
     path('list_skin_conditions/', ListSkinConditionView.as_view(), name='list_skin_conditions'),
     path('list_reports/', ListReportsView.as_view(), name='list_reports'),
+    path('<str:identification_number>/patient/', GetDetailPatientView.as_view(), name='get_detail_patient'),
 ]

@@ -6,6 +6,7 @@ from .save_report_view import SaveReportView
 from .list_hemodynamic_status_view import ListHemodynamicStatusView
 from .list_skin_condition_view import ListSkinConditionView
 from .list_reports_view import ListReportsView
+from .get_detail_patient_view import GetDetailPatientView
 
 __all__ = [
     'ListDiagnosisView',
@@ -15,5 +16,6 @@ __all__ = [
     'SaveReportView',
     'ListHemodynamicStatusView',
     'ListSkinConditionView',
-    'ListReportsView'
+    'ListReportsView',
+    'GetDetailPatientView'
 ]
