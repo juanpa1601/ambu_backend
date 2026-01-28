@@ -14,7 +14,8 @@ from patient_transport_report.models import (
     RequiredProcedures,
     Treatment,
     Result,
-    ComplicationsTransfer
+    ComplicationsTransfer,
+    Patient
 )
 from patient_transport_report.domain_service import SaveReportDomainService
 from patient_transport_report.types.typed_dict import SaveReportRequestData
@@ -116,17 +117,17 @@ class SaveReportApplicationService:
         if not Healthcare.objects.filter(base_staff_id=attending_staff_id).exists():
             raise ValidationError({'attending_staff': f'Personal de Salud {attending_staff_id} no encontrado'})
         # 2. Create Patient
-        patient = self.domain_service.create_or_update_patient(data['patient'])
+        patient: Patient = self.domain_service.create_or_update_patient(data['patient'])
         sections_created.append('patient')
         # 3. Create PatientTransportReport (initially empty)
-        report = PatientTransportReport.objects.create(
+        report: PatientTransportReport = PatientTransportReport.objects.create(
             patient=patient,
             status='borrador',
             created_by=user,
             updated_by=user
         )
         # 4. Create CareTransferReport (with attending_staff)
-        care_transfer = self._handle_care_transfer_report(
+        care_transfer: CareTransferReport | None = self._handle_care_transfer_report(
             data.get('care_transfer_report', {}),
             None,
             user
@@ -136,7 +137,7 @@ class SaveReportApplicationService:
             sections_created.append('care_transfer_report')
         # 5. Create InformedConsent if provided
         if 'informed_consent' in data:
-            informed_consent = self._handle_informed_consent(
+            informed_consent: InformedConsent | None = self._handle_informed_consent(
                 data['informed_consent'],
                 None,
                 user
@@ -146,7 +147,7 @@ class SaveReportApplicationService:
                 sections_created.append('informed_consent')
         # 6. Create SatisfactionSurvey if provided
         if 'satisfaction_survey' in data:
-            satisfaction = self._handle_satisfaction_survey(
+            satisfaction: SatisfactionSurvey | None = self._handle_satisfaction_survey(
                 data['satisfaction_survey'],
                 None,
                 user
@@ -180,14 +181,14 @@ class SaveReportApplicationService:
         sections_updated = []
         # 1. Update Patient if data provided
         if 'patient_data' in data:
-            self.domain_service.create_or_update_patient(
+            patient: Patient = self.domain_service.create_or_update_patient(
                 data['patient_data'], 
                 report.patient
             )
             sections_updated.append('patient')
         # 2. Update/Create InformedConsent
         if 'informed_consent' in data:
-            informed_consent = self._handle_informed_consent(
+            informed_consent: InformedConsent = self._handle_informed_consent(
                 data['informed_consent'],
                 report.informed_consent,
                 user
@@ -199,7 +200,7 @@ class SaveReportApplicationService:
                 sections_updated.append('informed_consent')
         # 3. Update/Create CareTransferReport
         if 'care_transfer_report' in data:
-            care_transfer = self._handle_care_transfer_report(
+            care_transfer: CareTransferReport = self._handle_care_transfer_report(
                 data['care_transfer_report'],
                 report.care_transfer_report,
                 user
@@ -211,7 +212,7 @@ class SaveReportApplicationService:
                 sections_updated.append('care_transfer_report')
         # 4. Update/Create SatisfactionSurvey
         if 'satisfaction_survey' in data:
-            satisfaction = self._handle_satisfaction_survey(
+            satisfaction: SatisfactionSurvey = self._handle_satisfaction_survey(
                 data['satisfaction_survey'],
                 report.satisfaction_survey,
                 user
