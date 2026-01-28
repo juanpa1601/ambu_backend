@@ -10,6 +10,10 @@ class SkinCondition(TimeStampedModel):
         max_length=100,
         unique=True
     )
+    order = models.IntegerField(
+        default=0,
+        help_text='Order for displaying skin conditions'
+    )
     is_active = models.BooleanField(default=True)
     
     class Meta:

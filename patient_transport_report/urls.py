@@ -12,5 +12,5 @@ urlpatterns = [
     path('list_ips/', ListIPSView.as_view(), name='list_ips'),
     path('list_buzon/', ListBuzonView.as_view(), name='list_buzon'),
     path('<int:report_id>/get_detail_report/', GetDetailsReportView.as_view(), name='get_detail_report'),
-    path('reports_save/', SaveReportView.as_view(), name='save_report'),
+    path('report_save/', SaveReportView.as_view(), name='save_report'),
 ]

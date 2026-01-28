@@ -68,9 +68,10 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    support_staff = serializers.IntegerField(
+    support_staff = serializers.CharField(
+        max_length=200, 
         required=False, 
-        allow_null=True
+        allow_blank=True
     )
     attending_staff_title = serializers.CharField(
         max_length=200, 
