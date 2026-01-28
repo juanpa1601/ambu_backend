@@ -20,35 +20,65 @@ class DailyMonthlyInventory(models.Model):
         BiomedicalEquipment, on_delete=models.CASCADE, null=True, blank=True
     )
     accessories_case = models.ForeignKey(
-        AccessoriesCase, on_delete=models.CASCADE, null=True, blank=True
+        AccessoriesCase,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     respiratory = models.ForeignKey(
-        Respiratory, on_delete=models.CASCADE, null=True, blank=True
+        Respiratory,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     immobilization_and_safety = models.ForeignKey(
-        ImmobilizationAndSafety, on_delete=models.CASCADE, null=True, blank=True
+        ImmobilizationAndSafety,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     surgical = models.ForeignKey(
-        Surgical, on_delete=models.CASCADE, null=True, blank=True
+        Surgical,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     accessories = models.ForeignKey(
-        Accessories, on_delete=models.CASCADE, null=True, blank=True
+        Accessories,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     additionals = models.ForeignKey(
-        Additionals, on_delete=models.CASCADE, null=True, blank=True
+        Additionals,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     pediatric = models.ForeignKey(
-        Pediatric, on_delete=models.CASCADE, null=True, blank=True
+        Pediatric,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     circulatory = models.ForeignKey(
-        Circulatory, on_delete=models.CASCADE, null=True, blank=True
+        Circulatory,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     ambulance_kit = models.ForeignKey(
-        AmbulanceKit, on_delete=models.CASCADE, null=True, blank=True
+        AmbulanceKit,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
 
     system_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     ambulance = models.ForeignKey(
         Ambulance,
@@ -65,7 +95,7 @@ class DailyMonthlyInventory(models.Model):
     )
     support_staff = models.TextField(
         blank=True,
-        default="",
+        null=True,
     )
 
     date = models.DateField()
@@ -75,7 +105,11 @@ class DailyMonthlyInventory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     is_completed = models.BooleanField(default=False)
-    is_deleted = models.BooleanField(default=False, db_index=True)
+
+    is_deleted = models.BooleanField(
+        default=False,
+        db_index=True,
+    )
 
     def __str__(self):
         return f"DailyMonthlyInventory {self.date} ({self.pk})"

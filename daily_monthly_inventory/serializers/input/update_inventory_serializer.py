@@ -23,14 +23,19 @@ class UpdateInventorySerializer(serializers.Serializer):
     At least one field must be provided.
     """
 
-    date = serializers.DateField(required=False, help_text="Date of the inventory")
+    date = serializers.DateField(
+        required=False,
+        help_text="Date of the inventory",
+    )
     ambulance_id = serializers.IntegerField(
         required=False,
         allow_null=True,
         help_text="ID of the ambulance this inventory belongs to",
     )
     shift = ShiftSerializer(
-        required=False, allow_null=True, help_text="Shift information (day or night)"
+        required=False,
+        allow_null=True,
+        help_text="Shift information (day or night)",
     )
     support_staff = serializers.CharField(
         required=False,
@@ -41,19 +46,45 @@ class UpdateInventorySerializer(serializers.Serializer):
 
     # Nested category serializers with proper validation
     biomedical_equipment = BiomedicalEquipmentSerializer(
-        required=False, allow_null=True
+        required=False,
+        allow_null=True,
     )
-    surgical = SurgicalSerializer(required=False, allow_null=True)
-    accessories_case = AccessoriesCaseSerializer(required=False, allow_null=True)
-    respiratory = RespiratorySerializer(required=False, allow_null=True)
+    surgical = SurgicalSerializer(
+        required=False,
+        allow_null=True,
+    )
+    accessories_case = AccessoriesCaseSerializer(
+        required=False,
+        allow_null=True,
+    )
+    respiratory = RespiratorySerializer(
+        required=False,
+        allow_null=True,
+    )
     immobilization_and_safety = ImmobilizationAndSafetySerializer(
-        required=False, allow_null=True
+        required=False,
+        allow_null=True,
     )
-    accessories = AccessoriesSerializer(required=False, allow_null=True)
-    additionals = AdditionalsSerializer(required=False, allow_null=True)
-    pediatric = PediatricSerializer(required=False, allow_null=True)
-    circulatory = CirculatorySerializer(required=False, allow_null=True)
-    ambulance_kit = AmbulanceKitSerializer(required=False, allow_null=True)
+    accessories = AccessoriesSerializer(
+        required=False,
+        allow_null=True,
+    )
+    additionals = AdditionalsSerializer(
+        required=False,
+        allow_null=True,
+    )
+    pediatric = PediatricSerializer(
+        required=False,
+        allow_null=True,
+    )
+    circulatory = CirculatorySerializer(
+        required=False,
+        allow_null=True,
+    )
+    ambulance_kit = AmbulanceKitSerializer(
+        required=False,
+        allow_null=True,
+    )
 
     observations = serializers.CharField(
         required=False,
