@@ -1,12 +1,8 @@
 from rest_framework import serializers
 from patient_transport_report.models import IPS
 
-class IPSSerializer(serializers.ModelSerializer):
-    '''
-    Serializer for IPS output (Receiving Institutions).
-    
-    Returns active IPS information.
-    '''
+class IPSDetailSerializer(serializers.ModelSerializer):
+    '''Serializer for IPS (health institution).'''
     
     class Meta:
         model = IPS
@@ -15,4 +11,4 @@ class IPSSerializer(serializers.ModelSerializer):
             'name',
             'is_active'
         ]
-        read_only_fields = ['id']
+        read_only_fields = fields

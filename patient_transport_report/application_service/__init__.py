@@ -3,11 +3,15 @@ from .list_ips_application_service import ListIPSApplicationService
 from .list_buzon_application_service import ListBuzonApplicationService
 from .get_detail_report_application_service import GetDetailsReportApplicationService
 from .save_report_application_service import SaveReportApplicationService
+from .list_skin_condition_application_service import ListSkinConditionApplicationService
+from .list_hemodynamic_status_application_service import ListHemodynamicStatusApplicationService
 
 __all__ = [
     'ListDiagnosisApplicationService',
     'ListIPSApplicationService',
     'ListBuzonApplicationService',
     'GetDetailsReportApplicationService',
-    'SaveReportApplicationService'
+    'SaveReportApplicationService',
+    'ListSkinConditionApplicationService',
+    'ListHemodynamicStatusApplicationService'
 ]

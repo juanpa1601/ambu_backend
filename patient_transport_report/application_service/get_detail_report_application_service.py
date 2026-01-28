@@ -51,8 +51,12 @@ class GetDetailsReportApplicationService:
         '''
         try:
             # Verify user has permission (Healthcare or Administrative)
-            is_healthcare: bool = Healthcare.objects.filter(user=user).exists()
-            is_administrative: bool = Administrative.objects.filter(user=user).exists()
+            is_healthcare: bool = Healthcare.objects.filter(
+                base_staff__system_user=user
+            ).exists()
+            is_administrative: bool = Administrative.objects.filter(
+                base_staff__system_user=user
+            ).exists()
             if not (is_healthcare or is_administrative):
                 return {
                     'response': 'Solamente el personal de salud o administrativo puede acceder a este recurso.',
@@ -61,29 +65,43 @@ class GetDetailsReportApplicationService:
                 }                
             # Retrieve report with all relationships using select_related and prefetch_related
             report: PatientTransportReport = PatientTransportReport.objects.select_related(
+                # Patient
                 'patient',
+                'patient__patient_history',
                 'patient__insurance_provider',
+                
+                # Informed Consent
                 'informed_consent',
-                'informed_consent__companion',
-                'informed_consent__healthcare_staff',
+                'informed_consent__responsible',
+                'informed_consent__attending_staff',
+                'informed_consent__attending_staff__base_staff',
                 'informed_consent__outgoing_entity',
-                'informed_consent__receiving_entity',
+                
+                # Care Transfer Report
                 'care_transfer_report',
                 'care_transfer_report__driver',
+                'care_transfer_report__driver__base_staff',
                 'care_transfer_report__attending_staff',
-                'care_transfer_report__support_staff',
+                'care_transfer_report__attending_staff__base_staff',
                 'care_transfer_report__ambulance',
-                'care_transfer_report__companion_1',
-                'care_transfer_report__companion_2',
-                'care_transfer_report__initial_physicial_examination',
-                'care_transfer_report__final_physical_examination',
+                'care_transfer_report__companion',
+                'care_transfer_report__responsible',
+                'care_transfer_report__initial_physical_exam',
+                'care_transfer_report__initial_physical_exam__glasgow',
+                'care_transfer_report__final_physical_exam',
+                'care_transfer_report__final_physical_exam__glasgow',
                 'care_transfer_report__treatment',
                 'care_transfer_report__diagnosis_1',
                 'care_transfer_report__diagnosis_2',
+                'care_transfer_report__ips',
                 'care_transfer_report__result',
                 'care_transfer_report__complications_transfer',
                 'care_transfer_report__receiving_entity',
+                
+                # Satisfaction Survey
                 'satisfaction_survey',
+                
+                # Audit fields
                 'created_by',
                 'updated_by'
             ).prefetch_related(

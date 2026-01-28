@@ -162,7 +162,7 @@ class CareTransferReport(AuditedModel):
     )
     
     # Physical examinations
-    initial_physicial_examination = models.OneToOneField(
+    initial_physical_exam = models.OneToOneField(
         PhysicalExam,
         on_delete=models.CASCADE,
         related_name='initial_physical_exam_care_transfer_report',
@@ -170,7 +170,7 @@ class CareTransferReport(AuditedModel):
         blank=True,
         help_text='Initial physical examination of the patient'
     )
-    final_physical_examination = models.OneToOneField(
+    final_physical_exam = models.OneToOneField(
         PhysicalExam,
         on_delete=models.CASCADE,
         related_name='final_physical_exam_care_transfer_report',
