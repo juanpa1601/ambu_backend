@@ -8,5 +8,7 @@ class ShiftSerializer(serializers.Serializer):
     """
 
     id = serializers.IntegerField(
-        required=True, help_text="ID of the shift (day or night)"
+        required=True,
+        allow_null=True,
+        help_text="ID of the shift (day or night)",
     )

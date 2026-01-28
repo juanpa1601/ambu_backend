@@ -8,62 +8,107 @@ class AmbulanceKitSerializer(serializers.Serializer):
     """
 
     trauma_shears = serializers.IntegerField(
-        required=False, min_value=0, max_value=10, help_text="Trauma shears quantity"
+        required=False,
+        min_value=0,
+        max_value=10,
+        allow_null=True,
+        help_text="Trauma shears quantity",
     )
     sterile_gauze_kit = serializers.IntegerField(
         required=False,
         min_value=0,
         max_value=20,
+        allow_null=True,
         help_text="Sterile gauze kit quantity",
     )
     iv_tourniquet = serializers.IntegerField(
-        required=False, min_value=0, max_value=10, help_text="IV tourniquet quantity"
+        required=False,
+        min_value=0,
+        max_value=10,
+        allow_null=True,
+        help_text="IV tourniquet quantity",
     )
     hemorrhage_control_tourniquet = serializers.IntegerField(
         required=False,
         min_value=0,
         max_value=10,
+        allow_null=True,
         help_text="Hemorrhage control tourniquet quantity",
     )
     medical_penlight = serializers.IntegerField(
-        required=False, min_value=0, max_value=10, help_text="Medical penlight quantity"
+        required=False,
+        min_value=0,
+        max_value=10,
+        allow_null=True,
+        help_text="Medical penlight quantity",
     )
     micropore_tape = serializers.IntegerField(
-        required=False, min_value=0, max_value=10, help_text="Micropore tape quantity"
+        required=False,
+        min_value=0,
+        max_value=10,
+        allow_null=True,
+        help_text="Micropore tape quantity",
     )
     adhesive_tape = serializers.IntegerField(
-        required=False, min_value=0, max_value=10, help_text="Adhesive tape quantity"
+        required=False,
+        min_value=0,
+        max_value=10,
+        allow_null=True,
+        help_text="Adhesive tape quantity",
     )
     surgical_masks = serializers.IntegerField(
-        required=False, min_value=0, max_value=20, help_text="Surgical masks quantity"
+        required=False,
+        min_value=0,
+        max_value=20,
+        allow_null=True,
+        help_text="Surgical masks quantity",
     )
     n95_masks = serializers.IntegerField(
-        required=False, min_value=0, max_value=20, help_text="N95 masks quantity"
+        required=False,
+        min_value=0,
+        max_value=20,
+        allow_null=True,
+        help_text="N95 masks quantity",
     )
     alcohol_pads = serializers.IntegerField(
-        required=False, min_value=0, max_value=20, help_text="Alcohol pads quantity"
+        required=False,
+        min_value=0,
+        max_value=20,
+        allow_null=True,
+        help_text="Alcohol pads quantity",
     )
     eye_patches = serializers.IntegerField(
-        required=False, min_value=0, max_value=20, help_text="Eye patches quantity"
+        required=False,
+        min_value=0,
+        max_value=20,
+        allow_null=True,
+        help_text="Eye patches quantity",
     )
     tongue_depressors = serializers.IntegerField(
         required=False,
         min_value=0,
         max_value=20,
+        allow_null=True,
         help_text="Tongue depressors quantity",
     )
     cotton_tipped_applicators = serializers.IntegerField(
         required=False,
         min_value=0,
         max_value=20,
+        allow_null=True,
         help_text="Cotton-tipped applicators quantity",
     )
     clinical_thermometer = serializers.IntegerField(
         required=False,
         min_value=0,
         max_value=10,
+        allow_null=True,
         help_text="Clinical thermometer quantity",
     )
     sanitary_pads = serializers.IntegerField(
-        required=False, min_value=0, max_value=20, help_text="Sanitary pads quantity"
+        required=False,
+        min_value=0,
+        max_value=20,
+        allow_null=True,
+        help_text="Sanitary pads quantity",
     )
