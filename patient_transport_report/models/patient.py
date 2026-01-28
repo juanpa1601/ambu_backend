@@ -33,10 +33,6 @@ class Patient(AuditedModel):
         null=True, 
         blank=True
     )
-    patient_age = models.IntegerField(
-        null=True, 
-        blank=True
-    )
     sex = models.CharField(
         max_length=20,
         null=True, 

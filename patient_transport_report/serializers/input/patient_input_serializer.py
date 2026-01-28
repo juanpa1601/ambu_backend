@@ -30,10 +30,6 @@ class PatientInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    patient_age: serializers.IntegerField = serializers.IntegerField(
-        required=False, 
-        allow_null=True
-    )
     birth_date: serializers.DateField = serializers.DateField(
         required=False, 
         allow_null=True
