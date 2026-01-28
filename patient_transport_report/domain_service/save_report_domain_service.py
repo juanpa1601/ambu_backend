@@ -166,16 +166,16 @@ class SaveReportDomainService:
             return None
         # Map frontend field names to model field names
         mapped_data: dict[str, str | None] = {
-            'full_name': companion_data.get('name'),
-            'document_number': companion_data.get('identification_number'),
-            'relationship': companion_data.get('kindship'),
-            'phone': companion_data.get('phone_number')
+            'name': companion_data.get('name'),
+            'identification_number': companion_data.get('identification_number'),
+            'kindship': companion_data.get('kindship'),
+            'phone_number': companion_data.get('phone_number')
         }
         # Check if companion exists by document
-        document_number: str | None = mapped_data.get('document_number')
-        if document_number:
+        identification_number: str | None = mapped_data.get('identification_number')
+        if identification_number:
             companion, created = Companion.objects.get_or_create(
-                document_number=document_number,
+                identification_number=identification_number,
                 defaults=mapped_data
             )
             if not created:
