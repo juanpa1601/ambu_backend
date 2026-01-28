@@ -67,7 +67,6 @@ class GetProfileInformationApplicationService:
                     'phone_number': profile_info.phone_number,
                     'address': profile_info.address,
                     'birth_date': profile_info.birth_date,
-                    'signature_url': profile_info.signature_url,
                     'created_at': profile_info.created_at,
                     'updated_at': profile_info.updated_at,
                 },
