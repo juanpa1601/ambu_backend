@@ -275,7 +275,7 @@ class SaveReportDomainService:
             return existing_treatment
         # Map frontend field name to model field name
         if 'liters_minute' in treatment_data:
-            treatment_data['liter_minute'] = treatment_data.pop('liters_minute')
+            treatment_data['liters_minute'] = treatment_data.pop('liters_minute')
         if existing_treatment:
             # Update existing
             for key, value in treatment_data.items():

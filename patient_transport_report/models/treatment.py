@@ -12,7 +12,7 @@ class Treatment(models.Model):
         blank=True,
         help_text='Indicates if oxygen was administered'
     )
-    liter_minute = models.FloatField(
+    liters_minute = models.FloatField(
         blank=True,
         null=True,
         help_text='Oxygen flow rate in liters per minute'

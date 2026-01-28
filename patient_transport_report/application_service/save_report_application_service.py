@@ -180,7 +180,10 @@ class SaveReportApplicationService:
         sections_updated = []
         # 1. Update Patient if data provided
         if 'patient_data' in data:
-            self.domain_service.create_or_update_patient(data['patient_data'], report.patient)
+            self.domain_service.create_or_update_patient(
+                data['patient_data'], 
+                report.patient
+            )
             sections_updated.append('patient')
         # 2. Update/Create InformedConsent
         if 'informed_consent' in data:

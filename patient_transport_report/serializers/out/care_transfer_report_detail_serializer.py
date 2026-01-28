@@ -1,55 +1,47 @@
 from rest_framework import serializers
 from patient_transport_report.models import CareTransferReport
+from .companion_detail_serializer import CompanionDetailSerializer
+from .physical_exam_detail_serializer import PhysicalExamDetailSerializer
+from .treatment_detail_serializer import TreatmentDetailSerializer
+from .result_detail_serializer import ResultDetailSerializer
+from .complications_transfer_detail_serializer import ComplicationsTransferDetailSerializer
+from .outgoing_receiving_entity_detail_serializer import OutgoingReceivingEntityDetailSerializer
+from .healthcare_staff_detail_serializer import HealthcareStaffDetailSerializer
+from .driver_detail_serializer import DriverDetailSerializer
+from .ambulance_detail_serializer import AmbulanceDetailSerializer
+from .diagnosis_detail_serializer import DiagnosisDetailSerializer
+from .ips_detail_serializer import IPSDetailSerializer
+from .skin_condition_detail_serializer import SkinConditionDetailSerializer
+from .hemodynamic_status_detail_serializer import HemodynamicStatusDetailSerializer
 
 class CareTransferReportDetailSerializer(serializers.ModelSerializer):
-    '''Serializer for CareTransferReport details in report view.'''
+    '''Complete serializer for CareTransferReport with all nested data.'''
     
-    driver_name: serializers.CharField = serializers.CharField(
-        source='driver.name', 
+    driver: DriverDetailSerializer = DriverDetailSerializer(read_only=True)
+    attending_staff: HealthcareStaffDetailSerializer = HealthcareStaffDetailSerializer(read_only=True)
+    ambulance: AmbulanceDetailSerializer = AmbulanceDetailSerializer(read_only=True)
+    companion: CompanionDetailSerializer = CompanionDetailSerializer(read_only=True)
+    responsible: CompanionDetailSerializer = CompanionDetailSerializer(read_only=True)
+    initial_physical_exam: PhysicalExamDetailSerializer = PhysicalExamDetailSerializer(read_only=True)
+    final_physical_exam: PhysicalExamDetailSerializer = PhysicalExamDetailSerializer(read_only=True)
+    treatment: TreatmentDetailSerializer = TreatmentDetailSerializer(read_only=True)
+    diagnosis_1: DiagnosisDetailSerializer = DiagnosisDetailSerializer(read_only=True)
+    diagnosis_2: DiagnosisDetailSerializer = DiagnosisDetailSerializer(read_only=True)
+    ips: IPSDetailSerializer = IPSDetailSerializer(read_only=True)
+    result: ResultDetailSerializer = ResultDetailSerializer(read_only=True)
+    complications_transfer: ComplicationsTransferDetailSerializer = ComplicationsTransferDetailSerializer(read_only=True)
+    receiving_entity: OutgoingReceivingEntityDetailSerializer = OutgoingReceivingEntityDetailSerializer(read_only=True)
+    
+    skin_condition: SkinConditionDetailSerializer = SkinConditionDetailSerializer(
+        source='skin_conditions', 
+        many=True, 
         read_only=True
     )
-    attending_staff_name: serializers.CharField = serializers.CharField(
-        source='attending_staff.name', 
+    hemodynamic_status: HemodynamicStatusDetailSerializer = HemodynamicStatusDetailSerializer(
+        source='hemodynamic_statuses', 
+        many=True, 
         read_only=True
     )
-    support_staff_name: serializers.CharField = serializers.CharField(
-        source='support_staff.name', 
-        read_only=True
-    )
-    ambulance_plate: serializers.CharField = serializers.CharField(
-        source='ambulance.plate_number', 
-        read_only=True
-    )
-    companion_1_name: serializers.CharField = serializers.CharField(
-        source='companion_1.full_name', 
-        read_only=True
-    )
-    companion_2_name: serializers.CharField = serializers.CharField(
-        source='companion_2.full_name', 
-        read_only=True
-    )
-    receiving_entity_name: serializers.CharField = serializers.CharField(
-        source='receiving_entity.name', 
-        read_only=True
-    )
-    diagnosis_1_code: serializers.CharField = serializers.CharField(
-        source='diagnosis_1.cie_10', 
-        read_only=True
-    )
-    diagnosis_1_name: serializers.CharField = serializers.CharField(
-        source='diagnosis_1.cie_10_name', 
-        read_only=True
-    )
-    diagnosis_2_code: serializers.CharField = serializers.CharField(
-        source='diagnosis_2.cie_10', 
-        read_only=True
-    )
-    diagnosis_2_name: serializers.CharField = serializers.CharField(
-        source='diagnosis_2.cie_10_name', 
-        read_only=True
-    )
-    skin_conditions_list: serializers.SerializerMethodField = serializers.SerializerMethodField()
-    hemodynamic_statuses_list: serializers.SerializerMethodField = serializers.SerializerMethodField()
     
     class Meta:
         model = CareTransferReport
@@ -68,48 +60,28 @@ class CareTransferReportDetailSerializer(serializers.ModelSerializer):
             'double_arrival_time',
             'end_attention_time',
             'driver',
-            'driver_name',
             'attending_staff',
-            'attending_staff_name',
             'reg_number',
             'support_staff',
-            'support_staff_name',
-            'attending_staff_tittle',
+            'attending_staff_title',
             'ambulance',
-            'ambulance_plate',
-            'companion_1',
-            'companion_1_name',
-            'companion_2',
-            'companion_2_name',
-            'initial_physicial_examination',
-            'final_physical_examination',
-            'skin_conditions_list',
-            'hemodynamic_statuses_list',
+            'companion',
+            'companion_is_responsible',
+            'responsible',
+            'initial_physical_exam',
+            'skin_condition',
+            'hemodynamic_status',
             'treatment',
             'diagnosis_1',
-            'diagnosis_1_code',
-            'diagnosis_1_name',
             'diagnosis_2',
-            'diagnosis_2_code',
-            'diagnosis_2_name',
             'result',
+            'ips',
             'complications_transfer',
             'notes',
+            'final_physical_exam',
             'receiving_entity',
-            'receiving_entity_name'
+            'receiving_entity_signature',
+            'created_at',
+            'updated_at'
         ]
         read_only_fields = fields
-    
-    def get_skin_conditions_list(
-        self, 
-        obj: CareTransferReport
-    ) -> list[dict]:
-        '''Get list of skin conditions'''
-        return list(obj.skin_conditions.values('id', 'condition_name'))
-    
-    def get_hemodynamic_statuses_list(
-        self, 
-        obj: CareTransferReport
-    ) -> list[dict]:
-        '''Get list of hemodynamic statuses'''
-        return list(obj.hemodynamic_statuses.values('id', 'status_name'))
