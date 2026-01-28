@@ -58,8 +58,7 @@ class InventoryDomainService:
             inventories_qs: QuerySet[DailyMonthlyInventory] = (
                 DailyMonthlyInventory.objects.select_related(
                     "system_user", "ambulance", "shift"
-                )
-                .filter(is_deleted=False)
+                ).filter(is_deleted=False)
             )
 
             if ambulance_id is not None:
