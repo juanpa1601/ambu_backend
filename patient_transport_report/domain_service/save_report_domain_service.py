@@ -91,7 +91,7 @@ class SaveReportDomainService:
         insurance: InsuranceProvider | None = None
         # Handle patient_age -> age mapping
         if 'patient_age' in patient_data:
-            patient_data['age'] = patient_data.pop('patient_age')
+            patient_data['patient_age'] = patient_data.pop('patient_age')
         if existing_patient:
             # Update patient history
             if history_data:
@@ -340,10 +340,6 @@ class SaveReportDomainService:
         if 'driver' in data and data['driver']:
             if not Driver.objects.filter(base_staff_id=data['driver']).exists():
                 errors['driver'] = f"Conductor con ID {data['driver']} no encontrado"
-        # Validate Support Staff
-        if 'support_staff' in data and data['support_staff']:
-            if not Healthcare.objects.filter(base_staff_id=data['support_staff']).exists():
-                errors['support_staff'] = f"Personal de Apoyo con ID {data['support_staff']} no encontrado"
         # Validate Ambulance
         if 'ambulance' in data and data['ambulance']:
             if not Ambulance.objects.filter(id=data['ambulance']).exists():

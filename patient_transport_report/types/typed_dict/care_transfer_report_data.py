@@ -24,7 +24,7 @@ class CareTransferReportData(TypedDict, total=False):
     driver: int
     attending_staff: int
     reg_number: str
-    support_staff: int
+    support_staff: str
     attending_staff_title: str
     ambulance: int
     companion: CompanionData

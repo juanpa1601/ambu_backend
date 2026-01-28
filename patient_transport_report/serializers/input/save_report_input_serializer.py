@@ -10,7 +10,7 @@ class SaveReportInputSerializer(serializers.Serializer):
         required=False, 
         allow_null=True
     )
-    patient_data: PatientInputSerializer = PatientInputSerializer(
+    patient: PatientInputSerializer = PatientInputSerializer(
         required=False, 
         allow_null=True
     )
@@ -33,13 +33,13 @@ class SaveReportInputSerializer(serializers.Serializer):
     ) -> dict:
         '''Cross-field validation'''
         report_id: int = data.get('report_id')
-        patient_data: PatientInputSerializer = data.get('patient_data')
+        patient: PatientInputSerializer = data.get('patient')
         care_transfer_report: CareTransferReportInputSerializer = data.get('care_transfer_report')
-        # CREATE mode: require patient_data and attending_staff
+        # CREATE mode: require patient and attending_staff
         if report_id is None:
-            if not patient_data:
+            if not patient:
                 raise serializers.ValidationError({
-                    'patient_data': 'Patient data is required when creating a new report'
+                    'patient': 'Patient data is required when creating a new report'
                 })
             if not care_transfer_report or 'attending_staff' not in care_transfer_report:
                 raise serializers.ValidationError({

@@ -18,11 +18,11 @@ class PatientHistoryInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    has_surgies = serializers.BooleanField(
+    has_surgeries = serializers.BooleanField(
         required=False, 
         default=False
     )
-    surgies = serializers.CharField(
+    surgeries = serializers.CharField(
         required=False, 
         allow_blank=True
     )
@@ -34,7 +34,7 @@ class PatientHistoryInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    tobacco_user = serializers.BooleanField(
+    tobacco_use = serializers.BooleanField(
         required=False,
         default=False
     )
@@ -42,7 +42,7 @@ class PatientHistoryInputSerializer(serializers.Serializer):
         required=False, 
         default=False
     )
-    alcohol_user = serializers.BooleanField(
+    alcohol_use = serializers.BooleanField(
         required=False, 
         default=False
     )

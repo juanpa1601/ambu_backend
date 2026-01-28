@@ -116,7 +116,7 @@ class SaveReportApplicationService:
         if not Healthcare.objects.filter(base_staff_id=attending_staff_id).exists():
             raise ValidationError({'attending_staff': f'Personal de Salud {attending_staff_id} no encontrado'})
         # 2. Create Patient
-        patient = self.domain_service.create_or_update_patient(data['patient_data'])
+        patient = self.domain_service.create_or_update_patient(data['patient'])
         sections_created.append('patient')
         # 3. Create PatientTransportReport (initially empty)
         report = PatientTransportReport.objects.create(
@@ -292,7 +292,7 @@ class SaveReportApplicationService:
         # Resolve FKs
         attending_staff: Healthcare = Healthcare.objects.get(base_staff_id=data['attending_staff'])
         driver: Driver | None = Driver.objects.get(base_staff_id=data['driver']) if data.get('driver') else None
-        support_staff: Healthcare | None = Healthcare.objects.get(base_staff_id=data['support_staff']) if data.get('support_staff') else None
+        support_staff_name: str | None = data.get('support_staff')
         ambulance: Ambulance | None = Ambulance.objects.get(id=data['ambulance']) if data.get('ambulance') else None
         # Handle nested companion
         companion: Companion | None = None
@@ -350,7 +350,7 @@ class SaveReportApplicationService:
         care_data: dict = {
             k: v for k, v in data.items()
             if k not in [
-                'attending_staff', 'driver', 'support_staff', 'ambulance', 'companion',
+                'attending_staff', 'driver', 'ambulance', 'companion',
                 'responsible',
                 'initial_physical_examination', 'final_physical_examination', 'treatment',
                 'result', 'complications_transfer', 'receiving_entity', 
@@ -361,7 +361,7 @@ class SaveReportApplicationService:
         care_data.update({
             'attending_staff': attending_staff,
             'driver': driver,
-            'support_staff': support_staff,
+            'support_staff': support_staff_name,
             'ambulance': ambulance,
             'companion': companion,
             'responsible': responsible,

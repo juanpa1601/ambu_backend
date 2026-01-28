@@ -18,7 +18,7 @@ class PatientHistory(models.Model):
         blank=True,
         null=True
     )
-    has_surgies = models.BooleanField(
+    has_surgeries = models.BooleanField(
         blank=True,
         null=True
     )

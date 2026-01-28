@@ -6,6 +6,7 @@ from core.views.base_view import BaseView
 from patient_transport_report.application_service import SaveReportApplicationService
 from patient_transport_report.serializers.input import SaveReportInputSerializer
 from rest_framework.throttling import UserRateThrottle
+from django.contrib.auth.models import User
 
 class SaveReportView(BaseView):
     '''
@@ -23,7 +24,7 @@ class SaveReportView(BaseView):
     Request Body (CREATE - Minimum):
         {
             "report_id": null,
-            "patient_data": {
+            "patient": {
                 "patient_name": "Juan Pérez",
                 "identification_type": "CC",
                 "identification_number": "1234567890"
@@ -102,16 +103,19 @@ class SaveReportView(BaseView):
         Create new report or update existing one.
         
         Supports:
-        - CREATE: report_id = null + patient_data + attending_staff required
+        - CREATE: report_id = null + patient + attending_staff required
         - UPDATE: report_id = <int> + any section(s) to update
         - COMPLETE: change_status_to = "completado" (validates required fields)
         
         All sections are optional except:
-        - patient_data (on CREATE)
+        - patient (on CREATE)
         - attending_staff (always when care_transfer_report is sent)
         '''
 
-        def service_callback(validated_data: dict) -> dict[str, Any]:
+        def service_callback(
+            validated_data: dict, 
+            user: User
+        ) -> dict[str, Any]:
             '''
             Execute business logic to save/update report.
             
@@ -124,7 +128,7 @@ class SaveReportView(BaseView):
             save_report_service: SaveReportApplicationService = SaveReportApplicationService()
             return save_report_service.save_report(
                 data=validated_data,
-                user=request.user
+                user=user
             )
 
         return self._handle_request(
