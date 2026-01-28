@@ -6,6 +6,12 @@ from staff.domain_service import (
     UserDomainService
 )
 from staff.types.dataclass import CreateUserRequest
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_400_BAD_REQUEST,
+    HTTP_201_CREATED,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class CreateUserApplicationService:
     '''
@@ -13,7 +19,10 @@ class CreateUserApplicationService:
     Handles authorization and orchestrates user creation.
     '''
     
-    def __init__(self):
+    SUCCESS: int = 1
+    FAILURE: int = -1    
+
+    def __init__(self) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.auth_domain_service: AuthDomainService = AuthDomainService()
         self.user_domain_service: UserDomainService = UserDomainService()
@@ -43,8 +52,8 @@ class CreateUserApplicationService:
                 )
                 return {
                     'response': 'No tienes permiso para crear usuarios.',
-                    'msg': -1,
-                    'status_code_http': 403
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_403_FORBIDDEN
                 }
             # Step 2: Create user through domain service
             success: bool
@@ -58,14 +67,14 @@ class CreateUserApplicationService:
                 if 'ya existe' in message.lower():
                     return {
                         'response': message,
-                        'msg': -1,
-                        'status_code_http': 400
+                        'msg': self.FAILURE,
+                        'status_code_http': HTTP_400_BAD_REQUEST
                     }
                 # Other errors
                 return {
                     'response': message,
-                    'msg': -1,
-                    'status_code_http': 500
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
                 }
             # Step 3: Build success response
             self.logger.info(
@@ -74,8 +83,8 @@ class CreateUserApplicationService:
             )
             return {
                 'response': message,
-                'msg': 1,
-                'status_code_http': 201,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_201_CREATED,
                 'data': {
                     'system_user_id': response_data.system_user_id,
                     'username': response_data.username,
@@ -92,6 +101,6 @@ class CreateUserApplicationService:
             )
             return {
                 'response': 'Ocurrió un error al crear el usuario.',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }

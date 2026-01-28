@@ -20,21 +20,58 @@ class Patient(AuditedModel):
         unique=True,
         db_index=True
     )
-    issue_date = models.DateField()
-    issue_place = models.CharField(max_length=200)
-    birth_date = models.DateField()
-    age = models.IntegerField()
-    sex = models.CharField(max_length=20)
-    home_address = models.CharField(max_length=300)
-    residence_city = models.CharField(max_length=100)
-    cell_phone = models.CharField(max_length=20)
+    issue_date = models.DateField(
+        null=True, 
+        blank=True
+    )
+    issue_place = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True
+    )
+    birth_date = models.DateField(
+        null=True, 
+        blank=True
+    )
+    patient_age = models.IntegerField(
+        null=True, 
+        blank=True
+    )
+    sex = models.CharField(
+        max_length=20,
+        null=True, 
+        blank=True
+    )
+    home_address = models.CharField(
+        max_length=300,
+        null=True,
+        blank=True
+    )
+    residence_city = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True
+    )
+    cell_phone = models.CharField(
+        max_length=20,
+        blank=True,
+        null=True
+    )
     landline_phone = models.CharField(
         max_length=20, 
         blank=True, 
         null=True
     )
-    marital_status = models.CharField(max_length=50)
-    occupation = models.CharField(max_length=100)
+    marital_status = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True
+    )
+    occupation = models.CharField(
+        max_length=100,
+        blank=True, 
+        null=True
+    )
     signature = models.TextField(
         blank=True, 
         null=True
@@ -42,14 +79,22 @@ class Patient(AuditedModel):
     patient_history = models.OneToOneField(
         PatientHistory,
         on_delete=models.CASCADE,
-        related_name='patient_history_patient'
+        related_name='patient_history_patient',
+        blank=True,
+        null=True
     )
     insurance_provider = models.OneToOneField(
         InsuranceProvider,
         on_delete=models.CASCADE,
-        related_name='insurance_provider_patient'
+        related_name='insurance_provider_patient',
+        blank=True,
+        null=True
     )
-    membership_category = models.CharField(max_length=50)
+    membership_category = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True    
+    )
 
     # ✅ Manager personalizado
     objects = ActiveManager()  # Excluye eliminados por defecto

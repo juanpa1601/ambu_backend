@@ -24,12 +24,16 @@ class PatientTransportReport(AuditedModel):
     informed_consent = models.OneToOneField(
         InformedConsent,
         on_delete=models.CASCADE,
-        related_name='patient_informed_consent'
+        related_name='patient_informed_consent',
+        null=True,
+        blank=True
     )
     care_transfer_report = models.OneToOneField(
         CareTransferReport,
         on_delete=models.CASCADE,
-        related_name='patient_care_transfer_report'
+        related_name='patient_care_transfer_report',
+        blank=True,
+        null=True
     )
     satisfaction_survey = models.OneToOneField(
         SatisfactionSurvey,
@@ -48,6 +52,16 @@ class PatientTransportReport(AuditedModel):
         db_index=True
     )
 
+    completion_percentage = models.IntegerField(
+        default=0,
+        help_text='Percentage of required fields completed (0-100)'
+    )
+    
+    has_patient_info = models.BooleanField(default=False)
+    has_informed_consent = models.BooleanField(default=False)
+    has_care_transfer = models.BooleanField(default=False)
+    has_satisfaction_survey = models.BooleanField(default=False)
+
     objects = ActiveManager()
     all_objects = models.Manager()
     
@@ -65,6 +79,22 @@ class PatientTransportReport(AuditedModel):
     def __str__(self) -> str:
         return f'Report #{self.id} - {self.patient.patient_name} ({self.status})'
     
+    def calculate_completion(self) -> int:
+        '''Calculate completion percentage'''
+        completed = 0
+        total = 4
+        
+        if self.has_patient_info:
+            completed += 1
+        if self.has_informed_consent:
+            completed += 1
+        if self.has_care_transfer:
+            completed += 1
+        if self.has_satisfaction_survey:
+            completed += 1
+            
+        return int((completed / total) * 100)
+
     def complete(
         self, 
         user: User

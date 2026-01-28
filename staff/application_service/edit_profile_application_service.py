@@ -6,11 +6,20 @@ from staff.types.dataclass import (
     EditProfileRequest,
     EditProfileResponse
 )
+from rest_framework.status import (
+    HTTP_404_NOT_FOUND,
+    HTTP_400_BAD_REQUEST,
+    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class EditProfileApplicationService:
     '''Application service for editing user's own profile.'''
-    
-    def __init__(self):
+
+    SUCCESS: int = 1
+    FAILURE: int = -1 
+
+    def __init__(self) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.user_domain_service: UserDomainService = UserDomainService()
     
@@ -43,21 +52,21 @@ class EditProfileApplicationService:
                 if 'ya existe' in message.lower():
                     return {
                         'response': message,
-                        'msg': -1,
-                        'status_code_http': 400
+                        'msg': self.FAILURE,
+                        'status_code_http': HTTP_400_BAD_REQUEST
                     }
                 
                 if 'no encontrado' in message.lower():
                     return {
                         'response': message,
-                        'msg': -1,
-                        'status_code_http': 404
+                        'msg': self.FAILURE,
+                        'status_code_http': HTTP_404_NOT_FOUND
                     }
                 # Other errors
                 return {
                     'response': message,
-                    'msg': -1,
-                    'status_code_http': 500
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
                 }
             # Build success response
             self.logger.info(
@@ -66,8 +75,8 @@ class EditProfileApplicationService:
             )
             return {
                 'response': message,
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'data': {
                     'system_user_id': response_data.system_user_id,
                     'username': response_data.username,
@@ -85,6 +94,6 @@ class EditProfileApplicationService:
             )
             return {
                 'response': 'Ocurrió un error al actualizar el perfil.',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }

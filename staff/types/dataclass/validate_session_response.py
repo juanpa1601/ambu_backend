@@ -7,6 +7,9 @@ from typing import Any
 @dataclass
 class ValidateSessionResponse:
     '''Data Transfer Object for validate session response'''
+    response: str
+    msg: int
+    status_code_http: int
     is_valid: bool
     username: str
     user_id: int

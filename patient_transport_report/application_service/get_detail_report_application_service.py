@@ -6,6 +6,12 @@ from staff.models import (
     Healthcare, 
     Administrative
 )
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class GetDetailsReportApplicationService:
     '''
@@ -17,6 +23,9 @@ class GetDetailsReportApplicationService:
     - Return full serialized data
     '''
     
+    SUCCESS: int = 1
+    FAILURE: int = -1       
+
     def get_report_details(
         self, 
         report_id: int,
@@ -47,8 +56,8 @@ class GetDetailsReportApplicationService:
             if not (is_healthcare or is_administrative):
                 return {
                     'response': 'Solamente el personal de salud o administrativo puede acceder a este recurso.',
-                    'msg': -1,
-                    'status_code_http': 403
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_403_FORBIDDEN
                 }                
             # Retrieve report with all relationships using select_related and prefetch_related
             report: PatientTransportReport = PatientTransportReport.objects.select_related(
@@ -87,19 +96,19 @@ class GetDetailsReportApplicationService:
             serializer: PatientTransportReportDetailSerializer = PatientTransportReportDetailSerializer(report)
             return {
                 'response': 'Detalles del informe recuperados con éxito.',
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'report': serializer.data
             }
         except PatientTransportReport.DoesNotExist:
             return {
                 'response': f'Informe con ID {report_id} no encontrado.',
-                'msg': -1,
-                'status_code_http': 404
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_404_NOT_FOUND
             }
         except Exception as e:
             return {
                 'response': f'Error al recuperar los detalles del informe: {str(e)}',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }
