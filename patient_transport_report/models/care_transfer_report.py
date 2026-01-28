@@ -109,12 +109,6 @@ class CareTransferReport(AuditedModel):
         related_name='attending_staff_care_transfer_reports',
         help_text='Healthcare staff attending the patient'
     )
-    reg_number = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True,
-        help_text='Registration number of the attending staff'    
-    )
     support_staff = models.CharField(
         max_length=100,
         blank=True,

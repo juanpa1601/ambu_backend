@@ -58,7 +58,9 @@ class ListBuzonApplicationService:
         '''
         try:
             # Verify user has permission (Healthcare or Administrative)
-            is_healthcare: bool = Healthcare.objects.filter(user=user).exists()
+            is_healthcare: bool = Healthcare.objects.filter(
+                base_staff__system_user=user
+            ).exists()
             if not (is_healthcare):
                 return {
                     'response': 'Solamente el personal de salud puede acceder a este recurso.',
@@ -79,8 +81,14 @@ class ListBuzonApplicationService:
             draft_reports: QuerySet[PatientTransportReport] = base_queryset.filter(status='borrador')
             completed_reports: QuerySet[PatientTransportReport] = base_queryset.filter(status='completado')
             # Serialize data
-            draft_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(draft_reports, many=True)
-            completed_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(completed_reports, many=True)
+            draft_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(
+                draft_reports, 
+                many=True
+            )
+            completed_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(
+                completed_reports, 
+                many=True
+            )
             return {
                 'response': 'Exito al recuperar los informes del usuario.',
                 'msg': self.SUCCESS,

@@ -61,7 +61,6 @@ class CareTransferReportDetailSerializer(serializers.ModelSerializer):
             'end_attention_time',
             'driver',
             'attending_staff',
-            'reg_number',
             'support_staff',
             'attending_staff_title',
             'ambulance',
