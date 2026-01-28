@@ -1,6 +1,7 @@
 from django.db import models
+from core.models import AuditedModel
 
-class SatisfactionSurvey(models.Model):
+class SatisfactionSurvey(AuditedModel):
 
     ambulance_request_ease = models.CharField(
         max_length=100,

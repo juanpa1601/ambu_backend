@@ -144,11 +144,24 @@ class SaveReportApplicationService:
             if informed_consent:
                 report.informed_consent = informed_consent
                 sections_created.append('informed_consent')
-        # 6. Update tracking flags
+        # 6. Create SatisfactionSurvey if provided
+        if 'satisfaction_survey' in data:
+            satisfaction = self._handle_satisfaction_survey(
+                data['satisfaction_survey'],
+                None,
+                user
+            )
+            if satisfaction:
+                report.satisfaction_survey = satisfaction
+                sections_created.append('satisfaction_survey')
+        # 7. Update tracking flags
         self.domain_service.update_tracking_flags(report)
         return {
             'message': 'Reporte creado exitosamente.',
-            'report_data': self._build_response_data(report, sections_created)
+            'report_data': self._build_response_data(
+                report, 
+                sections_created
+            )
         }
     
     def _update_existing_report(
@@ -304,18 +317,18 @@ class SaveReportApplicationService:
             responsible = self.domain_service.create_or_update_companion(data['responsible'])
         # Handle initial physical examination
         initial_exam: PhysicalExam | None = None
-        if 'initial_physical_examination' in data and data['initial_physical_examination']:
-            existing_initial: PhysicalExam | None = existing.initial_physical_examination if existing else None
+        if 'initial_physical_exam' in data and data['initial_physical_exam']:
+            existing_initial: PhysicalExam | None = existing.initial_physical_exam if existing else None
             initial_exam = self.domain_service.create_or_update_physical_exam(
-                data['initial_physical_examination'],
+                data['initial_physical_exam'],
                 existing_initial
             )
         # Handle final physical examination
         final_exam: PhysicalExam | None = None
-        if 'final_physical_examination' in data and data['final_physical_examination']:
-            existing_final: PhysicalExam | None = existing.final_physical_examination if existing else None
+        if 'final_physical_exam' in data and data['final_physical_exam']:
+            existing_final: PhysicalExam | None = existing.final_physical_exam if existing else None
             final_exam = self.domain_service.create_or_update_physical_exam(
-                data['final_physical_examination'],
+                data['final_physical_exam'],
                 existing_final
             )
         # Handle treatment
@@ -352,7 +365,7 @@ class SaveReportApplicationService:
             if k not in [
                 'attending_staff', 'driver', 'ambulance', 'companion',
                 'responsible',
-                'initial_physical_examination', 'final_physical_examination', 'treatment',
+                'initial_physical_exam', 'final_physical_exam', 'treatment',
                 'result', 'complications_transfer', 'receiving_entity', 
                 'skin_condition', 'hemodynamic_stats',
                 'diagnosis_1', 'diagnosis_2', 'ips'
@@ -365,8 +378,8 @@ class SaveReportApplicationService:
             'ambulance': ambulance,
             'companion': companion,
             'responsible': responsible,
-            'initial_physical_examination': initial_exam,
-            'final_physical_examination': final_exam,
+            'initial_physical_exam': initial_exam,
+            'final_physical_exam': final_exam,
             'treatment': treatment,
             'result': result,
             'complications_transfer': complications,
@@ -433,7 +446,6 @@ class SaveReportApplicationService:
             'report_id': report.id,
             'status': report.status,
             'completion_percentage': report.completion_percentage,
-            'can_complete': report.can_complete(),
             'has_patient_info': report.has_patient_info,
             'has_informed_consent': report.has_informed_consent,
             'has_care_transfer': report.has_care_transfer,

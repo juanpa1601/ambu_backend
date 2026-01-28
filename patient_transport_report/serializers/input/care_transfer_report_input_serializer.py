@@ -94,11 +94,11 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         required=False, 
         allow_null=True
     )
-    initial_physical_examination = PhysicalExamInputSerializer(
+    initial_physical_exam = PhysicalExamInputSerializer(
         required=False, 
         allow_null=True
     )
-    final_physical_examination = PhysicalExamInputSerializer(
+    final_physical_exam = PhysicalExamInputSerializer(
         required=False, 
         allow_null=True
     )

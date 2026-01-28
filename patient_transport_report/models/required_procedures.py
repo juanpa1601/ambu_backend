@@ -2,12 +2,12 @@ from django.db import models
 
 class RequiredProcedures(models.Model):
 
-    immovilization = models.BooleanField(
+    immobilization = models.BooleanField(
         null=True,
         blank=True,
         help_text='Indicates if immovilization was required'
     )
-    streatcher_transfer = models.BooleanField(
+    stretcher_transfer = models.BooleanField(
         null=True,
         blank=True,
         help_text='Indicates if stretcher transfer was required'
@@ -22,7 +22,7 @@ class RequiredProcedures(models.Model):
         blank=True,
         help_text='Indicates if patient assessment was required'
     )
-    other_procedures_details = models.TextField(
+    other_procedure_details = models.TextField(
         blank=True, 
         null=True,
         help_text='Details of other required procedures'
