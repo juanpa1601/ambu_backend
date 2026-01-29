@@ -111,9 +111,9 @@ class SaveReportApplicationService:
         user: User
     ) -> dict:
         '''Create new report with minimum required data'''
-        sections_created = []
+        sections_created: list[str] = []
         # 1. Validate attending_staff exists
-        attending_staff_id = data['care_transfer_report']['attending_staff']
+        attending_staff_id: int = data.get('attending_staff')
         if not Healthcare.objects.filter(base_staff_id=attending_staff_id).exists():
             raise ValidationError({'attending_staff': f'Personal de Salud {attending_staff_id} no encontrado'})
         # 2. Create Patient
@@ -121,22 +121,14 @@ class SaveReportApplicationService:
         sections_created.append('patient')
         # 3. Create PatientTransportReport (initially empty)
         report: PatientTransportReport = PatientTransportReport.objects.create(
+            attending_staff=attending_staff_id,
             patient=patient,
             status='borrador',
             created_by=user,
             updated_by=user
         )
-        # 4. Create CareTransferReport (with attending_staff)
-        care_transfer: CareTransferReport | None = self._handle_care_transfer_report(
-            data.get('care_transfer_report', {}),
-            None,
-            user
-        )
-        if care_transfer:
-            report.care_transfer_report = care_transfer
-            sections_created.append('care_transfer_report')
-        # 5. Create InformedConsent if provided
-        if 'informed_consent' in data:
+        # 4. Create InformedConsent if provided
+        if 'informed_consent' in data and data['informed_consent']:
             informed_consent: InformedConsent | None = self._handle_informed_consent(
                 data['informed_consent'],
                 None,
@@ -145,8 +137,18 @@ class SaveReportApplicationService:
             if informed_consent:
                 report.informed_consent = informed_consent
                 sections_created.append('informed_consent')
+        # 5. Create CareTransferReport if provided
+        if 'care_transfer_report' in data and data['care_transfer_report']:
+            care_transfer: CareTransferReport | None = self._handle_care_transfer_report(
+                data['care_transfer_report'],
+                None,
+                user
+            )
+            if care_transfer:
+                report.care_transfer_report = care_transfer
+                sections_created.append('care_transfer_report')
         # 6. Create SatisfactionSurvey if provided
-        if 'satisfaction_survey' in data:
+        if 'satisfaction_survey' in data and data['satisfaction_survey']:
             satisfaction: SatisfactionSurvey | None = self._handle_satisfaction_survey(
                 data['satisfaction_survey'],
                 None,
@@ -173,12 +175,13 @@ class SaveReportApplicationService:
     ) -> dict:
         '''Update existing report'''
         report: PatientTransportReport = PatientTransportReport.objects.select_related(
+            'attending_staff',
             'patient',
             'informed_consent',
             'care_transfer_report',
             'satisfaction_survey'
         ).get(id=report_id)
-        sections_updated = []
+        sections_updated: list[str] = []
         # 1. Update Patient if data provided
         if 'patient_data' in data:
             patient: Patient = self.domain_service.create_or_update_patient(
@@ -237,15 +240,6 @@ class SaveReportApplicationService:
         user: User
     ) -> InformedConsent:
         '''Handle InformedConsent creation/update'''
-        # Validate attending_staff
-        attending_staff_id: int = data['attending_staff']
-        attending_staff: Healthcare | None = Healthcare.objects.filter(base_staff_id=attending_staff_id).first()
-        if not attending_staff:
-            raise ValidationError({'attending_staff': f'Personal de Salud con ID {attending_staff_id} no encontrado'})
-        # Handle nested companion (responsible)
-        responsible_companion: Companion | None = None
-        if 'responsible' in data and data['responsible']:
-            responsible_companion = self.domain_service.create_or_update_companion(data['responsible'])
         # Handle outgoing entity
         outgoing_entity: OutgoingReceivingEntity | None = None
         if 'outgoing_entity' in data and data['outgoing_entity']:
@@ -270,12 +264,11 @@ class SaveReportApplicationService:
         consent_data: dict = {
             k: v for k, v in data.items() 
             if k not in [
-                'responsible', 'outgoing_entity', 'attending_staff', 
-                'procedure', 'medication_administration'
+                'outgoing_entity', 
+                'procedure', 
+                'medication_administration'
             ]
         }
-        consent_data['attending_staff'] = attending_staff
-        consent_data['responsible'] = responsible_companion
         consent_data['outgoing_entity'] = outgoing_entity
         consent_data['required_procedures'] = required_procedures
         consent_data['medication_administration'] = medication_administration
@@ -307,7 +300,6 @@ class SaveReportApplicationService:
         if errors:
             raise ValidationError(errors)
         # Resolve FKs
-        attending_staff: Healthcare = Healthcare.objects.get(base_staff_id=data['attending_staff'])
         driver: Driver | None = Driver.objects.get(base_staff_id=data['driver']) if data.get('driver') else None
         support_staff_name: str | None = data.get('support_staff')
         ambulance: Ambulance | None = Ambulance.objects.get(id=data['ambulance']) if data.get('ambulance') else None
@@ -367,7 +359,7 @@ class SaveReportApplicationService:
         care_data: dict = {
             k: v for k, v in data.items()
             if k not in [
-                'attending_staff', 'driver', 'ambulance', 'companion',
+                'driver', 'ambulance', 'companion',
                 'responsible',
                 'initial_physical_exam', 'final_physical_exam', 'treatment',
                 'result', 'complications_transfer', 'receiving_entity', 
@@ -376,7 +368,6 @@ class SaveReportApplicationService:
             ]
         }
         care_data.update({
-            'attending_staff': attending_staff,
             'driver': driver,
             'support_staff': support_staff_name,
             'ambulance': ambulance,

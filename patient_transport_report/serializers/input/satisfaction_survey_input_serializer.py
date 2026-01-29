@@ -66,7 +66,10 @@ class SatisfactionSurveyInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    respondent_can_sign: serializers.BooleanField = serializers.BooleanField(required=False)
+    respondent_can_sign: serializers.BooleanField = serializers.BooleanField(
+        required=False,
+        allow_null=True
+    )
     respondent_name: serializers.CharField = serializers.CharField(
         max_length=200, 
         required=False, 

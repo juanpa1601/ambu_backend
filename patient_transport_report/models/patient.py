@@ -17,7 +17,6 @@ class Patient(AuditedModel):
     )
     identification_number = models.CharField(
         max_length=100,
-        unique=True,
         db_index=True
     )
     issue_date = models.DateField(

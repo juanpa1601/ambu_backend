@@ -5,8 +5,10 @@ from .insurance_provider_input_serializer import InsuranceProviderInputSerialize
 class PatientInputSerializer(serializers.Serializer):
     '''Input serializer for Patient data'''
     patient_name: serializers.CharField = serializers.CharField(
-        max_length=200, 
-        required=True
+        max_length=200,
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     identification_type: serializers.ChoiceField = serializers.ChoiceField(
         required=False,
@@ -24,12 +26,15 @@ class PatientInputSerializer(serializers.Serializer):
     )
     other_identification_type: serializers.CharField = serializers.CharField(
         max_length=100,
-        required=False, 
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     identification_number: serializers.CharField = serializers.CharField(
         max_length=50, 
-        required=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     issue_date: serializers.DateField = serializers.DateField(
         required=False, 
@@ -37,57 +42,66 @@ class PatientInputSerializer(serializers.Serializer):
     )
     issue_place: serializers.CharField = serializers.CharField(
         max_length=100, 
-        required=False, 
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     birth_date: serializers.DateField = serializers.DateField(
-        required=False, 
-        allow_null=True
+        allow_null=True, 
+        required=False
     )
     sex: serializers.CharField = serializers.CharField(
         max_length=10, 
-        required=False, 
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     home_address: serializers.CharField = serializers.CharField(
-        required=False, 
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     residence_city: serializers.CharField = serializers.CharField(
         max_length=100,
-        required=False,
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )    
     cell_phone: serializers.CharField = serializers.CharField(
         max_length=20, 
-        required=False, 
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     landline_phone: serializers.CharField = serializers.CharField(
         max_length=20, 
-        required=False, 
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     marital_status: serializers.CharField = serializers.CharField(
         max_length=50, 
-        required=False, 
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     occupation: serializers.CharField = serializers.CharField(
         max_length=100, 
-        required=False, 
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )
     patient_history = PatientHistoryInputSerializer(
-        required=False, 
-        allow_null=True
+        allow_null=True, 
+        required=False
     )
     insurance_provider = InsuranceProviderInputSerializer(
-        required=False, 
-        allow_null=True
+        allow_null=True, 
+        required=False
     )
     membership_category: serializers.CharField = serializers.CharField(
         max_length=50, 
-        required=False, 
-        allow_blank=True
+        allow_null=True, 
+        allow_blank=True, 
+        required=False
     )

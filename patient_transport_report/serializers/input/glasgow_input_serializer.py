@@ -5,7 +5,8 @@ class GlasgowInputSerializer(serializers.Serializer):
     motor: serializers.IntegerField = serializers.IntegerField(
         min_value=1, 
         max_value=6, 
-        required=False
+        required=False,
+        allow_null=True 
     )
     motor_text: serializers.CharField = serializers.CharField(
         max_length=100, 
@@ -15,7 +16,8 @@ class GlasgowInputSerializer(serializers.Serializer):
     verbal: serializers.IntegerField = serializers.IntegerField(
         min_value=1, 
         max_value=5, 
-        required=False
+        required=False,
+        allow_null=True
     )
     verbal_text: serializers.CharField = serializers.CharField(
         max_length=100, 
@@ -25,7 +27,8 @@ class GlasgowInputSerializer(serializers.Serializer):
     eyes_opening: serializers.IntegerField = serializers.IntegerField(
         min_value=1, 
         max_value=4, 
-        required=False
+        required=False,
+        allow_null=True
     )
     eyes_opening_text: serializers.CharField = serializers.CharField(
         max_length=100, 
@@ -35,5 +38,6 @@ class GlasgowInputSerializer(serializers.Serializer):
     total: serializers.IntegerField = serializers.IntegerField(
         min_value=3, 
         max_value=15, 
-        required=False
+        required=False,
+        allow_null=True
     )

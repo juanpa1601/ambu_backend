@@ -4,7 +4,8 @@ from rest_framework import serializers
 class PatientHistoryInputSerializer(serializers.Serializer):
     has_pathology = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     pathology = serializers.CharField(
         required=False, 
@@ -12,7 +13,8 @@ class PatientHistoryInputSerializer(serializers.Serializer):
     )
     has_allergies = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     allergies = serializers.CharField(
         required=False, 
@@ -20,7 +22,8 @@ class PatientHistoryInputSerializer(serializers.Serializer):
     )
     has_surgeries = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     surgeries = serializers.CharField(
         required=False, 
@@ -28,7 +31,8 @@ class PatientHistoryInputSerializer(serializers.Serializer):
     )
     has_medicines = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     medicines = serializers.CharField(
         required=False, 
@@ -36,15 +40,18 @@ class PatientHistoryInputSerializer(serializers.Serializer):
     )
     tobacco_use = serializers.BooleanField(
         required=False,
-        default=False
+        default=False,
+        allow_null=True
     )
     substance_use = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     alcohol_use = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     other_history = serializers.CharField(
         required=False, 

@@ -53,7 +53,8 @@ class InformedConsentInputSerializer(serializers.Serializer):
     )
     administers_medications = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     medication_administration = MedicationAdministrationInputSerializer(
         required=False, 
@@ -72,7 +73,8 @@ class InformedConsentInputSerializer(serializers.Serializer):
     )
     patient_can_sign = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     patient_signature = serializers.CharField(
         required=False, 
@@ -80,7 +82,8 @@ class InformedConsentInputSerializer(serializers.Serializer):
     )
     responsible_can_sign = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     responsible_signature = serializers.CharField(
         required=False, 
@@ -96,5 +99,6 @@ class InformedConsentInputSerializer(serializers.Serializer):
     )
     outgoing_entity_signature = serializers.CharField(
         required=False, 
+        allow_null=True,
         allow_blank=True
     )

@@ -85,11 +85,6 @@ class SaveReportDomainService:
         '''
         Create new patient or update existing one.
         
-        If identification_number already exists in database:
-        - Find existing patient by identification_number
-        - Update all fields with new data
-        - Update nested history and insurance
-        
         Args:
             patient_data: Patient data from request
             existing_patient: Existing patient instance (optional)
@@ -100,17 +95,6 @@ class SaveReportDomainService:
         # Extract nested objects
         history_data: PatientHistoryData | None = patient_data.pop('patient_history', None)
         insurance_data: InsuranceProviderData | None = patient_data.pop('insurance_provider', None)
-        # Get identification_number for lookup
-        identification_number: str = patient_data.get('identification_number')
-        # Find existing patient by identification_number if not provided
-        if not existing_patient and identification_number:
-            try:
-                existing_patient = Patient.objects.get(
-                    identification_number=identification_number,
-                    is_deleted=False
-                )
-            except Patient.DoesNotExist:
-                existing_patient = None
         history: PatientHistory | None = None
         insurance: InsuranceProvider | None = None
         if existing_patient:

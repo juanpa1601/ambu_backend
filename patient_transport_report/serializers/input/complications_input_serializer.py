@@ -6,12 +6,18 @@ class ComplicationsInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    register_code: serializers.BooleanField = serializers.BooleanField(required=False)
+    register_code: serializers.BooleanField = serializers.BooleanField(
+        required=False,
+        allow_null=True
+    )
     code: serializers.CharField = serializers.CharField(
         required=False, 
         allow_blank=True
     )
-    record_waiting_time: serializers.BooleanField = serializers.BooleanField(required=False)
+    record_waiting_time: serializers.BooleanField = serializers.BooleanField(
+        required=False,
+        allow_null=True
+    )
     waiting_time: serializers.CharField = serializers.CharField(
         required=False, 
         allow_blank=True

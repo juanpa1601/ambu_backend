@@ -81,7 +81,8 @@ class CareTransferReportInputSerializer(serializers.Serializer):
     )
     companion_is_responsible = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     responsible = CompanionInputSerializer(
         required=False, 
@@ -98,12 +99,14 @@ class CareTransferReportInputSerializer(serializers.Serializer):
     skin_condition = serializers.ListField(
         child=serializers.IntegerField(),
         required=False,
-        allow_empty=True
+        allow_empty=True,
+        allow_null=True
     )
     hemodynamic_stats = serializers.ListField(
         child=serializers.IntegerField(),
         required=False,
-        allow_empty=True
+        allow_empty=True,
+        allow_null=True
     )
     treatment = TreatmentInputSerializer(
         required=False, 

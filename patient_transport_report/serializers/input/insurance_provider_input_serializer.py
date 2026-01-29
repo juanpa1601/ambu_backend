@@ -12,7 +12,8 @@ class InsuranceProviderInputSerializer(serializers.Serializer):
     )
     other_coverage_type = serializers.BooleanField(
         required=False, 
-        default=False
+        default=False,
+        allow_null=True
     )
     other_coverage_details = serializers.CharField(
         required=False, 
