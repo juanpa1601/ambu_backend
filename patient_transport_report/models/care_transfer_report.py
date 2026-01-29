@@ -103,12 +103,6 @@ class CareTransferReport(AuditedModel):
         blank=True,
         help_text='Driver of the ambulance'
     )
-    attending_staff = models.ForeignKey(
-        Healthcare,
-        on_delete=models.CASCADE,
-        related_name='attending_staff_care_transfer_reports',
-        help_text='Healthcare staff attending the patient'
-    )
     support_staff = models.CharField(
         max_length=100,
         blank=True,

@@ -28,7 +28,8 @@ class PatientTransportReport(AuditedModel):
         Patient,
         on_delete=models.CASCADE,
         related_name='transport_reports',
-        help_text='Patient associated with this transport report'
+        null=True,
+        help_text='Patient associated with this transport report',
     )
     informed_consent = models.OneToOneField(
         InformedConsent,

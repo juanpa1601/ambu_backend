@@ -102,7 +102,7 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         allow_empty=True,
         allow_null=True
     )
-    hemodynamic_stats = serializers.ListField(
+    hemodynamic_status = serializers.ListField(
         child=serializers.IntegerField(),
         required=False,
         allow_empty=True,

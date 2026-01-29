@@ -114,14 +114,20 @@ class SaveReportApplicationService:
         sections_created: list[str] = []
         # 1. Validate attending_staff exists
         attending_staff_id: int = data.get('attending_staff')
-        if not Healthcare.objects.filter(base_staff_id=attending_staff_id).exists():
-            raise ValidationError({'attending_staff': f'Personal de Salud {attending_staff_id} no encontrado'})
+        try:
+            attending_staff: Healthcare = Healthcare.objects.get(
+                base_staff_id=attending_staff_id
+            )
+        except Healthcare.DoesNotExist:
+            raise ValidationError({
+                'attending_staff': f'Personal de Salud con ID {attending_staff_id} no encontrado.'
+            })
         # 2. Create Patient
         patient: Patient = self.domain_service.create_or_update_patient(data['patient'])
         sections_created.append('patient')
         # 3. Create PatientTransportReport (initially empty)
         report: PatientTransportReport = PatientTransportReport.objects.create(
-            attending_staff=attending_staff_id,
+            attending_staff=attending_staff,
             patient=patient,
             status='borrador',
             created_by=user,
@@ -363,7 +369,7 @@ class SaveReportApplicationService:
                 'responsible',
                 'initial_physical_exam', 'final_physical_exam', 'treatment',
                 'result', 'complications_transfer', 'receiving_entity', 
-                'skin_condition', 'hemodynamic_stats',
+                'skin_condition', 'hemodynamic_status',
                 'diagnosis_1', 'diagnosis_2', 'ips'
             ]
         }
@@ -393,11 +399,13 @@ class SaveReportApplicationService:
                 setattr(existing, key, value)
             existing.updated_by = user
             existing.save()
-            # Handle ManyToMany (frontend names: skin_condition, hemodynamic_stats)
+            # Handle ManyToMany (frontend names: skin_condition, hemodynamic_status)
             if 'skin_condition' in data:
-                existing.skin_conditions.set(data['skin_condition'])
-            if 'hemodynamic_stats' in data:
-                existing.hemodynamic_statuses.set(data['hemodynamic_stats'])
+                skin_condition = data['skin_condition'] if data['skin_condition'] is not None else []
+                existing.skin_conditions.set(skin_condition)
+            if 'hemodynamic_status' in data:
+                hemodynamic_status = data['hemodynamic_status'] if data['hemodynamic_status'] is not None else []
+                existing.hemodynamic_statuses.set(hemodynamic_status)
             return existing
         else:
             # Create new
@@ -408,9 +416,11 @@ class SaveReportApplicationService:
             )
             # Handle ManyToMany
             if 'skin_condition' in data:
-                care_transfer.skin_conditions.set(data['skin_condition'])
-            if 'hemodynamic_stats' in data:
-                care_transfer.hemodynamic_statuses.set(data['hemodynamic_stats'])
+                skin_condition = data['skin_condition'] if data['skin_condition'] is not None else []
+                care_transfer.skin_conditions.set(skin_condition)
+            if 'hemodynamic_status' in data:
+                hemodynamic_status = data['hemodynamic_status'] if data['hemodynamic_status'] is not None else []
+                care_transfer.hemodynamic_statuses.set(hemodynamic_status)
             return care_transfer
     
     def _handle_satisfaction_survey(

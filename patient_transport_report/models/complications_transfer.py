@@ -23,7 +23,7 @@ class ComplicationsTransfer(models.Model):
         blank=True,
         help_text='Indicates if waiting time was recorded'
     )
-    waiting_time = models.DurationField( #HH:MM:SS <---- TODO
+    waiting_time = models.CharField( 
         blank=True,
         null=True,
         help_text='Waiting time duration'
