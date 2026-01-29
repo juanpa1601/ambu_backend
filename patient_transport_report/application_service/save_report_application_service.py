@@ -189,9 +189,9 @@ class SaveReportApplicationService:
         ).get(id=report_id)
         sections_updated: list[str] = []
         # 1. Update Patient if data provided
-        if 'patient_data' in data:
+        if 'patient' in data:
             patient: Patient = self.domain_service.create_or_update_patient(
-                data['patient_data'], 
+                data['patient'], 
                 report.patient
             )
             sections_updated.append('patient')

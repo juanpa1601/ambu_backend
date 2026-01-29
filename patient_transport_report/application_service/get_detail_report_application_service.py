@@ -65,6 +65,10 @@ class GetDetailsReportApplicationService:
                 }                
             # Retrieve report with all relationships using select_related and prefetch_related
             report: PatientTransportReport = PatientTransportReport.objects.select_related(
+                
+                # Attending Staff
+                'attending_staff',
+                'attending_staff__base_staff',
                 # Patient
                 'patient',
                 'patient__patient_history',
@@ -72,17 +76,12 @@ class GetDetailsReportApplicationService:
                 
                 # Informed Consent
                 'informed_consent',
-                'informed_consent__responsible',
-                'informed_consent__attending_staff',
-                'informed_consent__attending_staff__base_staff',
                 'informed_consent__outgoing_entity',
                 
                 # Care Transfer Report
                 'care_transfer_report',
                 'care_transfer_report__driver',
                 'care_transfer_report__driver__base_staff',
-                'care_transfer_report__attending_staff',
-                'care_transfer_report__attending_staff__base_staff',
                 'care_transfer_report__ambulance',
                 'care_transfer_report__companion',
                 'care_transfer_report__responsible',
