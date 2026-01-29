@@ -235,7 +235,7 @@ class InventoryDomainService:
                 system_user=user,
                 ambulance=ambulance,
                 shift=shift,
-                support_staff=request.support_staff or "",
+                support_staff=request.support_staff,
                 biomedical_equipment=biomedical_equipment,
                 surgical=surgical,
                 accessories_case=accessories_case,
@@ -247,7 +247,7 @@ class InventoryDomainService:
                 circulatory=circulatory,
                 ambulance_kit=ambulance_kit,
                 date=request.date,
-                observations=request.observations or "",
+                observations=request.observations,
             )
 
             # Compute and persist is_completed
@@ -335,7 +335,7 @@ class InventoryDomainService:
                 ambulance_kit=model_to_dict(inventory.ambulance_kit),
                 created_at=inventory.created_at.isoformat(),
                 shift=model_to_dict(inventory.shift),
-                support_staff=inventory.support_staff or "",
+                support_staff=inventory.support_staff,
             )
 
             self.logger.info(f"Retrieved inventory detail for ID {inventory_id}")
@@ -412,10 +412,9 @@ class InventoryDomainService:
                 inventory.shift = shift
                 updated_fields.append("shift")
 
-            # Update support_staff if provided
-            if request.support_staff is not None:
-                inventory.support_staff = request.support_staff
-                updated_fields.append("support_staff")
+            # Update support_staff - always update to clear field when None is sent
+            inventory.support_staff = request.support_staff if request.support_staff else ""
+            updated_fields.append("support_staff")
 
             # Update equipment entities (create new or update existing)
             if request.biomedical_equipment is not None:
