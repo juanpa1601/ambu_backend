@@ -62,7 +62,6 @@ class CareTransferReportDetailSerializer(serializers.ModelSerializer):
             'driver',
             'attending_staff',
             'support_staff',
-            'attending_staff_title',
             'ambulance',
             'companion',
             'companion_is_responsible',

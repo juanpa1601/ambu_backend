@@ -172,7 +172,7 @@ class SaveReportApplicationService:
         user: User
     ) -> dict:
         '''Update existing report'''
-        report = PatientTransportReport.objects.select_related(
+        report: PatientTransportReport = PatientTransportReport.objects.select_related(
             'patient',
             'informed_consent',
             'care_transfer_report',

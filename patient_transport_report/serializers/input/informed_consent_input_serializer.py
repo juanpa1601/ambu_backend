@@ -71,11 +71,6 @@ class InformedConsentInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    responsible = CompanionInputSerializer(
-        required=False, 
-        allow_null=True
-    )
-    attending_staff = serializers.IntegerField(required=True)
     attending_staff_signature = serializers.CharField(
         required=False, 
         allow_blank=True

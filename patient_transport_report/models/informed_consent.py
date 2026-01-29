@@ -1,8 +1,6 @@
 from django.db import models
 from .required_procedures import RequiredProcedures
 from .medication_administration import MedicationAdministration
-from .companion import Companion
-from staff.models import Healthcare
 from .outgoing_receiving_entity import OutgoingReceivingEntity
 from core.models import (
     AuditedModel, 
@@ -101,21 +99,6 @@ class InformedConsent(AuditedModel):
         blank=True,
         null=True,
         help_text='Digital signature in base64 format'
-    )
-    responsible = models.ForeignKey(
-        Companion,
-        on_delete=models.CASCADE,
-        related_name='responsible_informed_consents',
-        blank=True,
-        null=True
-    )
-    attending_staff = models.ForeignKey(
-        Healthcare,
-        on_delete=models.CASCADE,
-        related_name='attending_staff_informed_consents',
-        blank=True,
-        null=True,
-        help_text='Healthcare staff attending during consent'
     )
     attending_staff_signature = models.TextField(
         blank=True,

@@ -4,10 +4,12 @@ from .patient_detail_serializer import PatientDetailSerializer
 from .informed_consent_detail_serializer import InformedConsentDetailSerializer
 from .care_transfer_report_detail_serializer import CareTransferReportDetailSerializer
 from .satisfaction_survey_detail_serializer import SatisfactionSurveyDetailSerializer
+from .healthcare_staff_detail_serializer import HealthcareStaffDetailSerializer
 
 class PatientTransportReportDetailSerializer(serializers.ModelSerializer):
     '''Complete serializer for PatientTransportReport with all nested relationships.'''
     
+    attending_staff: HealthcareStaffDetailSerializer = HealthcareStaffDetailSerializer(read_only=True)
     patient: PatientDetailSerializer = PatientDetailSerializer(read_only=True)
     informed_consent: InformedConsentDetailSerializer = InformedConsentDetailSerializer(read_only=True)
     care_transfer_report: CareTransferReportDetailSerializer = CareTransferReportDetailSerializer(read_only=True)
@@ -32,6 +34,7 @@ class PatientTransportReportDetailSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'patient',
+            'attending_staff',
             'informed_consent',
             'care_transfer_report',
             'satisfaction_survey',

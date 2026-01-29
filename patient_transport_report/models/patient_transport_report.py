@@ -1,4 +1,5 @@
 from django.db import models
+from staff.models.healthcare import Healthcare
 from .informed_consent import InformedConsent
 from .satisfaction_survey import SatisfactionSurvey
 from .care_transfer_report import CareTransferReport
@@ -14,7 +15,15 @@ class PatientTransportReport(AuditedModel):
     Main report entity that aggregates all patient-related data.
     When a patient is deleted, all their reports must be deleted.
     '''
-    
+
+    attending_staff = models.ForeignKey(
+        Healthcare,
+        on_delete=models.CASCADE,
+        related_name='attending_staff_informed_consents',
+        blank=True,
+        null=True,
+        help_text='Healthcare staff attending during consent'
+    )    
     patient = models.ForeignKey(
         Patient,
         on_delete=models.CASCADE,

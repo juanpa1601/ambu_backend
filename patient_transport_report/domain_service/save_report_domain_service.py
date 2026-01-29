@@ -82,16 +82,37 @@ class SaveReportDomainService:
         patient_data: PatientData, 
         existing_patient: Patient | None = None
     ) -> Patient:
-        '''Create new patient or update existing one'''
-
+        '''
+        Create new patient or update existing one.
+        
+        If identification_number already exists in database:
+        - Find existing patient by identification_number
+        - Update all fields with new data
+        - Update nested history and insurance
+        
+        Args:
+            patient_data: Patient data from request
+            existing_patient: Existing patient instance (optional)
+        
+        Returns:
+            Patient: Created or updated patient instance
+        '''
         # Extract nested objects
         history_data: PatientHistoryData | None = patient_data.pop('patient_history', None)
         insurance_data: InsuranceProviderData | None = patient_data.pop('insurance_provider', None)
+        # Get identification_number for lookup
+        identification_number: str = patient_data.get('identification_number')
+        # Find existing patient by identification_number if not provided
+        if not existing_patient and identification_number:
+            try:
+                existing_patient = Patient.objects.get(
+                    identification_number=identification_number,
+                    is_deleted=False
+                )
+            except Patient.DoesNotExist:
+                existing_patient = None
         history: PatientHistory | None = None
         insurance: InsuranceProvider | None = None
-        # Handle patient_age -> age mapping
-        if 'patient_age' in patient_data:
-            patient_data['patient_age'] = patient_data.pop('patient_age')
         if existing_patient:
             # Update patient history
             if history_data:
@@ -107,13 +128,13 @@ class SaveReportDomainService:
                     existing_patient.insurance_provider
                 )
                 patient_data['insurance_provider'] = insurance
-            # Update existing patient
+            # Update existing patient fields
             for key, value in patient_data.items():
                 setattr(existing_patient, key, value)
             existing_patient.save()
             return existing_patient
         else:
-            # Create new patient with nested objects
+            # Create nested objects
             history = SaveReportDomainService.create_or_update_patient_history(history_data) if history_data else None
             insurance = SaveReportDomainService.create_or_update_insurance_provider(insurance_data) if insurance_data else None
             patient_data['patient_history'] = history
@@ -161,7 +182,6 @@ class SaveReportDomainService:
     @staticmethod
     def create_or_update_companion(companion_data: CompanionData) -> Companion | None:
         '''Create companion if data provided'''
-
         if not companion_data or not companion_data.get('name'):
             return None
         # Map frontend field names to model field names
