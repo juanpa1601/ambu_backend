@@ -1,5 +1,4 @@
 from typing import TypedDict
-from datetime import datetime
 from .companion_data import CompanionData
 from .physical_exam_data import PhysicalExamData
 from .treatment_data import TreatmentData
@@ -22,10 +21,7 @@ class CareTransferReportData(TypedDict, total=False):
     double_arrival_time: str
     end_attention_time: str
     driver: int
-    attending_staff: int
-    reg_number: str
     support_staff: str
-    attending_staff_title: str
     ambulance: int
     companion: CompanionData
     companion_is_responsible: bool

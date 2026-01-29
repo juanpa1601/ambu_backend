@@ -23,8 +23,6 @@ class InformedConsentData(TypedDict, total=False):
     patient_signature: str
     responsible_can_sign: bool
     responsible_signature: str
-    responsible: CompanionData
-    attending_staff: int
     attending_staff_signature: str
     outgoing_entity: EntityData
     outgoing_entity_signature: str
