@@ -12,10 +12,12 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         required=False, 
         allow_null=True
     )
-    transfer_type = serializers.CharField(
-        max_length=100, 
-        required=False, 
-        allow_blank=True
+    transfer_type = serializers.ChoiceField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        choices=['traslado asistencial básico-sencillo', 'traslado asistencial básico-doble'],
+        help_text='Type of transfer provided'
     )
     initial_address = serializers.CharField(
         required=False, 
@@ -25,10 +27,12 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    service_type = serializers.CharField(
-        max_length=100, 
+    service_type = serializers.ChoiceField(
         required=False,
-        allow_blank=True
+        allow_null=True,
+        allow_blank=True,
+        choices=['remisión', 'alta hospitalaria', 'redondo'],
+        help_text='Type of service provided'
     )
     dispatch_time = serializers.DateTimeField(
         required=False, 
@@ -62,7 +66,6 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         required=False, 
         allow_null=True
     )
-    attending_staff = serializers.IntegerField(required=True)
     support_staff = serializers.CharField(
         max_length=200, 
         required=False, 

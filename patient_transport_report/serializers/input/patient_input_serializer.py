@@ -8,9 +8,19 @@ class PatientInputSerializer(serializers.Serializer):
         max_length=200, 
         required=True
     )
-    identification_type: serializers.CharField = serializers.CharField(
-        max_length=50, 
-        required=True
+    identification_type: serializers.ChoiceField = serializers.ChoiceField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        choices=['cédula de ciudadanía', 
+                 'tarjeta de identidad', 
+                 'registro civil', 
+                 'cédula de extranjería', 
+                 'pasaporte', 
+                 'permiso de protección temporal',
+                 'otro'
+                ],
+        help_text='Type of identification document of the patient'
     )
     other_identification_type: serializers.CharField = serializers.CharField(
         max_length=100,

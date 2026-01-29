@@ -10,10 +10,12 @@ class InformedConsentInputSerializer(serializers.Serializer):
         required=False,
         allow_null=True
     )
-    guardian_type = serializers.CharField(
-        max_length=100, 
-        required=False, 
-        allow_blank=True
+    guardian_type = serializers.ChoiceField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        choices=['paciente', 'acompañante', 'familiar'],
+        help_text='Type of guardian'
     )
     guardian_name = serializers.CharField(
         max_length=200, 
@@ -25,10 +27,20 @@ class InformedConsentInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    guardian_id_type = serializers.CharField(
-        max_length=50, 
-        required=False, 
-        allow_blank=True
+    guardian_id_type = serializers.ChoiceField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        choices=['cédula de ciudadanía', 
+                 'tarjeta de identidad', 
+                 'registro civil', 
+                 'cédula de extranjería', 
+                 'pasaporte', 
+                 'dni/carné de identidad',
+                 'permiso de protección temporal',
+                 'documento de identidad extranjero'
+                ],
+        help_text='Type of identification document of the guardian'
     )
     guardian_id_number = serializers.CharField(
         max_length=50, 
@@ -47,9 +59,12 @@ class InformedConsentInputSerializer(serializers.Serializer):
         required=False, 
         allow_null=True
     )
-    service_type = serializers.CharField(
-        required=False, 
-        allow_blank=True
+    service_type = serializers.ChoiceField(
+        required=False,
+        allow_null=True,
+        allow_blank=True,
+        choices=['traslado asistencial de baja complejidad', 'atención prehospitalaria doble'],
+        help_text='Type of service provided'
     )
     other_implications = serializers.CharField(
         required=False, 
