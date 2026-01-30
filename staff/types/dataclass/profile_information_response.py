@@ -20,7 +20,6 @@ class ProfileInformationResponse:
     phone_number: str | None
     address: str | None
     birth_date: str | None
-    signature_url: str | None
     created_at: str
     updated_at: str
     

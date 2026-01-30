@@ -9,6 +9,13 @@ from staff.types.dataclass import (
     EditProfileResponse, 
     EditProfileRequest
 )
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_400_BAD_REQUEST,
+    HTTP_200_OK,
+    HTTP_404_NOT_FOUND,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class EditUserApplicationService:
     '''
@@ -16,7 +23,10 @@ class EditUserApplicationService:
     Requires administrative or superuser privileges.
     '''
     
-    def __init__(self):
+    SUCCESS: int = 1
+    FAILURE: int = -1  
+
+    def __init__(self) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.auth_domain_service: AuthDomainService = AuthDomainService()
         self.user_domain_service: UserDomainService = UserDomainService()
@@ -49,8 +59,8 @@ class EditUserApplicationService:
                 )
                 return {
                     'response': 'No tienes permiso para editar usuarios.',
-                    'msg': -1,
-                    'status_code_http': 403
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_403_FORBIDDEN
                 }
             # Step 2: Prevent editing their own profile (use edit_profile instead)
             if requesting_user.id == system_user_id:
@@ -59,8 +69,8 @@ class EditUserApplicationService:
                 )
                 return {
                     'response': 'Usa la sección de editar perfil, para editar tu propio perfil.',
-                    'msg': -1,
-                    'status_code_http': 400
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_400_BAD_REQUEST
                 }
             # Step 3: Update user profile through domain service
             success: bool
@@ -76,20 +86,20 @@ class EditUserApplicationService:
                 if 'ya existe' in message.lower():
                     return {
                         'response': message,
-                        'msg': -1,
-                        'status_code_http': 400
+                        'msg': self.FAILURE,
+                        'status_code_http': HTTP_400_BAD_REQUEST
                     }
                 if 'no encontrado' in message.lower():
                     return {
                         'response': message,
-                        'msg': -1,
-                        'status_code_http': 404
+                        'msg': self.FAILURE,
+                        'status_code_http': HTTP_404_NOT_FOUND
                     }
                 # Other errors
                 return {
                     'response': message,
-                    'msg': -1,
-                    'status_code_http': 500
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
                 }
             # Step 4: Build success response
             self.logger.info(
@@ -98,8 +108,8 @@ class EditUserApplicationService:
             )
             return {
                 'response': message,
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'data': {
                     'system_user_id': response_data.system_user_id,
                     'username': response_data.username,
@@ -117,6 +127,6 @@ class EditUserApplicationService:
             )
             return {
                 'response': 'Ocurrió un error al actualizar el usuario.',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }

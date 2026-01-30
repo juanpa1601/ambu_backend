@@ -6,14 +6,22 @@ from staff.domain_service import (
     AuthDomainService
 )
 from staff.types.dataclass import UserListResponse
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class ListUsersApplicationService:
     '''
     Application service for listing users.
     Handles authorization and orchestrates user retrieval.
     '''
-    
-    def __init__(self):
+
+    SUCCESS: int = 1
+    FAILURE: int = -1    
+
+    def __init__(self) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.auth_domain_service: AuthDomainService = AuthDomainService()
         self.user_domain_service: UserDomainService = UserDomainService()
@@ -40,8 +48,8 @@ class ListUsersApplicationService:
                 )
                 return {
                     'response': 'No tienes permiso para acceder a este recurso.',
-                    'msg': -1,
-                    'status_code_http': 403
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_403_FORBIDDEN
                 }
             # Step 2: Get all staff users
             user_items: list[UserListResponse] = self.user_domain_service.get_all_staff_users()
@@ -62,8 +70,8 @@ class ListUsersApplicationService:
             )
             return {
                 'response': 'Usuarios recuperados exitosamente.',
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'data': {
                     'users': users_data,
                     'total_count': len(user_items)
@@ -76,6 +84,6 @@ class ListUsersApplicationService:
             )
             return {
                 'response': 'Ocurrió un error al recuperar los usuarios.',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }

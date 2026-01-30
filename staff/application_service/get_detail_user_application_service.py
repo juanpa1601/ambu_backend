@@ -6,11 +6,20 @@ from ..domain_service import (
     AuthDomainService
 )
 from ..types.dataclass import UserDetailResponse
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK,
+    HTTP_404_NOT_FOUND,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class GetDetailUserApplicationService:
     '''Application service for retrieving user details.'''
-    
-    def __init__(self):
+
+    SUCCESS: int = 1
+    FAILURE: int = -1  
+
+    def __init__(self) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.user_domain_service: UserDomainService = UserDomainService()
         self.auth_domain_service: AuthDomainService = AuthDomainService()
@@ -39,8 +48,8 @@ class GetDetailUserApplicationService:
                 )
                 return {
                     'response': 'No tienes permiso para acceder a este recurso.',
-                    'msg': -1,
-                    'status_code_http': 403
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_403_FORBIDDEN
                 }
             # Step 2: Get user detail from domain service
             user_detail: UserDetailResponse | None = self.user_domain_service.get_user_detail_by_system_user_id(system_user_id)
@@ -50,8 +59,8 @@ class GetDetailUserApplicationService:
                 )
                 return {
                     'response': 'Usuario no encontrado.',
-                    'msg': -1,
-                    'status_code_http': 404
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_404_NOT_FOUND
                 }
             # Step 3: Build response data
             response_data: dict[str, Any] = {
@@ -74,7 +83,6 @@ class GetDetailUserApplicationService:
                     'phone_number': user_detail.phone_number,
                     'address': user_detail.address,
                     'birth_date': user_detail.birth_date,
-                    'signature_url': user_detail.signature_url,
                     'created_at': user_detail.created_at,
                     'updated_at': user_detail.updated_at,
                 },
@@ -86,8 +94,8 @@ class GetDetailUserApplicationService:
             )
             return {
                 'response': 'Detalle del usuario recuperado exitosamente.',
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'data': response_data
             }
         except Exception as e:
@@ -97,6 +105,6 @@ class GetDetailUserApplicationService:
             )
             return {
                 'response': 'Ocurrió un error al recuperar el detalle del usuario.',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }

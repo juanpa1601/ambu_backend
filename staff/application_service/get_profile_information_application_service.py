@@ -3,11 +3,22 @@ import logging
 from django.contrib.auth.models import User
 from ..types.dataclass import ProfileInformationResponse
 from staff.domain_service.user_domain_service import UserDomainService
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND,
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class GetProfileInformationApplicationService:
     '''Application service for retrieving authenticated user's profile information.'''
-    
-    def __init__(self):
+
+    SUCCESS: int = 1
+    FAILURE: int = -1    
+
+    def __init__(self) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.user_domain_service: UserDomainService = UserDomainService()
     
@@ -34,8 +45,8 @@ class GetProfileInformationApplicationService:
                 )
                 return {
                     'response': 'Perfil de usuario no encontrado.',
-                    'msg': -1,
-                    'status_code_http': 404
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_404_NOT_FOUND
                 }
             # Step 2: Build response data
             response_data: dict[str, Any] = {
@@ -56,7 +67,6 @@ class GetProfileInformationApplicationService:
                     'phone_number': profile_info.phone_number,
                     'address': profile_info.address,
                     'birth_date': profile_info.birth_date,
-                    'signature_url': profile_info.signature_url,
                     'created_at': profile_info.created_at,
                     'updated_at': profile_info.updated_at,
                 },
@@ -68,8 +78,8 @@ class GetProfileInformationApplicationService:
             )
             return {
                 'response': 'Información del perfil recuperada exitosamente.',
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'data': response_data
             }
         except Exception as e:
@@ -79,6 +89,6 @@ class GetProfileInformationApplicationService:
             )
             return {
                 'response': 'Ocurrió un error al recuperar la información del perfil.',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }

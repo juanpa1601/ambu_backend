@@ -74,11 +74,10 @@ class EditProfileSerializer(serializers.Serializer):
         max_length=50,
         help_text='Professional registration number (CMP, etc.)'
     )
-    professional_position: serializers.CharField = serializers.CharField(
+    professional_position: serializers.ChoiceField = serializers.ChoiceField(
         required=False,
-        allow_null=True,
-        max_length=100,
-        help_text='Professional position (Paramedic, Doctor, etc.)'
+        choices=['técnico/tecnólogo en atención prehospitalaria', 'auxiliar de enfermería'],
+        help_text='Professional position'
     )
     
     # Driver specific fields (optional)

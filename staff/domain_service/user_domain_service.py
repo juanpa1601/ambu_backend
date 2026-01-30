@@ -117,8 +117,6 @@ class UserDomainService:
                     }
             # Build full name
             full_name: str = user.get_full_name() or user.username
-            # Get signature URL
-            signature_url: str | None = base_staff.signature if base_staff.signature else None
             # Build response
             user_detail: UserDetailResponse = UserDetailResponse(
                 # System User data
@@ -139,7 +137,6 @@ class UserDomainService:
                 phone_number=base_staff.phone_number,
                 address=base_staff.address,
                 birth_date=base_staff.birth_date.isoformat() if base_staff.birth_date else None,
-                signature_url=signature_url,
                 created_at=base_staff.created_at.isoformat(),
                 updated_at=base_staff.updated_at.isoformat(),
                 # Specific profile data
@@ -223,8 +220,6 @@ class UserDomainService:
                 return None
             # Build full name
             full_name: str = user.get_full_name() or user.username
-            # Get signature URL
-            signature_url: str | None = base_staff.signature if base_staff.signature else None
             # Determine staff type and get specific data
             staff_type: str | None = None
             specific_data: dict | None = None
@@ -283,7 +278,6 @@ class UserDomainService:
                 phone_number=base_staff.phone_number,
                 address=base_staff.address,
                 birth_date=base_staff.birth_date.isoformat() if base_staff.birth_date else None,
-                signature_url=signature_url,
                 created_at=base_staff.created_at.isoformat(),
                 updated_at=base_staff.updated_at.isoformat(),
                 # Specific profile data

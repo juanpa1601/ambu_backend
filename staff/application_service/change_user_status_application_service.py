@@ -1,6 +1,13 @@
 from typing import Any
 import logging
 from django.contrib.auth.models import User
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_404_NOT_FOUND,
+    HTTP_400_BAD_REQUEST,
+    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 from staff.domain_service.auth_domain_service import AuthDomainService
 from staff.domain_service.user_domain_service import UserDomainService
 from staff.types.dataclass import ChangeUserStatusRequest
@@ -11,7 +18,10 @@ class ChangeUserStatusApplicationService:
     Handles authorization and orchestrates status change.
     '''
     
-    def __init__(self):
+    SUCCESS: int = 1
+    FAILURE: int = -1
+
+    def __init__(self) -> None:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.auth_domain_service: AuthDomainService = AuthDomainService()
         self.user_domain_service: UserDomainService = UserDomainService()
@@ -42,8 +52,8 @@ class ChangeUserStatusApplicationService:
                 )
                 return {
                     'response': 'No tienes permiso para cambiar el estado del usuario.',
-                    'msg': -1,
-                    'status_code_http': 403
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_403_FORBIDDEN
                 }
             # Step 2: Change user status through domain service
             success: bool
@@ -58,14 +68,14 @@ class ChangeUserStatusApplicationService:
                 if 'no encontrado' in message.lower():
                     return {
                         'response': message,
-                        'msg': -1,
-                        'status_code_http': 404
+                        'msg': self.FAILURE,
+                        'status_code_http': HTTP_404_NOT_FOUND
                     }
                 # Other errors (superuser, already same status, etc.)
                 return {
                     'response': message,
-                    'msg': -1,
-                    'status_code_http': 400
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_400_BAD_REQUEST
                 }
             # Step 3: Build success response
             self.logger.info(
@@ -73,8 +83,8 @@ class ChangeUserStatusApplicationService:
             )
             return {
                 'response': message,
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'data': {
                     'user_id': user.id,
                     'username': user.username,
@@ -88,6 +98,6 @@ class ChangeUserStatusApplicationService:
             )
             return {
                 'response': 'Ocurrió un error al cambiar el estado del usuario.',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }

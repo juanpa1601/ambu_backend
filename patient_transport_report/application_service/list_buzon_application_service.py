@@ -6,6 +6,11 @@ from django.db.models import QuerySet
 from ..models import PatientTransportReport
 from ..serializers.out import PatientTransportReportSummarySerializer
 from staff.models import Healthcare
+from rest_framework.status import (
+    HTTP_403_FORBIDDEN,
+    HTTP_200_OK,
+    HTTP_500_INTERNAL_SERVER_ERROR
+)
 
 class ListBuzonApplicationService:
     '''
@@ -18,6 +23,9 @@ class ListBuzonApplicationService:
     - Order by most recent first
     '''
     
+    SUCCESS: int = 1
+    FAILURE: int = -1     
+
     def list_user_reports(
         self, 
         user: User
@@ -50,12 +58,14 @@ class ListBuzonApplicationService:
         '''
         try:
             # Verify user has permission (Healthcare or Administrative)
-            is_healthcare: bool = Healthcare.objects.filter(user=user).exists()
+            is_healthcare: bool = Healthcare.objects.filter(
+                base_staff__system_user=user
+            ).exists()
             if not (is_healthcare):
                 return {
                     'response': 'Solamente el personal de salud puede acceder a este recurso.',
-                    'msg': -1,
-                    'status_code_http': 403
+                    'msg': self.FAILURE,
+                    'status_code_http': HTTP_403_FORBIDDEN
                 }                  
             # Calculate time threshold (48 hours ago)
             time_threshold: timezone.datetime = timezone.now() - timedelta(hours=48)
@@ -71,12 +81,18 @@ class ListBuzonApplicationService:
             draft_reports: QuerySet[PatientTransportReport] = base_queryset.filter(status='borrador')
             completed_reports: QuerySet[PatientTransportReport] = base_queryset.filter(status='completado')
             # Serialize data
-            draft_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(draft_reports, many=True)
-            completed_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(completed_reports, many=True)
+            draft_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(
+                draft_reports, 
+                many=True
+            )
+            completed_serializer: PatientTransportReportSummarySerializer = PatientTransportReportSummarySerializer(
+                completed_reports, 
+                many=True
+            )
             return {
                 'response': 'Exito al recuperar los informes del usuario.',
-                'msg': 1,
-                'status_code_http': 200,
+                'msg': self.SUCCESS,
+                'status_code_http': HTTP_200_OK,
                 'list_report_draft': draft_serializer.data,
                 'list_report_completed': completed_serializer.data,
                 'total_draft': draft_reports.count(),
@@ -85,6 +101,6 @@ class ListBuzonApplicationService:
         except Exception as e:
             return {
                 'response': f'Error retrieving user reports: {str(e)}',
-                'msg': -1,
-                'status_code_http': 500
+                'msg': self.FAILURE,
+                'status_code_http': HTTP_500_INTERNAL_SERVER_ERROR
             }
