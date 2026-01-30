@@ -83,7 +83,6 @@ class GetDetailUserApplicationService:
                     'phone_number': user_detail.phone_number,
                     'address': user_detail.address,
                     'birth_date': user_detail.birth_date,
-                    'signature_url': user_detail.signature_url,
                     'created_at': user_detail.created_at,
                     'updated_at': user_detail.updated_at,
                 },
