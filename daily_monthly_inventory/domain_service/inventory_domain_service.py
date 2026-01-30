@@ -46,9 +46,17 @@ class InventoryDomainService:
         month: int | None = None,
         year: int | None = None,
         day: int | None = None,
+        system_user_id: int | None = None,
     ) -> InventoryListResponse:
         """
         Retrieve all daily/monthly inventories with basic information.
+
+        Args:
+            ambulance_id: Optional ambulance ID to filter by
+            month: Optional month to filter by
+            year: Optional year to filter by
+            day: Optional day to filter by
+            system_user_id: Optional user ID to filter by (for healthcare staff)
 
         Returns:
             InventoryListResponse with list of inventory items
@@ -61,6 +69,10 @@ class InventoryDomainService:
                 ).filter(is_deleted=False)
             )
 
+            # Filter by user if specified (for healthcare staff)
+            if system_user_id is not None:
+                inventories_qs = inventories_qs.filter(system_user__id=system_user_id)
+            
             if ambulance_id is not None:
                 inventories_qs = inventories_qs.filter(ambulance__id=ambulance_id)
             if month is not None:

@@ -8,6 +8,7 @@ from daily_monthly_inventory.types.dataclass import (
     InventoryListResponse,
     InventoryListItem,
 )
+from staff.models import Healthcare, Administrative
 
 
 class ListInventoryApplicationService:
@@ -33,15 +34,48 @@ class ListInventoryApplicationService:
 
         Args:
             requesting_user: User making the request
+            ambulance_id: Optional ambulance ID filter
+            month: Optional month filter
+            day: Optional day filter
+            year: Optional year filter
 
         Returns:
             dictionary with response data and status
         """
         try:
-            # Get all inventories with optional filters
+            # Determine if user should see only their own inventories
+            system_user_filter: int | None = None
+            
+            # Check if user is superuser or administrative (can see all inventories)
+            is_superuser: bool = requesting_user.is_superuser
+            is_administrative: bool = Administrative.objects.filter(
+                base_staff__system_user=requesting_user
+            ).exists()
+            
+            # If user is healthcare (not superuser or administrative), filter by their user ID
+            if not is_superuser and not is_administrative:
+                is_healthcare: bool = Healthcare.objects.filter(
+                    base_staff__system_user=requesting_user
+                ).exists()
+                
+                if is_healthcare:
+                    system_user_filter = requesting_user.id
+                    self.logger.info(
+                        f"Healthcare user {requesting_user.username} - filtering inventories by user ID"
+                    )
+            else:
+                self.logger.info(
+                    f"User {requesting_user.username} has full access - showing all inventories"
+                )
+            
+            # Get inventories with optional filters
             inventory_response: InventoryListResponse = (
                 self.inventory_domain_service.get_all_inventories(
-                    ambulance_id=ambulance_id, month=month, day=day, year=year
+                    ambulance_id=ambulance_id,
+                    month=month,
+                    day=day,
+                    year=year,
+                    system_user_id=system_user_filter,
                 )
             )
             inventory_items: list[InventoryListItem] = inventory_response.inventories
