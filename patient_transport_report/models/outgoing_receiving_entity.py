@@ -12,6 +12,8 @@ class OutgoingReceivingEntity(models.Model):
         max_length=100,
         null=True,
         blank=True,
+        db_index=True,
+        unique=True,
         help_text='Document identifier of the entity'    
     )
     staff_title = models.CharField(

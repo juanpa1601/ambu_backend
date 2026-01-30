@@ -15,26 +15,15 @@ class PatientTransportReportDetailSerializer(serializers.ModelSerializer):
     care_transfer_report: CareTransferReportDetailSerializer = CareTransferReportDetailSerializer(read_only=True)
     satisfaction_survey: SatisfactionSurveyDetailSerializer = SatisfactionSurveyDetailSerializer(read_only=True)
     
-    created_by_username: serializers.CharField = serializers.CharField(
-        source='created_by.username', 
-        read_only=True,
-        allow_null=True
-    )
     created_by_full_name: serializers.SerializerMethodField = serializers.SerializerMethodField()
-    
-    updated_by_username: serializers.CharField = serializers.CharField(
-        source='updated_by.username', 
-        read_only=True,
-        allow_null=True
-    )
     updated_by_full_name: serializers.SerializerMethodField = serializers.SerializerMethodField()
     
     class Meta:
         model = PatientTransportReport
         fields = [
             'id',
-            'patient',
             'attending_staff',
+            'patient',
             'informed_consent',
             'care_transfer_report',
             'satisfaction_survey',
@@ -42,10 +31,8 @@ class PatientTransportReportDetailSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'created_by',
-            'created_by_username',
             'created_by_full_name',
             'updated_by',
-            'updated_by_username',
             'updated_by_full_name'
         ]
         read_only_fields = fields

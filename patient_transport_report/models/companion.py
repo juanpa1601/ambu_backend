@@ -12,6 +12,8 @@ class Companion(models.Model):
         null=True,
         blank=True,
         max_length=100,
+        unique=True,
+        db_index=True,
         help_text='Identification document number'
     )
     kindship = models.CharField(
