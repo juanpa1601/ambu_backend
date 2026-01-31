@@ -20,35 +20,65 @@ class DailyMonthlyInventory(models.Model):
         BiomedicalEquipment, on_delete=models.CASCADE, null=True, blank=True
     )
     accessories_case = models.ForeignKey(
-        AccessoriesCase, on_delete=models.CASCADE, null=True, blank=True
+        AccessoriesCase,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     respiratory = models.ForeignKey(
-        Respiratory, on_delete=models.CASCADE, null=True, blank=True
+        Respiratory,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     immobilization_and_safety = models.ForeignKey(
-        ImmobilizationAndSafety, on_delete=models.CASCADE, null=True, blank=True
+        ImmobilizationAndSafety,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     surgical = models.ForeignKey(
-        Surgical, on_delete=models.CASCADE, null=True, blank=True
+        Surgical,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     accessories = models.ForeignKey(
-        Accessories, on_delete=models.CASCADE, null=True, blank=True
+        Accessories,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     additionals = models.ForeignKey(
-        Additionals, on_delete=models.CASCADE, null=True, blank=True
+        Additionals,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     pediatric = models.ForeignKey(
-        Pediatric, on_delete=models.CASCADE, null=True, blank=True
+        Pediatric,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     circulatory = models.ForeignKey(
-        Circulatory, on_delete=models.CASCADE, null=True, blank=True
+        Circulatory,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
     ambulance_kit = models.ForeignKey(
-        AmbulanceKit, on_delete=models.CASCADE, null=True, blank=True
+        AmbulanceKit,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
     )
 
     system_user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     ambulance = models.ForeignKey(
         Ambulance,
@@ -65,7 +95,7 @@ class DailyMonthlyInventory(models.Model):
     )
     support_staff = models.TextField(
         blank=True,
-        default="",
+        null=True,
     )
 
     date = models.DateField()
@@ -75,32 +105,79 @@ class DailyMonthlyInventory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     is_completed = models.BooleanField(default=False)
-    is_deleted = models.BooleanField(default=False, db_index=True)
+
+    is_deleted = models.BooleanField(
+        default=False,
+        db_index=True,
+    )
 
     def __str__(self):
         return f"DailyMonthlyInventory {self.date} ({self.pk})"
 
     def calculate_is_completed(self) -> bool:
         """
-        Check if the inventory is complete.
-        An inventory is considered complete when all equipment categories have data,
-        excluding optional fields like support_staff and observations.
+        Determina si el inventario está completo.
 
-        Returns:
-            bool: True if all required fields are filled, False otherwise
+        Reglas:
+        - Campos obligatorios del inventario: date, ambulance, shift, system_user
+        - Exige que todas las relaciones de equipamiento no sean None
+        - Para cada objeto relacionado, valida todos sus campos de modelo:
+            - Los campos PK/autoincrement se ignoran.
+            - `None` o strings vacíos cuentan como "vacío" -> no completado.
+            - Valores numéricos (incluyendo 0) y booleanos se consideran válidos.
+        - Campos opcionales que NO se validan: support_staff, observations, observations_comments
         """
-        # Check if all equipment categories exist (not None)
-        return all(
-            [
-                self.biomedical_equipment is not None,
-                self.surgical is not None,
-                self.accessories_case is not None,
-                self.respiratory is not None,
-                self.immobilization_and_safety is not None,
-                self.accessories is not None,
-                self.additionals is not None,
-                self.pediatric is not None,
-                self.circulatory is not None,
-                self.ambulance_kit is not None,
-            ]
-        )
+        # Campos opcionales que se ignoran en la validación
+        optional_fields = ['observations_comments']
+        
+        # Validar campos obligatorios del inventario principal
+        if self.date is None:
+            return False
+        if self.ambulance is None:
+            return False
+        if self.shift is None:
+            return False
+        if self.system_user is None:
+            return False
+
+        # Relaciones de equipamiento a revisar (todas obligatorias)
+        related_attrs = [
+            "accessories",
+            "accessories_case",
+            "additionals",
+            "ambulance_kit",
+            "biomedical_equipment",
+            "circulatory",
+            "immobilization_and_safety",
+            "pediatric",
+            "respiratory",
+            "surgical",
+        ]
+
+        for attr in related_attrs:
+            rel_obj = getattr(self, attr, None)
+            if rel_obj is None:
+                return False
+
+            # Inspeccionar cada campo del modelo relacionado
+            for field in rel_obj._meta.fields:
+                # Ignorar PK/autoincrement y campos auto generados
+                if getattr(field, "primary_key", False):
+                    continue
+                
+                # Ignorar campos opcionales específicos
+                if field.name in optional_fields:
+                    continue
+                    
+                # Obtener valor
+                value = getattr(rel_obj, field.name, None)
+                # None => incompleto
+                if value is None:
+                    return False
+                # Cadenas vacías => incompleto
+                if isinstance(value, str) and value.strip() == "":
+                    return False
+                # Para otros tipos (int, bool, float, date, ...) asumimos que el valor presente es válido
+
+        # Si pasó todas las comprobaciones, está completo
+        return True

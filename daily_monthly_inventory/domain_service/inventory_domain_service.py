@@ -46,9 +46,17 @@ class InventoryDomainService:
         month: int | None = None,
         year: int | None = None,
         day: int | None = None,
+        system_user_id: int | None = None,
     ) -> InventoryListResponse:
         """
         Retrieve all daily/monthly inventories with basic information.
+
+        Args:
+            ambulance_id: Optional ambulance ID to filter by
+            month: Optional month to filter by
+            year: Optional year to filter by
+            day: Optional day to filter by
+            system_user_id: Optional user ID to filter by (for healthcare staff)
 
         Returns:
             InventoryListResponse with list of inventory items
@@ -58,10 +66,13 @@ class InventoryDomainService:
             inventories_qs: QuerySet[DailyMonthlyInventory] = (
                 DailyMonthlyInventory.objects.select_related(
                     "system_user", "ambulance", "shift"
-                )
-                .filter(is_deleted=False)
+                ).filter(is_deleted=False)
             )
 
+            # Filter by user if specified (for healthcare staff)
+            if system_user_id is not None:
+                inventories_qs = inventories_qs.filter(system_user__id=system_user_id)
+            
             if ambulance_id is not None:
                 inventories_qs = inventories_qs.filter(ambulance__id=ambulance_id)
             if month is not None:
@@ -103,7 +114,7 @@ class InventoryDomainService:
                     person_name=person_name,
                     mobile_number=mobile_number,
                     date=inventory.date,
-                    is_completed=inventory.calculate_is_completed(),
+                    is_completed=inventory.is_completed,  # Usar el valor guardado en BD
                     shift=model_to_dict(inventory.shift),
                 )
                 inventory_items.append(inventory_item)
@@ -236,7 +247,7 @@ class InventoryDomainService:
                 system_user=user,
                 ambulance=ambulance,
                 shift=shift,
-                support_staff=request.support_staff or "",
+                support_staff=request.support_staff,
                 biomedical_equipment=biomedical_equipment,
                 surgical=surgical,
                 accessories_case=accessories_case,
@@ -248,7 +259,7 @@ class InventoryDomainService:
                 circulatory=circulatory,
                 ambulance_kit=ambulance_kit,
                 date=request.date,
-                observations=request.observations or "",
+                observations=request.observations,
             )
 
             # Compute and persist is_completed
@@ -336,7 +347,7 @@ class InventoryDomainService:
                 ambulance_kit=model_to_dict(inventory.ambulance_kit),
                 created_at=inventory.created_at.isoformat(),
                 shift=model_to_dict(inventory.shift),
-                support_staff=inventory.support_staff or "",
+                support_staff=inventory.support_staff,
             )
 
             self.logger.info(f"Retrieved inventory detail for ID {inventory_id}")
@@ -413,10 +424,9 @@ class InventoryDomainService:
                 inventory.shift = shift
                 updated_fields.append("shift")
 
-            # Update support_staff if provided
-            if request.support_staff is not None:
-                inventory.support_staff = request.support_staff
-                updated_fields.append("support_staff")
+            # Update support_staff - always update to clear field when None is sent
+            inventory.support_staff = request.support_staff if request.support_staff else ""
+            updated_fields.append("support_staff")
 
             # Update equipment entities (create new or update existing)
             if request.biomedical_equipment is not None:
