@@ -7,12 +7,14 @@ from daily_monthly_inventory.views import (
     ListAmbulancesView,
     ListInventoryView,
     ListShiftsView,
+    SaveInventoryView,
     UpdateInventoryView,
 )
 
 urlpatterns = [
     path("list_inventories/", ListInventoryView.as_view(), name="inventory_list"),
     path("create_inventory/", CreateInventoryView.as_view(), name="create_inventory"),
+    path("save_inventory/", SaveInventoryView.as_view(), name="save_inventory"),
     path(
         "<int:inventory_id>/get_detail/",
         GetInventoryDetailView.as_view(),
