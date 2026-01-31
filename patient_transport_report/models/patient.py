@@ -91,7 +91,7 @@ class Patient(AuditedModel):
         null=True    
     )
 
-    # ✅ Manager personalizado
+    # Manager personalizado
     objects = ActiveManager()  # Excluye eliminados por defecto
     all_objects = models.Manager()  # Incluye todos
     

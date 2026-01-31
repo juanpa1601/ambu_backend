@@ -27,7 +27,6 @@ class CareTransferReportDetailSerializer(serializers.ModelSerializer):
     treatment: TreatmentDetailSerializer = TreatmentDetailSerializer(read_only=True)
     diagnosis_1: DiagnosisDetailSerializer = DiagnosisDetailSerializer(read_only=True)
     diagnosis_2: DiagnosisDetailSerializer = DiagnosisDetailSerializer(read_only=True)
-    ips: IPSDetailSerializer = IPSDetailSerializer(read_only=True)
     result: ResultDetailSerializer = ResultDetailSerializer(read_only=True)
     complications_transfer: ComplicationsTransferDetailSerializer = ComplicationsTransferDetailSerializer(read_only=True)
     receiving_entity: OutgoingReceivingEntityDetailSerializer = OutgoingReceivingEntityDetailSerializer(read_only=True)

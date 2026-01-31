@@ -34,6 +34,7 @@ class PatientDetailSerializer(serializers.ModelSerializer):
             'occupation',
             'patient_history',
             'insurance_provider',
+            'membership_category',
             'created_at',
             'updated_at'
         ]
