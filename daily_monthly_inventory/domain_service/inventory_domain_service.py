@@ -114,7 +114,7 @@ class InventoryDomainService:
                     person_name=person_name,
                     mobile_number=mobile_number,
                     date=inventory.date,
-                    is_completed=inventory.calculate_is_completed(),
+                    is_completed=inventory.is_completed,  # Usar el valor guardado en BD
                     shift=model_to_dict(inventory.shift),
                 )
                 inventory_items.append(inventory_item)

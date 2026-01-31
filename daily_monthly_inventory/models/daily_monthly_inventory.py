@@ -119,50 +119,65 @@ class DailyMonthlyInventory(models.Model):
         Determina si el inventario está completo.
 
         Reglas:
-        - Exige que las relaciones principales no sean None (p. ej. biomedical_equipment, surgical, ...).
+        - Campos obligatorios del inventario: date, ambulance, shift, system_user
+        - Exige que todas las relaciones de equipamiento no sean None
         - Para cada objeto relacionado, valida todos sus campos de modelo:
             - Los campos PK/autoincrement se ignoran.
             - `None` o strings vacíos cuentan como "vacío" -> no completado.
             - Valores numéricos (incluyendo 0) y booleanos se consideran válidos.
-        - No tiene en cuenta `support_staff` ni `observations` del propio inventario.
+        - Campos opcionales que NO se validan: support_staff, observations, observations_comments
         """
-        # relaciones a revisar
-        related_attrs = [
-            "biomedical_equipment",
-            "surgical",
-            "accessories_case",
-            "respiratory",
-            "immobilization_and_safety",
-            "accessories",
-            "additionals",
-            "pediatric",
-            "circulatory",
-            "ambulance_kit",
-        ]
-
-        # date y ambulance son obligatorios para considerar completado
-        if self.date is None or self.ambulance is None:
+        # Campos opcionales que se ignoran en la validación
+        optional_fields = ['observations_comments']
+        
+        # Validar campos obligatorios del inventario principal
+        if self.date is None:
             return False
+        if self.ambulance is None:
+            return False
+        if self.shift is None:
+            return False
+        if self.system_user is None:
+            return False
+
+        # Relaciones de equipamiento a revisar (todas obligatorias)
+        related_attrs = [
+            "accessories",
+            "accessories_case",
+            "additionals",
+            "ambulance_kit",
+            "biomedical_equipment",
+            "circulatory",
+            "immobilization_and_safety",
+            "pediatric",
+            "respiratory",
+            "surgical",
+        ]
 
         for attr in related_attrs:
             rel_obj = getattr(self, attr, None)
             if rel_obj is None:
                 return False
 
-            # inspeccionar cada campo del modelo relacionado
+            # Inspeccionar cada campo del modelo relacionado
             for field in rel_obj._meta.fields:
-                # ignorar PK/autoincrement y campos auto generados
+                # Ignorar PK/autoincrement y campos auto generados
                 if getattr(field, "primary_key", False):
                     continue
-                # obtener valor
+                
+                # Ignorar campos opcionales específicos
+                if field.name in optional_fields:
+                    continue
+                    
+                # Obtener valor
                 value = getattr(rel_obj, field.name, None)
                 # None => incompleto
                 if value is None:
                     return False
-                # cadenas vacías => incompleto
+                # Cadenas vacías => incompleto
                 if isinstance(value, str) and value.strip() == "":
                     return False
-                # para otros tipos (int, bool, float, date, ...) asumimos que el valor presente es válido
+                # Para otros tipos (int, bool, float, date, ...) asumimos que el valor presente es válido
 
-        # si pasó todas las comprobaciones, está completo
+        # Si pasó todas las comprobaciones, está completo
         return True
