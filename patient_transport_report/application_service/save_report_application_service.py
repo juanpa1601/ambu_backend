@@ -123,7 +123,10 @@ class SaveReportApplicationService:
                 'attending_staff': f'Personal de Salud con ID {attending_staff_id} no encontrado.'
             })
         # 2. Create Patient
-        patient: Patient = self.domain_service.create_or_update_patient(data['patient'])
+        patient: Patient = self.domain_service.create_or_update_patient(
+            data['patient'],
+            None
+        )
         sections_created.append('patient')
         # 3. Create PatientTransportReport (initially empty)
         report: PatientTransportReport = PatientTransportReport.objects.create(
