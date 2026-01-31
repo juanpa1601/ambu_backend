@@ -208,12 +208,10 @@ class CareTransferReport(AuditedModel):
         blank=True,
         help_text='Results obtained during the transport'
     )
-    ips = models.ForeignKey(
-        IPS,
-        on_delete=models.CASCADE,
-        related_name='ips_care_transfer_reports',
-        null=True,
+    ips = models.CharField(
+        max_length=100,
         blank=True,
+        null=True,
         help_text='IPS associated with the care transfer report'
     )
     complications_transfer = models.OneToOneField(

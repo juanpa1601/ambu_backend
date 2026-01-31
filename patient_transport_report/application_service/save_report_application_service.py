@@ -166,8 +166,16 @@ class SaveReportApplicationService:
             if satisfaction:
                 report.satisfaction_survey = satisfaction
                 sections_created.append('satisfaction_survey')
-        # 7. Update tracking flags
-        self.domain_service.update_tracking_flags(report)
+        # 7. Verify report completion
+        completion_percentage: int
+        completed: bool
+        completion_percentage, completed = self.domain_service.get_report_completion_info(data)
+        report.completion_percentage = completion_percentage
+        if completed:
+            report.status = 'completado'
+        else:
+            report.status = 'borrador'
+        report.save()
         return {
             'message': 'Reporte creado exitosamente.',
             'report_data': self._build_response_data(
@@ -236,7 +244,16 @@ class SaveReportApplicationService:
                 sections_updated.append('satisfaction_survey')
         # 5. Update tracking
         report.updated_by = user
-        self.domain_service.update_tracking_flags(report)
+        # 6. Verify report completion
+        completion_percentage: int
+        completed: bool
+        completion_percentage, completed = self.domain_service.get_report_completion_info(data)
+        report.completion_percentage = completion_percentage
+        if completed:
+            report.status = 'completado'
+        else:
+            report.status = 'borrador'
+        report.save()
         return {
             'message': 'Reporte actualizado exitosamente.',
             'report_data': self._build_response_data(report, sections_updated)

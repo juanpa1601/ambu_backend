@@ -351,12 +351,97 @@ class SaveReportDomainService:
         return errors
     
     @staticmethod
-    def update_tracking_flags(report: PatientTransportReport) -> None:
-        '''Update completion tracking flags'''
+    def get_report_completion_info(data: dict) -> tuple[int, bool]:
+        '''
+        Evaluate whether all required fields in the report are complete..
+        Returns True if all required fields have a value other than None and "".
+        '''
+        # List of paths to required fields (using your structure)
+        required_fields: list[list[str]] = [
+            ['attending_staff'],
+            # Patient
+            ['patient', 'patient_name'],
+            ['patient', 'identification_type'],
+            ['patient', 'other_identification_type'],
+            ['patient', 'identification_number'],
+            ['patient', 'birth_date'],
+            ['patient', 'sex'],
+            ['patient', 'home_address'],
+            ['patient', 'residence_city'],
+            ['patient', 'cell_phone'],
+            ['patient', 'patient_history', 'has_pathology'],
+            ['patient', 'patient_history', 'has_allergies'],
+            ['patient', 'patient_history', 'has_surgeries'],
+            ['patient', 'patient_history', 'has_medicines'],
+            ['patient', 'patient_history', 'tobacco_use'],
+            ['patient', 'patient_history', 'substance_use'],
+            ['patient', 'patient_history', 'alcohol_use'],
+            ['patient', 'insurance_provider', 'coverage_type'],
+            ['patient', 'insurance_provider', 'provider_name'],
+            ['patient', 'membership_category'],
+            # Informed consent
+            ['informed_consent', 'consent_timestamp'],
+            ['informed_consent', 'guardian_type'],
+            ['informed_consent', 'guardian_name'],
+            ['informed_consent', 'responsible_for'],
+            ['informed_consent', 'guardian_id_type'],
+            ['informed_consent', 'guardian_id_number'],
+            ['informed_consent', 'administers_medications'],
+            ['informed_consent', 'service_type'],
+            ['informed_consent', 'attending_staff_signature'],
+            # Care transfer report
+            ['care_transfer_report', 'patient_one_of'],
+            ['care_transfer_report', 'service_type'],
+            ['care_transfer_report', 'initial_address'],
+            ['care_transfer_report', 'transfer_type'],
+            ['care_transfer_report', 'driver'],
+            ['care_transfer_report', 'ambulance'],
+            ['care_transfer_report', 'initial_physical_exam', 'systolic'],
+            ['care_transfer_report', 'initial_physical_exam', 'diastolic'],
+            ['care_transfer_report', 'initial_physical_exam', 'heart_rate'],
+            ['care_transfer_report', 'initial_physical_exam', 'respiratory_rate'],
+            ['care_transfer_report', 'initial_physical_exam', 'oxygen_saturation'],
+            ['care_transfer_report', 'initial_physical_exam', 'temperature'],
+            ['care_transfer_report', 'initial_physical_exam', 'glasgow', 'motor'],
+            ['care_transfer_report', 'initial_physical_exam', 'glasgow', 'motor_text'],
+            ['care_transfer_report', 'initial_physical_exam', 'glasgow', 'verbal'],
+            ['care_transfer_report', 'initial_physical_exam', 'glasgow', 'verbal_text'],
+            ['care_transfer_report', 'initial_physical_exam', 'glasgow', 'eyes_opening'],
+            ['care_transfer_report', 'initial_physical_exam', 'glasgow', 'eyes_opening_text'],
+            ['care_transfer_report', 'skin_condition'],
+            ['care_transfer_report', 'hemodynamic_status'],
+            ['care_transfer_report', 'treatment', 'monitors_vital_signs'],
+            ['care_transfer_report', 'treatment', 'oxygen'],
+            ['care_transfer_report', 'diagnosis_1'],
+            ['care_transfer_report', 'ips'],
+            ['care_transfer_report', 'complications_transfer', 'description_complication'],
+            ['care_transfer_report', 'notes'],
+            ['care_transfer_report', 'final_physical_exam', 'systolic'],
+            ['care_transfer_report', 'final_physical_exam', 'diastolic'],
+            ['care_transfer_report', 'final_physical_exam', 'heart_rate'],
+            ['care_transfer_report', 'final_physical_exam', 'respiratory_rate'],
+            ['care_transfer_report', 'final_physical_exam', 'oxygen_saturation'],
+            ['care_transfer_report', 'final_physical_exam', 'temperature'],
+            # satisfaction_survey
+            ['satisfaction_survey', 'satisfaction_survey_conducted'],
+        ]
 
-        report.has_patient_info = bool(report.patient_id)
-        report.has_informed_consent = bool(report.informed_consent_id)
-        report.has_care_transfer = bool(report.care_transfer_report_id)
-        report.has_satisfaction_survey = bool(report.satisfaction_survey_id)
-        report.completion_percentage = report.calculate_completion()
-        report.save()
+        def get_nested(
+            data: dict, 
+            keys: list[str]
+        ) -> str | None:
+            for key in keys:
+                if isinstance(data, dict) and key in data:
+                    data = data[key]
+                else:
+                    return None
+            return data
+        total: int = len(required_fields)
+        completed: int = 0
+        for path in required_fields:
+            value = get_nested(data, path)
+            if value not in (None, ""):
+                completed += 1
+        percentage: int = int((completed / total) * 100) if total > 0 else 0
+        is_complete: bool = (percentage == 100)
+        return percentage, is_complete

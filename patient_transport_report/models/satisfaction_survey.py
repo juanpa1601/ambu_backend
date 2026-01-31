@@ -3,6 +3,11 @@ from core.models import AuditedModel
 
 class SatisfactionSurvey(AuditedModel):
 
+    satisfaction_survey_conducted = models.BooleanField(
+        null=True,
+        blank=True,
+        help_text='Indicates if the satisfaction survey was conducted'
+    )
     ambulance_request_ease = models.CharField(
         max_length=100,
         null=True,

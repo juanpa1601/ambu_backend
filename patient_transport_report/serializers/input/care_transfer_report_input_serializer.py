@@ -124,9 +124,10 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         required=False, 
         allow_null=True
     )
-    ips = serializers.IntegerField(
+    ips = serializers.CharField(
         required=False, 
-        allow_null=True
+        allow_null=True,
+        allow_blank=True
     )
     complications_transfer = ComplicationsInputSerializer(
         required=False, 

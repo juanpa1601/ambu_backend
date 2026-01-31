@@ -2,6 +2,10 @@ from rest_framework import serializers
 
 class SatisfactionSurveyInputSerializer(serializers.Serializer):
     '''Input serializer for Satisfaction Survey'''
+    satisfaction_survey_conducted: serializers.BooleanField = serializers.BooleanField(
+        required=False,
+        allow_null=True
+    )
     ambulance_request_ease: serializers.CharField = serializers.CharField(
         max_length=50, 
         required=False, 
