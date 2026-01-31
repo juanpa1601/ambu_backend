@@ -64,7 +64,8 @@ class InformedConsentInputSerializer(serializers.Serializer):
         required=False,
         allow_null=True,
         allow_blank=True,
-        choices=['traslado asistencial de baja complejidad', 'atención prehospitalaria doble'],
+        choices=['traslado asistencial de baja complejidad', 
+                 'atención prehospitalaria doble'],
         help_text='Type of service provided'
     )
     other_implications = serializers.CharField(

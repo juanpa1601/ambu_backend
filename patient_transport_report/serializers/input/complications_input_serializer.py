@@ -20,7 +20,7 @@ class ComplicationsInputSerializer(serializers.Serializer):
     )
     waiting_time: serializers.CharField = serializers.CharField(
         required=False, 
-        allow_blank=True
+        allow_null=True
     )
     time_code: serializers.CharField = serializers.CharField(
         required=False, 
