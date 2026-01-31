@@ -1,3 +1,4 @@
+from typing import Any
 from patient_transport_report.models import (
     Patient,
     PatientHistory,
@@ -448,11 +449,11 @@ class SaveReportDomainService:
             ['care_transfer_report', 'end_attention_time'],
         ]
 
-        # Helper para obtener valor anidado
+        # Helper to get nested value
         def get_nested(
             data: dict, 
             keys: list[str]
-        ) -> dict | None:
+        ) -> Any:
             for key in keys:
                 if isinstance(data, dict) and key in data:
                     data = data[key]
@@ -460,7 +461,7 @@ class SaveReportDomainService:
                     return None
             return data
         # 1. Determine transfer_type
-        transfer_type: dict | None = get_nested(data, ['care_transfer_report', 'transfer_type'])
+        transfer_type: str | None = get_nested(data, ['care_transfer_report', 'transfer_type'])
         if transfer_type == 'traslado asistencial básico-doble':
             required_fields += hour_fields_double
         elif transfer_type == 'traslado asistencial básico-sencillo':
@@ -474,12 +475,17 @@ class SaveReportDomainService:
                 if procedure.get(pf) not in (None, ""):
                     procedure_valid = True
                     break
+        # 3. responsible_for solo obligatorio si guardian_type es acompañante o familiar
+        guardian_type: str | None = get_nested(data, ['informed_consent', 'guardian_type'])
+        responsible_for_required: bool = guardian_type in ('acompañante', 'familiar')
+        if responsible_for_required:
+            required_fields.append(['informed_consent', 'responsible_for'])                
         # If none, it is considered incomplete
         total: int = len(required_fields) + 1  # +1 for procedure
         completed: int = 0
-        # 3. Count completed fields
+        # 4. Count completed fields
         for path in required_fields:
-            value: dict | None = get_nested(data, path)
+            value: Any = get_nested(data, path)
             if value not in (None, ""):
                 completed += 1
         if procedure_valid:
