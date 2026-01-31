@@ -178,22 +178,32 @@ class InventoryDomainService:
             # Validate no duplicate inventory exists (same ambulance, day/month/year, and shift)
             # Note: Using .objects (ActiveManager) automatically filters is_deleted=False
             if shift:
-                existing_inventory: bool = DailyMonthlyInventory.objects.filter(
+                existing_inventory: DailyMonthlyInventory | None = DailyMonthlyInventory.objects.filter(
                     ambulance=ambulance,
                     date__year=request.date.year,
                     date__day=request.date.day,
                     date__month=request.date.month,
                     shift=shift,
-                ).exists()
+                ).select_related('created_by').first()
 
                 if existing_inventory:
+                    # Get creator's name for better error message
+                    created_by_name: str = "Usuario desconocido"
+                    if existing_inventory.created_by:
+                        created_by_name = (
+                            existing_inventory.created_by.get_full_name() 
+                            or existing_inventory.created_by.username
+                        )
+                    
                     self.logger.warning(
                         f"Duplicate inventory detected for ambulance {ambulance.id}, "
-                        f"date {request.date.day}-{request.date.month}-{request.date.year}, shift {shift.name}"
+                        f"date {request.date.day}-{request.date.month}-{request.date.year}, "
+                        f"shift {shift.name}, created by {created_by_name}"
                     )
                     raise ValueError(
                         f"Ya existe un inventario para la ambulancia {ambulance.mobile_number} "
-                        f"en la fecha {request.date.strftime('%d/%m/%Y')} para la jornada de {shift.name}."
+                        f"en la fecha {request.date.strftime('%d/%m/%Y')} para la jornada de {shift.name}, "
+                        f"creado por {created_by_name}."
                     )
 
             # Create all optional foreign key records from provided data
