@@ -412,7 +412,7 @@ class SaveReportApplicationService:
         if 'diagnosis_2' in data and data['diagnosis_2']:
             care_data['diagnosis_2'] = Diagnosis.objects.get(id=data['diagnosis_2'])
         if 'ips' in data and data['ips']:
-            care_data['ips'] = IPS.objects.get(id=data['ips'])
+            care_data['ips'] = data['ips']
         if existing:
             # Update existing
             for key, value in care_data.items():
