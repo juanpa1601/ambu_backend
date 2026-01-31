@@ -92,7 +92,6 @@ class GetDetailsReportApplicationService:
                 'care_transfer_report__treatment',
                 'care_transfer_report__diagnosis_1',
                 'care_transfer_report__diagnosis_2',
-                'care_transfer_report__ips',
                 'care_transfer_report__result',
                 'care_transfer_report__complications_transfer',
                 'care_transfer_report__receiving_entity',
