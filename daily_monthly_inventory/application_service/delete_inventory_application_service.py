@@ -46,8 +46,8 @@ class DeleteInventoryApplicationService:
                     "status_code_http": 404,
                 }
 
-            # Step 2: Soft-delete the inventory
-            if getattr(inventory, "is_deleted", False):
+            # Step 2: Soft-delete the inventory using AuditedModel method
+            if inventory.is_deleted:
                 # already deleted
                 return {
                     "response": f"Inventario con ID {inventory_id} ya está eliminado.",
@@ -55,8 +55,8 @@ class DeleteInventoryApplicationService:
                     "status_code_http": 400,
                 }
 
-            inventory.is_deleted = True
-            inventory.save()
+            # Use soft_delete method from AuditedModel (tracks deleted_by and deleted_at)
+            inventory.soft_delete(user=requesting_user)
 
             # Step 3: Build response
             self.logger.info(

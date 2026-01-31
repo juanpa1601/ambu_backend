@@ -8,6 +8,7 @@ class UpdateInventoryRequest:
     """DTO for updating an inventory."""
 
     inventory_id: int
+    updated_by_id: int  # User ID for audit trail
     date: date | None = None
     observations: str | None = None
     ambulance_id: int | None = None

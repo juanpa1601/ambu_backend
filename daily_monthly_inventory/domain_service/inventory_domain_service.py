@@ -63,10 +63,11 @@ class InventoryDomainService:
         """
         try:
             # Query DailyMonthlyInventory with related system_user, ambulance and shift
+            # Note: Using .objects (ActiveManager) automatically filters is_deleted=False
             inventories_qs: QuerySet[DailyMonthlyInventory] = (
                 DailyMonthlyInventory.objects.select_related(
                     "system_user", "ambulance", "shift"
-                ).filter(is_deleted=False)
+                )
             )
 
             # Filter by user if specified (for healthcare staff)
@@ -175,6 +176,7 @@ class InventoryDomainService:
                     raise ValueError(f"La jornada con ID {request.shift_id} no existe")
 
             # Validate no duplicate inventory exists (same ambulance, day/month/year, and shift)
+            # Note: Using .objects (ActiveManager) automatically filters is_deleted=False
             if shift:
                 existing_inventory: bool = DailyMonthlyInventory.objects.filter(
                     ambulance=ambulance,
@@ -182,7 +184,6 @@ class InventoryDomainService:
                     date__day=request.date.day,
                     date__month=request.date.month,
                     shift=shift,
-                    is_deleted=False,
                 ).exists()
 
                 if existing_inventory:
@@ -260,6 +261,9 @@ class InventoryDomainService:
                 ambulance_kit=ambulance_kit,
                 date=request.date,
                 observations=request.observations,
+                # Audit fields
+                created_by=user,
+                updated_by=user,
             )
 
             # Compute and persist is_completed
@@ -380,8 +384,18 @@ class InventoryDomainService:
         Raises:
             DailyMonthlyInventory.DoesNotExist: If inventory not found
             Ambulance.DoesNotExist: If ambulance_id provided but not found
+            User.DoesNotExist: If updated_by_id provided but user not found
         """
         try:
+            # Resolve user for audit trail
+            try:
+                user: User = User.objects.get(id=request.updated_by_id)
+            except User.DoesNotExist:
+                self.logger.error(
+                    f"User with ID {request.updated_by_id} does not exist"
+                )
+                raise
+
             # Get the inventory with all related objects
             inventory: DailyMonthlyInventory = (
                 DailyMonthlyInventory.objects.select_related(
@@ -536,6 +550,10 @@ class InventoryDomainService:
                         **request.ambulance_kit
                     )
                 updated_fields.append("ambulance_kit")
+
+            # Update audit trail
+            inventory.updated_by = user
+            updated_fields.append("updated_by")
 
             # Save inventory
             inventory.save()
