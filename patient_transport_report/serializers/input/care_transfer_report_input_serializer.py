@@ -16,7 +16,8 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         required=False,
         allow_null=True,
         allow_blank=True,
-        choices=['traslado asistencial básico-sencillo', 'traslado asistencial básico-doble'],
+        choices=['traslado asistencial básico-sencillo', 
+                 'traslado asistencial básico-doble'],
         help_text='Type of transfer provided'
     )
     initial_address = serializers.CharField(

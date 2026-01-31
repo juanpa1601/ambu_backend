@@ -388,7 +388,7 @@ class SaveReportDomainService:
             ['informed_consent', 'guardian_id_number'],
             ['informed_consent', 'administers_medications'],
             ['informed_consent', 'service_type'],
-            ['informed_consent', 'attending_staff_signature'],
+            ['informed_consent', 'attending_staff_signature'],            
             # Care transfer report
             ['care_transfer_report', 'patient_one_of'],
             ['care_transfer_report', 'service_type'],
@@ -422,26 +422,68 @@ class SaveReportDomainService:
             ['care_transfer_report', 'final_physical_exam', 'respiratory_rate'],
             ['care_transfer_report', 'final_physical_exam', 'oxygen_saturation'],
             ['care_transfer_report', 'final_physical_exam', 'temperature'],
+            ['care_transfer_report', 'final_physical_exam', 'glasgow', 'motor'],
+            ['care_transfer_report', 'final_physical_exam', 'glasgow', 'motor_text'],
+            ['care_transfer_report', 'final_physical_exam', 'glasgow', 'verbal'],
+            ['care_transfer_report', 'final_physical_exam', 'glasgow', 'verbal_text'],
+            ['care_transfer_report', 'final_physical_exam', 'glasgow', 'eyes_opening'],
+            ['care_transfer_report', 'final_physical_exam', 'glasgow', 'eyes_opening_text'],            
             # satisfaction_survey
             ['satisfaction_survey', 'satisfaction_survey_conducted'],
         ]
 
+        # Campos de hora según transfer_type
+        hour_fields_double: list[list[str]] = [
+            ['care_transfer_report', 'patient_arrival_time'],
+            ['care_transfer_report', 'patient_departure_time'],
+            ['care_transfer_report', 'arrival_time_patient'],
+            ['care_transfer_report', 'double_departure_time'],
+            ['care_transfer_report', 'double_arrival_time'],
+            ['care_transfer_report', 'end_attention_time'],
+        ]
+        hour_fields_simple: list[list[str]] = [
+            ['care_transfer_report', 'patient_arrival_time'],
+            ['care_transfer_report', 'patient_departure_time'],
+            ['care_transfer_report', 'arrival_time_patient'],
+            ['care_transfer_report', 'end_attention_time'],
+        ]
+
+        # Helper para obtener valor anidado
         def get_nested(
             data: dict, 
             keys: list[str]
-        ) -> str | None:
+        ) -> dict | None:
             for key in keys:
                 if isinstance(data, dict) and key in data:
                     data = data[key]
                 else:
                     return None
             return data
-        total: int = len(required_fields)
+        # 1. Determine transfer_type
+        transfer_type: dict | None = get_nested(data, ['care_transfer_report', 'transfer_type'])
+        if transfer_type == 'traslado asistencial básico-doble':
+            required_fields += hour_fields_double
+        elif transfer_type == 'traslado asistencial básico-sencillo':
+            required_fields += hour_fields_simple
+        # 2. Validate procedure: at least one must be marked (not None or "")
+        procedure: dict | None = get_nested(data, ['informed_consent', 'procedure'])
+        procedure_fields: list[str] = ['immobilization', 'stretcher_transfer', 'ambulance_transport', 'assessment']
+        procedure_valid: bool = False
+        if isinstance(procedure, dict):
+            for pf in procedure_fields:
+                if procedure.get(pf) not in (None, ""):
+                    procedure_valid = True
+                    break
+        # If none, it is considered incomplete
+        total: int = len(required_fields) + 1  # +1 for procedure
         completed: int = 0
+        # 3. Count completed fields
         for path in required_fields:
-            value = get_nested(data, path)
+            value: dict | None = get_nested(data, path)
             if value not in (None, ""):
                 completed += 1
+        if procedure_valid:
+            completed += 1
         percentage: int = int((completed / total) * 100) if total > 0 else 0
         is_complete: bool = (percentage == 100)
         return percentage, is_complete
