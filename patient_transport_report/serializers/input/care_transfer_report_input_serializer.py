@@ -12,7 +12,7 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         required=False, 
         allow_null=True
     )
-    transfer_type = serializers.ChoiceField(
+    service_type = serializers.ChoiceField(
         required=False,
         allow_null=True,
         allow_blank=True,
@@ -27,7 +27,7 @@ class CareTransferReportInputSerializer(serializers.Serializer):
         required=False, 
         allow_blank=True
     )
-    service_type = serializers.ChoiceField(
+    transfer_type = serializers.ChoiceField(
         required=False,
         allow_null=True,
         allow_blank=True,
