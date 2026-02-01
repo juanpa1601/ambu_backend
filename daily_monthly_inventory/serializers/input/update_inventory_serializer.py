@@ -103,11 +103,36 @@ class UpdateInventorySerializer(serializers.Serializer):
         """
         Validate that at least one field is provided for update.
         For save_inventory endpoint: skip validation if inventory_id is None (create mode).
+        For new inventories: require shift and ambulance fields.
         """
         inventory_id = data.get('inventory_id')
         
-        # If creating new inventory (inventory_id is None), skip the "at least one field" check
+        # If creating new inventory (inventory_id is None), require shift and ambulance
         if inventory_id is None:
+            # Validate shift is present
+            if 'shift' not in data or data.get('shift') is None:
+                raise serializers.ValidationError({
+                    'shift': 'La jornada es obligatoria para crear un inventario.'
+                })
+            # Validate shift has an id
+            shift_data = data.get('shift')
+            if isinstance(shift_data, dict) and not shift_data.get('id'):
+                raise serializers.ValidationError({
+                    'shift': 'Debe seleccionar una jornada válida.'
+                })
+            
+            # Validate ambulance is present
+            if 'ambulance_id' not in data or data.get('ambulance_id') is None:
+                raise serializers.ValidationError({
+                    'ambulance_id': 'La ambulancia es obligatoria para crear un inventario.'
+                })
+            # Validate ambulance_id is not zero or negative
+            ambulance_id = data.get('ambulance_id')
+            if isinstance(ambulance_id, int) and ambulance_id <= 0:
+                raise serializers.ValidationError({
+                    'ambulance_id': 'Debe seleccionar una ambulancia válida.'
+                })
+            
             return data
             
         # For updates, ensure at least one field besides inventory_id is provided

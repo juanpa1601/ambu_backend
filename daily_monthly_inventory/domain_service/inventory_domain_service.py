@@ -150,10 +150,10 @@ class InventoryDomainService:
             # Resolve ambulance by ID (required)
             if not request.ambulance_id:
                 self.logger.error(
-                    "Se requiere el ID de la ambulancia para crear el inventario"
+                    "Se requiere seleccionar una ambulancia para crear el inventario"
                 )
                 raise ValueError(
-                    "Se requiere el ID de la ambulancia para crear el inventario"
+                    "Se requiere seleccionar una ambulancia para crear el inventario"
                 )
 
             try:
