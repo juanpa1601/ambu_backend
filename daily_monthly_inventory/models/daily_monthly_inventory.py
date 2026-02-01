@@ -13,9 +13,10 @@ from .pediatric import Pediatric
 from .respiratory import Respiratory
 from .surgical import Surgical
 from .shift import Shift
+from core.models import AuditedModel, ActiveManager
 
 
-class DailyMonthlyInventory(models.Model):
+class DailyMonthlyInventory(AuditedModel):
     biomedical_equipment = models.ForeignKey(
         BiomedicalEquipment, on_delete=models.CASCADE, null=True, blank=True
     )
@@ -102,14 +103,11 @@ class DailyMonthlyInventory(models.Model):
 
     observations = models.TextField(blank=True, default="")
 
-    created_at = models.DateTimeField(auto_now_add=True)
-
     is_completed = models.BooleanField(default=False)
 
-    is_deleted = models.BooleanField(
-        default=False,
-        db_index=True,
-    )
+    # Managers
+    objects = ActiveManager()  # Excluye is_deleted=True por defecto
+    all_objects = models.Manager()  # Incluye todos los registros
 
     def __str__(self):
         return f"DailyMonthlyInventory {self.date} ({self.pk})"

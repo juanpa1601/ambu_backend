@@ -169,6 +169,7 @@ class SaveInventoryApplicationService:
             # Build UpdateInventoryRequest DTO
             request_dto: UpdateInventoryRequest = UpdateInventoryRequest(
                 inventory_id=inventory_id,
+                updated_by_id=user.id,  # Audit trail
                 date=data.get("date"),
                 observations=data.get("observations"),
                 ambulance_id=data.get("ambulance_id"),
