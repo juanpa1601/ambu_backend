@@ -8,7 +8,7 @@ class InformedConsentDetailSerializer(serializers.ModelSerializer):
     '''Complete serializer for InformedConsent with all nested data.'''
     
     outgoing_entity: OutgoingReceivingEntityDetailSerializer = OutgoingReceivingEntityDetailSerializer(read_only=True)
-    required_procedure: RequiredProcedureDetailSerializer = RequiredProcedureDetailSerializer(read_only=True)
+    required_procedures: RequiredProcedureDetailSerializer = RequiredProcedureDetailSerializer(read_only=True)
     medication_administration: MedicationAdministrationDetailSerializer = MedicationAdministrationDetailSerializer(read_only=True)
     
     class Meta:
@@ -21,7 +21,7 @@ class InformedConsentDetailSerializer(serializers.ModelSerializer):
             'responsible_for',
             'guardian_id_type',
             'guardian_id_number',
-            'required_procedure',
+            'required_procedures',
             'administers_medications',
             'medication_administration',
             'service_type',
