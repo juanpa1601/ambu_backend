@@ -10,7 +10,7 @@ class TreatmentInputSerializer(serializers.Serializer):
         required=False,
         allow_null=True
     )
-    liter_minute: serializers.FloatField = serializers.FloatField(
+    liters_minute: serializers.FloatField = serializers.FloatField(
         required=False,
         allow_null=True
     )
