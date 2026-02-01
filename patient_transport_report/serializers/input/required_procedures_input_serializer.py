@@ -24,5 +24,6 @@ class RequiredProceduresInputSerializer(serializers.Serializer):
     )
     other_procedure_details = serializers.CharField(
         required=False, 
-        allow_blank=True
+        allow_blank=True,
+        allow_null=True
     )
