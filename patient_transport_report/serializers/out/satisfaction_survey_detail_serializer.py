@@ -8,6 +8,7 @@ class SatisfactionSurveyDetailSerializer(serializers.ModelSerializer):
         model = SatisfactionSurvey
         fields = [
             'id',
+            'satisfaction_survey_conducted',
             'ambulance_request_ease',
             'phone_support_quality',
             'service_punctuality',
